@@ -38,6 +38,7 @@
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{
   background:var(--bg); color:var(--ink);
   font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
@@ -172,6 +173,12 @@ input[type=range]{accent-color:var(--accent);width:104px}
 .pin.done{border-color:var(--ok);color:var(--ok)}
 .pin[aria-current="true"]{background:var(--shu);color:var(--sheet);box-shadow:0 0 0 4px var(--shu-soft)}
 .pin.done[aria-current="true"]{background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft)}
+.stage3d{position:relative;width:100%;height:100%;min-height:340px;background:var(--sheet);border:1px solid var(--sheet-edge);box-shadow:0 2px 3px rgba(19,28,40,.10),0 14px 40px rgba(19,28,40,.16)}
+.stage3d canvas{display:block;width:100%;height:100%;touch-action:none}
+.stage3d.picking canvas{cursor:crosshair}
+.pin3d{z-index:2}
+.hud{position:absolute;left:10px;bottom:9px;font-family:"Roboto Mono",monospace;font-size:10.5px;color:var(--sheet-ink);opacity:.62;pointer-events:none}
+.loading3d{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:13px;background:var(--sheet)}
 .empty{padding:40px 24px;text-align:center;color:var(--ink-3);font-size:13px;max-width:34ch;margin:0 auto}
 .empty b{display:block;color:var(--ink-2);font-size:14px;margin-bottom:6px}
 
@@ -267,7 +274,7 @@ textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-
     <section class="stage">
       <div class="titleblock" id="tblock"></div>
 
-      <div class="toolbar">
+      <div class="toolbar" id="toolbar">
         <button class="btn" id="btnPin" aria-pressed="false">指摘を打つ</button>
         <button class="btn" id="btnRev">＋ 版を追加</button>
         <span style="width:1px;height:20px;background:var(--line)"></span>
@@ -444,7 +451,7 @@ function genSVG(kind,ink){
 /* ---------------- state ---------------- */
 const S={db:null,assets:null,dl:null,editor:false,ready:false,
   projects:[],pid:null,drawings:[],did:null,revs:[],marks:[],
-  revId:null,cmpId:null,mode:"none",ratio:50,zoom:1,invert:false,pinMode:false,selMark:null,
+  view:"2d",revId:null,cmpId:null,mode:"none",ratio:50,zoom:1,invert:false,pinMode:false,selMark:null,
   filt:{open:1,doing:1,done:0,curRev:0},me:""};
 const bucket={projects:[],vault:[]};
 const subs={};
@@ -453,7 +460,9 @@ const STATUS={open:"未対応",doing:"対応中",done:"完了"};
 const rootOf=(p)=>p&&p.visibility==="private"?"vault":"projects";
 const curProj=()=>S.projects.find(p=>p.id===S.pid)||null;
 const curDwg=()=>S.drawings.find(d=>d.id===S.did)||null;
-const curRev=()=>S.revs.find(r=>r.id===S.revId)||S.revs[S.revs.length-1]||null;
+const revsIn=(v)=>S.revs.filter(r=>(r.view||"2d")===(v||S.view));
+const has3D=()=>S.revs.some(r=>r.view==="3d");
+const curRev=()=>{const l=revsIn();return l.find(r=>r.id===S.revId)||l[l.length-1]||null;};
 const cmpRev=()=>S.revs.find(r=>r.id===S.cmpId)||null;
 const base=()=>{const p=curProj();return p?`${rootOf(p)}/${p.id}`:null;};
 const dwgPath=()=>base()&&S.did?`${base()}/drawings/${S.did}`:null;
@@ -516,7 +525,9 @@ function selectDrawing(did){
   if(S.db&&did){
     subs.rev=S.db.collection(`${dwgPath()}/revs`).onSnapshot(snap=>{
       S.revs=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
-      if(!S.revId||!S.revs.some(r=>r.id===S.revId))S.revId=S.revs.length?S.revs[S.revs.length-1].id:null;
+      if(!revsIn().length&&S.revs.length)S.view=(S.revs[0].view||"2d");
+      const rl=revsIn();
+      if(!S.revId||!rl.some(r=>r.id===S.revId))S.revId=rl.length?rl[rl.length-1].id:null;
       renderStage();
     },()=>{});
     subs.mark=S.db.collection(`${dwgPath()}/marks`).onSnapshot(snap=>{
@@ -555,7 +566,7 @@ function renderDwgList(){
       <span class="dwg-no mono">${esc(d.no)}</span><span></span>
       <span class="count ${open?"":"zero"}">${open}</span>
       <span class="dwg-title">${esc(d.title)}</span>
-      <span class="dwg-meta"><span class="rev-tag mono">Rev.${esc(rv)}</span><span>${esc(d.discipline||"")}</span>
+      <span class="dwg-meta"><span class="rev-tag mono">Rev.${esc(rv)}</span><span>${esc(d.discipline||"")}</span>${d.kind&&d.kind!=="図面"?`<span class="chip">${esc(d.kind)}</span>`:""}
       ${rl?`<span style="color:var(--${rl==="要修正"?"shu":"ok"})">${esc(rl)}</span>`:`<span>検図前</span>`}</span>
     </button>`;
   }).join("");
@@ -641,7 +652,7 @@ function renderStage(){
 function renderRevbar(){
   const bar=$("#revbar");
   if(!S.did){bar.innerHTML="";return;}
-  bar.innerHTML=S.revs.map(r=>{
+  bar.innerHTML=revsIn().map(r=>{
     const cur=r.id===S.revId,cmp=r.id===S.cmpId;
     return `<button class="rev${cmp?" cmp":""}" data-rid="${esc(r.id)}" aria-current="${cur}">
       <b>Rev.${esc(r.rev)}</b><i>${esc(fdate(r.at))} ${esc(r.by||"")}</i></button>`;
@@ -791,7 +802,7 @@ async function pdfPageToCanvas(doc,n,maxSide){
 
 /* ---------------- 取り込み（版の追加） ---------------- */
 function nextRevLetter(){
-  const used=S.revs.map(r=>r.rev);
+  const used=revsIn("2d").map(r=>r.rev);
   for(let i=0;i<26;i++){const l=REVLET(i);if(!used.includes(l))return l;}
   return String(S.revs.length+1);
 }
@@ -823,6 +834,28 @@ function step1(dlg,st){
   };
   $("#capCam",dlg.root).onchange=onImg;
   $("#capFile",dlg.root).onchange=onImg;
+  $("#capGlb",dlg.root).onchange=async(e)=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    $(".body",dlg.root).innerHTML=`<div class="note">3Dモデルを登録しています… 大きなモデルは少し時間がかかります。</div>`;
+    try{
+      const buf=await f.arrayBuffer();
+      if(buf.byteLength>14.5*1024*1024)throw new Error("size");
+      const wrapped=JSON.stringify({format:/\.gltf$/i.test(f.name)?"gltf":"glb",name:f.name,b64:abToB64(buf)});
+      const up=await S.assets.upload(new Blob([wrapped],{type:"application/json"}),{type:"application/json"});
+      const rev=next3DLetter();
+      await S.db.collection(`${dwgPath()}/revs`).add({
+        rev,view:"3d",src:"model",asset:up.id,format:/\.gltf$/i.test(f.name)?"gltf":"glb",
+        note:f.name,by:S.me||"名無し",at:nowISO()});
+      await S.db.doc(dwgPath()).update({has3d:true});
+      S.view="3d";S.revId=null;
+      toast(`3Dモデル Rev.${rev} を登録しました`);
+      dlg.close();renderStage();
+    }catch(err){
+      $(".body",dlg.root).innerHTML=`<div class="note" style="color:var(--shu)">${
+        err&&err.message==="size"?"ファイルが大きすぎます（約14MBまで）。不要なオブジェクトを削るか、テクスチャを縮小して書き出してください。"
+        :"3Dモデルを登録できませんでした。GLB形式での書き出しをお試しください。"}</div>`;
+    }
+  };
   $("#capPdf",dlg.root).onchange=async(e)=>{
     const f=e.target.files&&e.target.files[0];if(!f)return;
     $(".body",dlg.root).innerHTML=`<div class="note">PDFを読み込んでいます…</div>`;
@@ -1041,13 +1074,15 @@ function newDrawing(){
     <div class="row" style="margin:0;gap:10px">
       <div class="field" style="flex:1"><span>分野</span>
         <select id="dd"><option>意匠</option><option>構造</option><option>設備</option><option>外構</option></select></div>
+      <div class="field" style="flex:1"><span>種別</span>
+        <select id="dk"><option>図面</option><option>パース</option><option>3Dモデル</option></select></div>
       <div class="field" style="flex:1"><span>縮尺</span><input id="ds" placeholder="1:100" value="1:100"></div>
     </div>`,
     onOk:async(root)=>{
       const no=$("#dn",root).value.trim(),title=$("#dt",root).value.trim();
       if(!no||!title){toast("図面番号と図面名称を入力してください");return false;}
       const ref=await S.db.collection(`${base()}/drawings`).add({
-        no,title,discipline:$("#dd",root).value,scale:$("#ds",root).value.trim(),
+        no,title,discipline:$("#dd",root).value,kind:$("#dk",root).value,scale:$("#ds",root).value.trim(),
         status:"作図中",lastRev:"—",openCount:0,by:S.me||"名無し",createdAt:nowISO()});
       selectDrawing(ref.id);toast("図面を登録しました");
     }});
@@ -1160,7 +1195,7 @@ $$("[data-cmp]").forEach(b=>b.onclick=()=>{
   $("#cmpCtl").hidden=!on;
   $("#cmpLabel").textContent=S.mode==="wipe"?"境界":"透過";
   if(S.mode!=="none"&&!S.cmpId){
-    const others=S.revs.filter(r=>r.id!==S.revId);
+    const others=revsIn().filter(r=>r.id!==S.revId);
     if(others.length)S.cmpId=others[others.length-1].id;
     else toast("比較するには版が2つ以上必要です");
   }
@@ -1450,6 +1485,8 @@ function step1(dlg,st){
         <input type="file" accept="application/pdf" id="capPdf" style="margin-top:7px"></div></label>
       <label class="opt"><div><strong>SVG（ベクターデータ）</strong><small>CADやIllustratorからの書き出し。線のまま原寸で保持され、拡大しても劣化しません。</small>
         <input type="file" accept="image/svg+xml,.svg" id="capSvg" style="margin-top:7px"></div></label>
+      <label class="opt"><div><strong>3Dモデル（GLB / glTF）</strong><small>BIM・SketchUp・Blender からの書き出し。パースとして回して見られ、モデルの表面に指摘を打てます。約14MBまで。</small>
+        <input type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" id="capGlb" style="margin-top:7px"></div></label>
     </div>
     <div class="note">どの形式でも、取り込んだ図面の上に全員で赤入れできます。原図は書き換わりません。</div>`;
   $("[data-ok]",dlg.root).disabled=true;
@@ -1495,5 +1532,392 @@ function step1(dlg,st){
     }
   };
 }
+renderAll();
+</script>
+<script>
+/* ---------------- 3D / パース ---------------- */
+const V={host:null,renderer:null,scene:null,camera:null,controls:null,model:null,
+  loaded:null,pending:false,proj:"persp",restore:null,ro:null};
+const THREE_BASE="https://cdn.jsdelivr.net/npm/three@0.128.0";
+
+function abToB64(buf){
+  const b=new Uint8Array(buf);let s="";
+  for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));
+  return btoa(s);
+}
+function b64ToAb(b64){
+  const bin=atob(b64),u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return u.buffer;
+}
+function next3DLetter(){
+  const used=S.revs.filter(r=>r.view==="3d").map(r=>r.rev);
+  for(let i=0;i<26;i++){const l=REVLET(i);if(!used.includes(l))return l;}
+  return String(used.length+1);
+}
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error(src));
+    document.head.appendChild(s);
+  });
+}
+async function loadThree(){
+  if(window.THREE&&THREE.GLTFLoader&&THREE.OrbitControls)return;
+  if(!window.THREE)await loadScript(THREE_BASE+"/build/three.min.js");
+  if(!THREE.OrbitControls)await loadScript(THREE_BASE+"/examples/js/controls/OrbitControls.js");
+  if(!THREE.GLTFLoader)await loadScript(THREE_BASE+"/examples/js/loaders/GLTFLoader.js");
+}
+
+/* サンプル：平面図と同じ 31.2m × 18m・3階建てのボリューム */
+function genBuilding(){
+  const g=new THREE.Group();
+  const wall=new THREE.MeshLambertMaterial({color:0xE7E2D9});
+  const glass=new THREE.MeshLambertMaterial({color:0x4A6C8C,transparent:true,opacity:.72});
+  const trim=new THREE.MeshLambertMaterial({color:0xB2ADA3});
+  const plinthM=new THREE.MeshLambertMaterial({color:0xD2D1C9});
+  const W=31.2,D=18,FH=3.8,N=3;
+  const body=new THREE.Mesh(new THREE.BoxGeometry(W,FH*N,D),wall);body.position.y=FH*N/2;g.add(body);
+  const par=new THREE.Mesh(new THREE.BoxGeometry(W+.7,.9,D+.7),trim);par.position.y=FH*N+.35;g.add(par);
+  for(let f=0;f<N;f++)for(let i=0;i<6;i++){
+    const w=new THREE.Mesh(new THREE.BoxGeometry(3.4,2.0,.14),glass);
+    w.position.set(-W/2+3.1+i*5.0,f*FH+2.0,D/2+.03);g.add(w);
+    const w2=w.clone();w2.position.z=-D/2-.03;g.add(w2);
+  }
+  for(let f=0;f<N;f++)for(let i=0;i<3;i++){
+    const w=new THREE.Mesh(new THREE.BoxGeometry(.14,2.0,3.0),glass);
+    w.position.set(W/2+.03,f*FH+2.0,-D/2+3.4+i*5.2);g.add(w);
+    const w2=w.clone();w2.position.x=-W/2-.03;g.add(w2);
+  }
+  const can=new THREE.Mesh(new THREE.BoxGeometry(9,.35,4.4),trim);can.position.set(0,3.55,D/2+2.2);g.add(can);
+  [-4,4].forEach(x=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,3.55,14),trim);
+    c.position.set(x,1.78,D/2+4.0);g.add(c);});
+  const ent=new THREE.Mesh(new THREE.BoxGeometry(5.4,3.0,.14),glass);ent.position.set(0,1.5,D/2+.04);g.add(ent);
+  const pl=new THREE.Mesh(new THREE.BoxGeometry(W+9,.4,D+10),plinthM);pl.position.y=-.2;g.add(pl);
+  return g;
+}
+
+function ensureHost(){
+  if(V.host)return V.host;
+  const h=document.createElement("div");
+  h.className="stage3d";
+  h.innerHTML=`<div class="pinlayer" id="pin3d"></div><div class="hud" id="hud3d"></div>`;
+  V.host=h;return h;
+}
+function initThree(){
+  if(V.renderer)return;
+  const h=V.host;
+  V.renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  V.renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+  V.renderer.setClearColor(0xF3F5F8,1);
+  h.insertBefore(V.renderer.domElement,h.firstChild);
+  V.scene=new THREE.Scene();
+  V.scene.add(new THREE.HemisphereLight(0xFFFFFF,0xB6BCC4,0.95));
+  const sun=new THREE.DirectionalLight(0xFFF6E8,0.75);sun.position.set(38,52,26);V.scene.add(sun);
+  const fill=new THREE.DirectionalLight(0xDCE6F2,0.28);fill.position.set(-30,18,-24);V.scene.add(fill);
+  const grid=new THREE.GridHelper(140,70,0x9AA6B4,0xC7CEd6);grid.position.y=-0.42;V.scene.add(grid);
+  makeCamera("persp");
+  V.ro=new ResizeObserver(()=>resize3D());
+  V.ro.observe(h);
+  V.renderer.domElement.addEventListener("pointerdown",onPick3D);
+}
+function makeCamera(kind){
+  const h=V.host,w=Math.max(1,h.clientWidth),ht=Math.max(1,h.clientHeight),a=w/ht;
+  const prev=V.camera;
+  if(kind==="iso"){
+    const d=prev?prev.position.length():70;
+    const s=d*0.42;
+    V.camera=new THREE.OrthographicCamera(-s*a,s*a,s,-s,.1,4000);
+  }else{
+    V.camera=new THREE.PerspectiveCamera(46,a,.1,4000);
+  }
+  const tgt=V.controls?V.controls.target.clone():new THREE.Vector3(0,5,0);
+  V.camera.position.copy(prev?prev.position:new THREE.Vector3(44,26,52));
+  if(V.controls)V.controls.dispose();
+  V.controls=new THREE.OrbitControls(V.camera,V.renderer.domElement);
+  V.controls.enableDamping=false;
+  V.controls.target.copy(tgt);
+  V.controls.addEventListener("change",requestRender);
+  V.camera.lookAt(tgt);V.controls.update();
+  V.proj=kind;
+  resize3D();
+}
+function resize3D(){
+  if(!V.renderer||!V.host)return;
+  const w=Math.max(1,V.host.clientWidth),h=Math.max(1,V.host.clientHeight);
+  V.renderer.setSize(w,h,false);
+  if(V.camera.isOrthographicCamera){
+    const a=w/h,s=(V.camera.top||20);
+    V.camera.left=-s*a;V.camera.right=s*a;
+  }else V.camera.aspect=w/h;
+  V.camera.updateProjectionMatrix();
+  requestRender();
+}
+function requestRender(){
+  if(V.pending||!V.renderer)return;
+  V.pending=true;
+  requestAnimationFrame(()=>{
+    V.pending=false;
+    V.renderer.render(V.scene,V.camera);
+    updatePins3D();updateHud();
+  });
+}
+function updateHud(){
+  const el=$("#hud3d",V.host);if(!el)return;
+  const p=V.camera.position;
+  el.textContent=`${V.proj==="iso"?"アイソメ":"パース"}  X ${p.x.toFixed(1)}  Y ${p.y.toFixed(1)}  Z ${p.z.toFixed(1)}  ／ ドラッグ=回転・ホイール=ズーム・右ドラッグ=平行移動`;
+}
+function fitCamera(dir){
+  if(!V.model)return;
+  const box=new THREE.Box3().setFromObject(V.model);
+  const c=box.getCenter(new THREE.Vector3()),sz=box.getSize(new THREE.Vector3());
+  const r=Math.max(sz.x,sz.y,sz.z)*0.62;
+  const d=dir||new THREE.Vector3(1,0.62,1.15).normalize();
+  const dist=r/Math.sin((V.camera.fov?V.camera.fov:46)*Math.PI/360)*1.22;
+  V.camera.position.copy(c.clone().add(d.clone().multiplyScalar(dist)));
+  V.controls.target.copy(c);
+  if(V.camera.isOrthographicCamera){
+    const a=V.host.clientWidth/Math.max(1,V.host.clientHeight),s=r*1.5;
+    V.camera.top=s;V.camera.bottom=-s;V.camera.left=-s*a;V.camera.right=s*a;
+  }
+  V.camera.updateProjectionMatrix();V.controls.update();requestRender();
+}
+async function load3D(rev){
+  if(V.loaded===rev.id)return;
+  V.loaded=rev.id;
+  if(V.model){V.scene.remove(V.model);V.model=null;}
+  const busy=document.createElement("div");
+  busy.className="loading3d";busy.textContent="モデルを読み込んでいます…";
+  V.host.appendChild(busy);
+  try{
+    if(rev.src==="gen3d"){
+      V.model=genBuilding();
+    }else{
+      const res=await fetch("/_blob/"+rev.asset);
+      const j=await res.json();
+      const buf=b64ToAb(j.b64);
+      const loader=new THREE.GLTFLoader();
+      const gltf=await new Promise((ok,ng)=>loader.parse(buf,"",ok,ng));
+      V.model=gltf.scene||gltf.scenes[0];
+    }
+    V.scene.add(V.model);
+    fitCamera();
+  }catch(e){
+    busy.textContent="このモデルを表示できませんでした。Draco圧縮を外し、GLB形式で書き出し直してください。";
+    busy.style.color="var(--shu)";
+    setTimeout(()=>busy.remove(),5200);
+    requestRender();return;
+  }
+  busy.remove();
+  if(V.restore){applyCam(V.restore);V.restore=null;}
+  requestRender();
+}
+function camState(){
+  return {p:V.camera.position.toArray().map(n=>+n.toFixed(3)),
+          t:V.controls.target.toArray().map(n=>+n.toFixed(3)),iso:V.proj==="iso"};
+}
+function applyCam(c){
+  if(!c||!c.p)return;
+  if(c.iso&&V.proj!=="iso")makeCamera("iso");
+  if(!c.iso&&V.proj!=="persp")makeCamera("persp");
+  V.camera.position.fromArray(c.p);V.controls.target.fromArray(c.t||[0,5,0]);
+  V.controls.update();requestRender();
+}
+function marks3D(){return S.marks.filter(m=>m.view==="3d");}
+function updatePins3D(){
+  const host=$("#pin3d",V.host);if(!host)return;
+  const list=marks3D();
+  const sig=list.map(m=>m.id+m.status).join("|")+"::"+S.selMark;
+  if(host.dataset.sig!==sig){
+    host.dataset.sig=sig;
+    host.innerHTML=list.map(m=>`<button class="pin pin3d ${m.status==="done"?"done":""}" data-mid="${esc(m.id)}"
+      aria-current="${m.id===S.selMark}" title="${esc(m.title)}"><span>${m.no}</span></button>`).join("");
+    $$(".pin3d",host).forEach(b=>b.onclick=(e)=>{
+      e.stopPropagation();
+      const m=S.marks.find(x=>x.id===b.dataset.mid);
+      S.selMark=b.dataset.mid;
+      if(m&&m.cam)applyCam(m.cam);
+      renderThreads();updatePins3D();
+    });
+  }
+  const v=new THREE.Vector3();
+  list.forEach((m,i)=>{
+    const el=host.children[i];if(!el||!m.p)return;
+    v.fromArray(m.p).project(V.camera);
+    const vis=v.z<1&&v.x>=-1.2&&v.x<=1.2&&v.y>=-1.2&&v.y<=1.2;
+    el.hidden=!vis;
+    el.style.left=((v.x+1)/2*100).toFixed(2)+"%";
+    el.style.top=((-v.y+1)/2*100).toFixed(2)+"%";
+  });
+}
+function onPick3D(e){
+  if(!S.pinMode||e.button!==0)return;
+  const r=V.host.getBoundingClientRect();
+  const nd=new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+  const ray=new THREE.Raycaster();ray.setFromCamera(nd,V.camera);
+  const hit=V.model?ray.intersectObject(V.model,true)[0]:null;
+  if(!hit){toast("モデルの表面をクリックしてください");return;}
+  newMark3D(hit.point.toArray().map(n=>+n.toFixed(3)));
+}
+function newMark3D(p){
+  if(!need())return;
+  const r=curRev();if(!r)return;
+  const cam=camState();
+  dialog({title:"3Dモデル上に指摘を追加",ok:"起票",body:`
+    <div class="row" style="margin:0;gap:10px">
+      <div class="field" style="width:130px"><span>分類</span>
+        <select id="mk">${KINDS.map(k=>`<option>${k}</option>`).join("")}</select></div>
+      <div class="field" style="flex:1"><span>件名</span><input id="mt" placeholder="例：庇の出が短く雨掛かりが大きい"></div>
+    </div>
+    <div class="field"><span>内容</span><textarea id="mb" placeholder="根拠・依頼事項・確認したい点"></textarea></div>
+    <div class="note mono">位置 X:${p[0]} Y:${p[1]} Z:${p[2]}　Rev.${esc(r.rev)}（3D）</div>
+    <div class="note">いま見ているアングルも一緒に保存されます。指摘を開くと、この視点に戻ります。</div>`,
+    onOk:async(root)=>{
+      const title=$("#mt",root).value.trim();
+      if(!title){toast("件名を入力してください");return false;}
+      const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
+      await S.db.collection(`${dwgPath()}/marks`).add({
+        no,view:"3d",p,cam,x:0,y:0,rev:r.rev,kind:$("#mk",root).value,title,
+        body:$("#mb",root).value.trim(),status:"open",replies:[],by:S.me||"名無し",at:nowISO()});
+      await bumpOpen(1);
+      S.pinMode=false;$("#btnPin").setAttribute("aria-pressed","false");
+      renderStage();
+      toast(`指摘 #${no} を起票しました`);
+    }});
+}
+async function savePerspective(){
+  if(!need()||!S.assets){toast("パースの保存には編集権限が必要です");return;}
+  V.renderer.render(V.scene,V.camera);
+  const blob=await new Promise(r=>V.renderer.domElement.toBlob(r,"image/jpeg",0.92));
+  if(!blob)return;
+  toast("パースを書き出しています…");
+  try{
+    const up=await S.assets.upload(blob);
+    const rev=nextRevLetter();
+    await S.db.collection(`${dwgPath()}/revs`).add({
+      rev,view:"2d",src:"asset",asset:up.id,w:V.renderer.domElement.width,h:V.renderer.domElement.height,
+      note:"3Dビューから書き出したパース",by:S.me||"名無し",at:nowISO()});
+    await S.db.doc(dwgPath()).update({lastRev:rev});
+    S.view="2d";S.revId=null;renderStage();
+    toast(`パースを Rev.${rev} として保存しました。赤入れできます。`);
+  }catch(e){toast("保存できませんでした");}
+}
+
+/* 2D / 3D の切り替えとツールバー */
+(function build3DBar(){
+  const vt=document.createElement("div");
+  vt.className="seg";vt.id="viewToggle";vt.setAttribute("role","group");vt.setAttribute("aria-label","表示の切り替え");
+  vt.innerHTML=`<button data-v="2d" aria-pressed="true">図面</button><button data-v="3d" aria-pressed="false">3D パース</button>`;
+  $("#toolbar").prepend(vt);
+  $$("[data-v]",vt).forEach(b=>b.onclick=()=>{
+    const v=b.dataset.v;
+    if(v==="3d"&&!has3D()){toast("この図面にはまだ3Dモデルがありません。「＋ 版を追加」からGLB/glTFを登録できます。");return;}
+    S.view=v;S.revId=null;S.selMark=null;renderStage();renderThreads();
+  });
+  const bar=document.createElement("div");
+  bar.className="toolbar";bar.id="bar3d";bar.hidden=true;
+  bar.innerHTML=`
+    <span class="lbl" style="margin-right:2px">視点</span>
+    <div class="seg" role="group" aria-label="投影">
+      <button data-proj="persp" aria-pressed="true">パース</button><button data-proj="iso" aria-pressed="false">アイソメ</button>
+    </div>
+    <div class="seg" role="group" aria-label="方位">
+      <button data-dir="s">南</button><button data-dir="e">東</button><button data-dir="n">北</button><button data-dir="w">西</button><button data-dir="top">上</button>
+    </div>
+    <button class="btn" id="v3dFit">全体を表示</button>
+    <span class="spacer" style="flex:1"></span>
+    <button class="btn" id="v3dShot">このアングルをパースとして保存</button>`;
+  $("#revbar").before(bar);
+  $$("[data-proj]",bar).forEach(b=>b.onclick=()=>{
+    if(!V.renderer)return;
+    makeCamera(b.dataset.proj);fitCamera();
+    $$("[data-proj]",bar).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  });
+  const DIRS={s:[0,.28,1],n:[0,.28,-1],e:[1,.28,0],w:[-1,.28,0],top:[0.001,1,0.001]};
+  $$("[data-dir]",bar).forEach(b=>b.onclick=()=>{
+    if(!V.model)return;
+    fitCamera(new THREE.Vector3(...DIRS[b.dataset.dir]).normalize());
+  });
+  $("#v3dFit",bar).onclick=()=>fitCamera();
+  $("#v3dShot",bar).onclick=savePerspective;
+})();
+
+function sync3DBars(){
+  const is3=S.view==="3d";
+  $$("#viewToggle [data-v]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.v==="3d")===is3)));
+  const t3=$("#viewToggle [data-v='3d']");
+  if(t3){t3.disabled=!has3D()&&!is3;t3.title=has3D()?"3Dモデルで見る":"3Dモデル未登録";}
+  $("#bar3d").hidden=!is3;
+  $("#editbar").hidden=is3;
+  const cmpSeg=$("[data-cmp]")?$("[data-cmp]").parentElement:null;
+  if(cmpSeg)cmpSeg.hidden=is3;
+  $("#cmpCtl").hidden=is3||!(S.mode==="overlay"||S.mode==="wipe");
+  const zoomSeg=$("#zIn")?$("#zIn").parentElement:null;
+  if(zoomSeg)zoomSeg.hidden=is3;
+  $("#btnInvert").hidden=is3;
+}
+
+/* 2Dのピンは2Dの指摘のみ */
+function pinsHTML(){
+  const r=curRev();
+  return S.marks.filter(m=>(m.view||"2d")==="2d").filter(m=>!S.filt.curRev||!r||m.rev===r.rev).map(m=>
+    `<button class="pin ${m.status==="done"?"done":""}" data-mid="${esc(m.id)}" aria-current="${m.id===S.selMark}"
+      style="left:${(m.x*100).toFixed(2)}%;top:${(m.y*100).toFixed(2)}%" title="${esc(m.title)}"><span>${m.no}</span></button>`
+  ).join("");
+}
+
+const _renderStage2=renderStage;
+renderStage=function(){
+  if(S.view!=="3d"){_renderStage2();sync3DBars();return;}
+  renderTitleBlock();renderRevbar();sync3DBars();
+  const w=$("#sheetWrap"),r=curRev();
+  $("#btnRev").disabled=!S.did;$("#btnApprove").disabled=!S.did;$("#btnPin").disabled=!r;
+  if(!r){
+    w.innerHTML=`<div class="empty"><b>3Dモデルが登録されていません</b>「＋ 版を追加」からGLB / glTFを取り込むと、ここでパースとして回して見られます。</div>`;
+    return;
+  }
+  const host=ensureHost();
+  if(host.parentElement!==w){w.innerHTML="";w.style.padding="0";w.style.placeItems="stretch";w.appendChild(host);}
+  host.classList.toggle("picking",!!S.pinMode);
+  (async()=>{
+    try{
+      await loadThree();
+      initThree();
+      resize3D();
+      await load3D(r);
+      updatePins3D();
+    }catch(e){
+      w.innerHTML=`<div class="empty"><b>3D表示を読み込めませんでした</b>ネットワークを確認して開き直してください。図面表示には戻れます。</div>`;
+    }
+  })();
+};
+const _rt=renderThreads;
+renderThreads=function(){
+  _rt();
+  $$(".thread",$("#threads")).forEach(b=>{
+    const m=S.marks.find(x=>x.id===b.dataset.mid);if(!m)return;
+    if(m.view==="3d"){
+      const top=$(".th-top",b);
+      if(top&&!$(".is3d",top)){
+        const c=document.createElement("span");c.className="chip is3d";c.textContent="3D";
+        top.insertBefore(c,top.children[1]||null);
+      }
+    }
+    b.onclick=()=>{
+      S.selMark=m.id;
+      const v=m.view||"2d";
+      if(v!==S.view&&(v!=="3d"||has3D())){S.view=v;S.revId=null;}
+      if(v==="3d"&&m.cam)V.restore=m.cam;
+      else if(v==="3d"&&m.cam===undefined&&V.renderer)V.restore=null;
+      if(v==="3d"&&V.renderer&&V.loaded)applyCam(m.cam);
+      renderThreads();renderStage();
+    };
+  });
+};
+/* 2Dに戻したら sheet-wrap の余白を戻す */
+const _rs3=renderStage;
+renderStage=function(){
+  if(S.view!=="3d"){const w=$("#sheetWrap");if(w){w.style.padding="";w.style.placeItems="";}}
+  _rs3();
+};
 renderAll();
 </script>
