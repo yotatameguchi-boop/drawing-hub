@@ -2,47 +2,47 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
 <style>
 :root{
-  --bg:#E7EBF0; --surface:#F3F6FA; --panel:#FFFFFF; --panel-2:#F7F9FC;
+  --bg:#EDEFF3; --surface:#F5F7FA; --panel:#FFFFFF; --panel-2:#F6F8FB;
   --ink:#131C28; --ink-2:#4C5868; --ink-3:#8593A4;
-  --line:#C9D2DE; --line-2:#E2E8F0;
-  --accent:#234B85; --accent-2:#3A6CB0; --accent-soft:#DEE7F5;
-  --shu:#BC3B2B; --shu-soft:#F7E2DE;
-  --ok:#2C6A4C; --ok-soft:#DCEDE4;
-  --warn:#8E6510; --warn-soft:#F6EBD5;
-  --grid:rgba(35,75,133,.075);
-  --shadow:0 1px 2px rgba(19,28,40,.06),0 8px 24px rgba(19,28,40,.07);
+  --line:#D2D9E3; --line-2:#E6EBF1;
+  --accent:#234B85; --accent-2:#3A6CB0; --accent-soft:#E1E9F6;
+  --shu:#BC3B2B; --shu-soft:#F8E4E0;
+  --ok:#2C6A4C; --ok-soft:#DFEEE6;
+  --warn:#8E6510; --warn-soft:#F7EDD9;
+  --grid:rgba(35,75,133,.07);
   --sheet:#FBFCFD; --sheet-ink:#1A2430; --sheet-edge:#B9C3D1;
+  --shadow:0 1px 2px rgba(19,28,40,.05),0 6px 18px rgba(19,28,40,.06);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0F1319; --surface:#141A22; --panel:#1A212B; --panel-2:#161D26;
+    --bg:#0E1217; --surface:#141A22; --panel:#1A212B; --panel-2:#161D26;
     --ink:#E5EBF3; --ink-2:#9DAABB; --ink-3:#6B7A8D;
-    --line:#2A3441; --line-2:#212A35;
-    --accent:#7FA8E8; --accent-2:#A2C1F2; --accent-soft:#1D2A3C;
-    --shu:#E9705A; --shu-soft:#3A211C;
+    --line:#2B3441; --line-2:#222A35;
+    --accent:#7FA8E8; --accent-2:#A2C1F2; --accent-soft:#1C2839;
+    --shu:#E9705A; --shu-soft:#38211D;
     --ok:#63B18B; --ok-soft:#172A22;
-    --warn:#D8A84C; --warn-soft:#2B2313;
-    --grid:rgba(150,180,220,.07);
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    --warn:#D8A84C; --warn-soft:#2A2313;
+    --grid:rgba(150,180,220,.06);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.32);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0F1319; --surface:#141A22; --panel:#1A212B; --panel-2:#161D26;
+  --bg:#0E1217; --surface:#141A22; --panel:#1A212B; --panel-2:#161D26;
   --ink:#E5EBF3; --ink-2:#9DAABB; --ink-3:#6B7A8D;
-  --line:#2A3441; --line-2:#212A35;
-  --accent:#7FA8E8; --accent-2:#A2C1F2; --accent-soft:#1D2A3C;
-  --shu:#E9705A; --shu-soft:#3A211C;
+  --line:#2B3441; --line-2:#222A35;
+  --accent:#7FA8E8; --accent-2:#A2C1F2; --accent-soft:#1C2839;
+  --shu:#E9705A; --shu-soft:#38211D;
   --ok:#63B18B; --ok-soft:#172A22;
-  --warn:#D8A84C; --warn-soft:#2B2313;
-  --grid:rgba(150,180,220,.07);
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  --warn:#D8A84C; --warn-soft:#2A2313;
+  --grid:rgba(150,180,220,.06);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.32);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{
-  background:var(--bg); color:var(--ink);
+  background:var(--bg);color:var(--ink);
   font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;
 }
 .mono{font-family:"Roboto Mono","SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -50,331 +50,357 @@ button,input,select,textarea{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ---------- shell ---------- */
-.app{height:100dvh;display:grid;grid-template-rows:auto auto minmax(0,1fr);}
-.topbar{
-  display:flex;align-items:center;gap:16px;padding:0 16px;height:52px;
-  background:var(--panel);border-bottom:1px solid var(--line);
+#app{min-height:100dvh;display:flex;flex-direction:column}
+.nav{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+  height:54px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line);
 }
-.brand{display:flex;align-items:baseline;gap:9px;padding-right:14px;border-right:1px solid var(--line-2)}
-.brand b{font-size:17px;white-space:nowrap;letter-spacing:.14em;font-weight:700}
-.brand span{font-size:9.5px;white-space:nowrap;letter-spacing:.24em;color:var(--ink-3);text-transform:uppercase}
-.proj-pick{display:flex;align-items:center;gap:8px;min-width:0}
-.select{
-  appearance:none;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;
-  padding:5px 26px 5px 10px;max-width:340px;text-overflow:ellipsis;
-  background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
-  background-position:calc(100% - 14px) 52%,calc(100% - 9px) 52%;background-size:5px 5px;background-repeat:no-repeat;
+.nav .back{
+  flex:none;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);
+  display:grid;place-items:center;cursor:pointer;font-size:17px;line-height:1;
 }
-.spacer{flex:1}
-.who{display:flex;align-items:center;gap:7px}
-.who input{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:5px 9px;width:112px}
-.lbl{font-size:10px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
-.conn{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3);flex:none}
-.dot.on{background:var(--ok)} .dot.off{background:var(--warn)}
+.nav .back:hover{border-color:var(--accent-2);color:var(--accent)}
+.nav h1{margin:0;font-size:16px;font-weight:700;letter-spacing:.02em;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav h1 small{display:block;font-size:11px;font-weight:400;color:var(--ink-3);letter-spacing:.04em}
+.nav .navact{display:flex;gap:6px;align-items:center;flex:none}
+main{flex:1;min-height:0;display:flex;flex-direction:column}
+.wrap{width:100%;max-width:780px;margin:0 auto;padding:16px 16px 44px;display:grid;gap:14px}
+.wrap.full{display:flex;flex-direction:column;gap:0;max-width:none;padding:0;flex:1;min-height:0}
 
-.main{display:grid;grid-template-columns:272px minmax(0,1fr) 352px;min-height:0}
-.rail,.side{background:var(--panel);min-height:0;display:flex;flex-direction:column;overflow:hidden}
-.rail{border-right:1px solid var(--line)}
-.side{border-left:1px solid var(--line)}
-.stage{background:var(--surface);min-width:0;display:flex;flex-direction:column;min-height:0}
-
-/* ---------- rail ---------- */
-.rail-head,.side-head{
-  display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--line-2);flex:none;
-}
-.rail-head h2,.side-head h2{margin:0;font-size:11px;letter-spacing:.18em;color:var(--ink-2);font-weight:700;text-transform:uppercase}
-.scroll{overflow:auto;min-height:0;flex:1}
-.dwg{
-  display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;
-  width:100%;text-align:left;padding:10px 13px;background:none;border:0;border-bottom:1px solid var(--line-2);cursor:pointer;
-}
-.dwg:hover{background:var(--panel-2)}
-.dwg[aria-current="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
-.dwg-no{font-size:11px;color:var(--accent);font-weight:500}
-.dwg-title{grid-column:1/3;font-size:13.5px;font-weight:500;line-height:1.35}
-.dwg-meta{grid-column:1/4;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ink-3)}
-.rev-tag{font-size:10px;letter-spacing:.08em;border:1px solid var(--line);border-radius:3px;padding:0 4px;color:var(--ink-2)}
-.count{
-  grid-row:1;grid-column:3;font-size:11px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;
-  display:grid;place-items:center;background:var(--shu-soft);color:var(--shu);font-weight:700;
-}
-.count.zero{background:transparent;color:var(--ink-3);font-weight:400}
-
-/* ---------- title block ---------- */
-.titleblock{
-  display:grid;grid-template-columns:2.2fr 1fr 1fr .9fr 1.3fr;
-  border-bottom:1px solid var(--line);background:var(--panel);flex:none;
-}
-.tb{padding:7px 12px;border-right:1px solid var(--line-2);min-width:0}
-.tb:last-child{border-right:0}
-.tb i{display:block;font-style:normal;font-size:9.5px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
-.tb b{display:block;font-weight:500;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vis{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:1px 7px;border-radius:11px;border:1px solid var(--line);color:var(--ink-2)}
-.vis.private{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
-.vis.open{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
-
-/* ---------- toolbar ---------- */
-.toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel-2);flex:none;flex-wrap:wrap}
-.btn{
-  display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);
-  border-radius:5px;padding:5px 11px;cursor:pointer;font-size:12.5px;white-space:nowrap;
-}
+/* ---------- common ---------- */
+.lbl{font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px;white-space:nowrap}
 .btn:hover{border-color:var(--accent-2);color:var(--accent)}
 .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-:root[data-theme="dark"] .btn[aria-pressed="true"],:root:not([data-theme="light"]) .btn[aria-pressed="true"]{color:#0F1319}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-:root[data-theme="dark"] .btn.primary{color:#0F1319}
 .btn.primary:hover{opacity:.9;color:#fff}
-:root[data-theme="dark"] .btn.primary:hover{color:#0F1319}
-.btn.small{padding:3px 8px;font-size:11.5px}
+.btn.small{padding:4px 10px;font-size:12.5px;border-radius:6px}
+.btn.wide{width:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.seg{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:var(--panel)}
-.seg button{background:none;border:0;padding:5px 10px;cursor:pointer;font-size:12px;border-right:1px solid var(--line-2)}
+.btn.danger{color:var(--shu);border-color:var(--shu)}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{background:none;border:0;padding:7px 12px;cursor:pointer;font-size:13px;border-right:1px solid var(--line-2);flex:1}
 .seg button:last-child{border-right:0}
 .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
-.slider{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink-2)}
-input[type=range]{accent-color:var(--accent);width:104px}
-
-/* ---------- revisions ---------- */
-.revbar{display:flex;align-items:center;gap:0;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;overflow-x:auto}
-.rev{
-  position:relative;background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;
-  padding:8px 13px;text-align:left;white-space:nowrap;color:var(--ink-2);
-}
-.rev b{display:block;font-size:13px;font-weight:700;letter-spacing:.06em}
-.rev i{display:block;font-style:normal;font-size:10px;color:var(--ink-3)}
-.rev[aria-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
-.rev.cmp{border-bottom-color:var(--shu);color:var(--shu)}
-
-/* ---------- sheet ---------- */
-.sheet-wrap{
-  flex:1;min-height:0;overflow:auto;padding:26px;display:grid;place-items:start center;
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:24px 24px;
-}
-.sheet{
-  position:relative;background:var(--sheet);box-shadow:0 2px 3px rgba(19,28,40,.10),0 14px 40px rgba(19,28,40,.16);
-  border:1px solid var(--sheet-edge);transform-origin:top center;width:min(100%,1189px);
-}
-.sheet.invert{filter:invert(1) hue-rotate(180deg)}
-.layer{position:absolute;inset:0;width:100%;height:100%}
-.layer svg,.layer img{display:block;width:100%;height:100%;object-fit:contain}
-.layer.top{transition:opacity .12s linear}
-.pinlayer{position:absolute;inset:0;pointer-events:none}
-.pin{pointer-events:auto}
-.sheet.picking{cursor:crosshair}
-.pin{
-  position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50% 50% 50% 2px;
-  transform:rotate(-45deg);background:var(--sheet);border:1.5px solid var(--shu);color:var(--shu);
-  display:grid;place-items:center;cursor:pointer;padding:0;
-}
-.pin>span{transform:rotate(45deg);font-size:11px;font-weight:700;font-family:"Roboto Mono",monospace}
-.pin.done{border-color:var(--ok);color:var(--ok)}
-.pin[aria-current="true"]{background:var(--shu);color:var(--sheet);box-shadow:0 0 0 4px var(--shu-soft)}
-.pin.done[aria-current="true"]{background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft)}
-.stage3d{position:relative;width:100%;height:100%;min-height:340px;background:var(--sheet);border:1px solid var(--sheet-edge);box-shadow:0 2px 3px rgba(19,28,40,.10),0 14px 40px rgba(19,28,40,.16)}
-.stage3d canvas{display:block;width:100%;height:100%;touch-action:none}
-.stage3d.picking canvas{cursor:crosshair}
-.pin3d{z-index:2}
-.hud{position:absolute;left:10px;bottom:9px;font-family:"Roboto Mono",monospace;font-size:10.5px;color:var(--sheet-ink);opacity:.62;pointer-events:none}
-.loading3d{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:13px;background:var(--sheet)}
-.empty{padding:40px 24px;text-align:center;color:var(--ink-3);font-size:13px;max-width:34ch;margin:0 auto}
-.empty b{display:block;color:var(--ink-2);font-size:14px;margin-bottom:6px}
-
-/* ---------- threads ---------- */
-.filters{display:flex;gap:5px;padding:8px 12px;border-bottom:1px solid var(--line-2);flex-wrap:wrap;flex:none}
-.f{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:2px 9px;font-size:11.5px;cursor:pointer}
-.f[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-:root[data-theme="dark"] .f[aria-pressed="true"]{color:#0F1319}
-.thread{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line-2);padding:11px 13px;cursor:pointer;display:block}
-.thread:hover{background:var(--panel-2)}
-.thread[aria-current="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
-.th-top{display:flex;align-items:center;gap:6px;margin-bottom:3px}
-.num{font-family:"Roboto Mono",monospace;font-size:11px;color:var(--shu);font-weight:700}
-.num.done{color:var(--ok)}
-.chip{font-size:10.5px;padding:0 6px;border-radius:3px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card>h2{margin:0;padding:11px 14px;font-size:11px;letter-spacing:.16em;color:var(--ink-2);
+  text-transform:uppercase;border-bottom:1px solid var(--line-2);font-weight:700}
+.chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid var(--line);
+  color:var(--ink-2);white-space:nowrap;line-height:1.7}
 .chip.kind-意匠{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 .chip.kind-構造{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
 .chip.kind-設備{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
 .chip.kind-法規{border-color:var(--shu);color:var(--shu);background:var(--shu-soft)}
-.th-title{font-size:13px;font-weight:500;line-height:1.4}
-.th-sub{font-size:11px;color:var(--ink-3);margin-top:3px;display:flex;gap:8px}
-.detail{border-top:1px solid var(--line);background:var(--panel-2);padding:12px 13px;flex:none;max-height:52%;overflow:auto}
-.reply{border-left:2px solid var(--line);padding:4px 0 4px 9px;margin-top:8px}
-.reply .rmeta{font-size:10.5px;color:var(--ink-3)}
-.reply p{margin:2px 0 0}
-textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:7px 9px;resize:vertical;min-height:56px}
-.row{display:flex;gap:7px;align-items:center;margin-top:8px;flex-wrap:wrap}
-.stamp{
-  display:grid;place-items:center;width:62px;height:62px;border-radius:50%;border:2px solid var(--shu);color:var(--shu);
-  transform:rotate(-11deg);text-align:center;line-height:1.15;flex:none;
-}
-.stamp b{font-size:13px;font-weight:700;display:block}
-.stamp i{font-style:normal;font-size:8.5px;font-family:"Roboto Mono",monospace}
-
-/* ---------- dialog ---------- */
-.mask{position:fixed;inset:0;background:rgba(10,16,24,.5);display:grid;place-items:center;padding:20px;z-index:50}
-.modal{background:var(--panel);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow);width:min(520px,100%);max-height:88dvh;overflow:auto}
-.modal h3{margin:0;padding:14px 17px;border-bottom:1px solid var(--line-2);font-size:14.5px}
-.modal .body{padding:15px 17px;display:grid;gap:12px}
-.modal .foot{padding:12px 17px;border-top:1px solid var(--line-2);display:flex;justify-content:flex-end;gap:8px}
+.chip.warn{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.chip.shu{border-color:var(--shu);color:var(--shu);background:var(--shu-soft)}
+.chip.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.note{font-size:12.5px;color:var(--ink-3);line-height:1.65}
 .field{display:grid;gap:5px}
-.field>span{font-size:11px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
-.field input,.field select{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:7px 9px;width:100%}
-.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:10px 12px;cursor:pointer}
-.opt[data-on="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.opt strong{display:block;font-size:13px}
-.opt small{color:var(--ink-2);font-size:11.5px;line-height:1.5;display:block}
-.note{font-size:11.5px;color:var(--ink-3);line-height:1.6}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 15px;border-radius:6px;font-size:13px;z-index:60;box-shadow:var(--shadow)}
-.banner{display:flex;gap:9px;align-items:center;padding:7px 14px;background:var(--warn-soft);color:var(--warn);font-size:12px;border-bottom:1px solid var(--line)}
-.skel{height:11px;border-radius:3px;background:linear-gradient(90deg,var(--line-2),var(--line),var(--line-2));background-size:200% 100%;animation:sk 1.3s linear infinite}
+.field>span{font-size:10.5px;letter-spacing:.13em;color:var(--ink-3);text-transform:uppercase}
+.field input,.field select,.field textarea{background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:9px 11px;width:100%}
+.field textarea{resize:vertical;min-height:88px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.empty{padding:34px 20px;text-align:center;color:var(--ink-3);font-size:13.5px}
+.empty b{display:block;color:var(--ink-2);font-size:15px;margin-bottom:6px}
+
+/* ---------- list rows ---------- */
+.item{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:center;width:100%;
+  text-align:left;padding:13px 14px;background:var(--panel);border:0;border-bottom:1px solid var(--line-2);cursor:pointer}
+.item:last-child{border-bottom:0}
+.item:hover{background:var(--panel-2)}
+.item .t{font-size:15px;font-weight:500;line-height:1.4}
+.item .s{grid-column:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3)}
+.item .r{grid-row:1/3;justify-self:end;grid-column:2;display:flex;align-items:center;gap:9px;color:var(--ink-3)}
+.item .chev{font-size:17px;color:var(--line)}
+.badge{min-width:22px;height:22px;padding:0 7px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;background:var(--shu-soft);color:var(--shu)}
+.badge.zero{background:var(--line-2);color:var(--ink-3);font-weight:400}
+
+/* ---------- action tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{display:grid;gap:2px;text-align:left;padding:13px 14px;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.tile:hover{border-color:var(--accent-2);background:var(--panel-2)}
+.tile b{font-size:14.5px;font-weight:500}
+.tile small{font-size:11.5px;color:var(--ink-3);line-height:1.5}
+.tile[disabled]{opacity:.45;cursor:not-allowed}
+.tile .n{position:absolute}
+@media (max-width:460px){.tiles{grid-template-columns:1fr}}
+
+/* ---------- sheet / drawing ---------- */
+.stagebar{display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--panel);
+  border-bottom:1px solid var(--line);flex-wrap:wrap;flex:none}
+.sheet-wrap{flex:1;min-height:0;overflow:auto;padding:16px;display:grid;place-items:start center;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;background-color:var(--surface)}
+.sheet{position:relative;background:var(--sheet);border:1px solid var(--sheet-edge);
+  box-shadow:0 2px 3px rgba(19,28,40,.10),0 14px 40px rgba(19,28,40,.15);transform-origin:top center;width:min(100%,1189px)}
+.sheet.invert{filter:invert(1) hue-rotate(180deg)}
+.layer{position:absolute;inset:0;width:100%;height:100%}
+.layer svg,.layer img{display:block;width:100%;height:100%;object-fit:contain}
+.pinlayer{position:absolute;inset:0;pointer-events:none}
+.sheet.picking{cursor:crosshair}
+.pin{position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50% 50% 50% 2px;
+  transform:rotate(-45deg);background:var(--sheet);border:1.5px solid var(--shu);color:var(--shu);
+  display:grid;place-items:center;cursor:pointer;padding:0;pointer-events:auto}
+.pin>span{transform:rotate(45deg);font-size:11.5px;font-weight:700;font-family:"Roboto Mono",monospace}
+.pin.done{border-color:var(--ok);color:var(--ok)}
+.pin[aria-current="true"]{background:var(--shu);color:var(--sheet);box-shadow:0 0 0 4px var(--shu-soft)}
+.pin.done[aria-current="true"]{background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft)}
+.pin3d{z-index:2}
+.preview{display:block;width:100%;background:var(--sheet);border:1px solid var(--sheet-edge);
+  border-radius:10px;overflow:hidden;cursor:pointer;position:relative;padding:0}
+.preview .sheet{border:0;box-shadow:none;width:100%}
+
+/* ---------- 3d ---------- */
+.stage3d{position:relative;width:100%;height:100%;min-height:320px;background:var(--sheet)}
+.stage3d canvas{display:block;width:100%;height:100%;touch-action:none}
+.stage3d.picking canvas{cursor:crosshair}
+.hud{position:absolute;left:10px;bottom:9px;font-family:"Roboto Mono",monospace;font-size:10.5px;
+  color:var(--sheet-ink);opacity:.6;pointer-events:none}
+.loading3d{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:13px;background:var(--sheet)}
+
+/* ---------- banners / toast ---------- */
+.banner{display:flex;gap:9px;align-items:center;padding:10px 13px;background:var(--warn-soft);
+  color:var(--warn);font-size:12.5px;border:1px solid var(--warn);border-radius:9px;flex-wrap:wrap}
+.banner.shu{background:var(--shu-soft);color:var(--shu);border-color:var(--shu)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:9px 16px;border-radius:8px;font-size:13.5px;z-index:60;box-shadow:var(--shadow);max-width:92vw;text-align:center}
+.skel{height:13px;border-radius:4px;background:linear-gradient(90deg,var(--line-2),var(--line),var(--line-2));
+  background-size:200% 100%;animation:sk 1.3s linear infinite}
 @keyframes sk{to{background-position:-200% 0}}
-
-@media (max-width:1080px){
-  .app{height:auto;min-height:100dvh}
-  .topbar{flex-wrap:wrap;height:auto;padding:8px 12px;row-gap:8px}
-  .brand{padding-right:10px}
-  .main{display:flex;flex-direction:column;min-height:0}
-  .rail{border-right:0;border-bottom:1px solid var(--line)}
-  .side{border-left:0;border-top:1px solid var(--line)}
-  .rail .scroll,.side .scroll{overflow:visible;flex:none}
-  .stage{min-height:64dvh}
-  .detail{max-height:none}
-  .sheet-wrap{padding:12px}
-  .titleblock{grid-template-columns:1fr 1fr}
-  .tb{border-bottom:1px solid var(--line-2)}
-}
+.reply{border-left:2px solid var(--line);padding:3px 0 3px 10px;margin-top:9px}
+.reply .rmeta{font-size:11px;color:var(--ink-3)}
+.reply p{margin:2px 0 0;font-size:13.5px}
+.stamp{display:grid;place-items:center;width:66px;height:66px;border-radius:50%;border:2px solid var(--shu);
+  color:var(--shu);transform:rotate(-10deg);text-align:center;line-height:1.15;flex:none}
+.stamp b{font-size:14px;font-weight:700;display:block}
+.stamp i{font-style:normal;font-size:8.5px;font-family:"Roboto Mono",monospace}
+.stamp.ok{border-color:var(--ok);color:var(--ok)}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+table.tbl th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);font-size:10.5px;
+  letter-spacing:.1em;color:var(--ink-3);font-weight:700}
+table.tbl td{padding:7px 10px;border-bottom:1px solid var(--line-2)}
 </style>
-<div class="app">
-  <header class="topbar">
-    <div class="brand"><b>検図台</b><span>drawing review</span></div>
-    <div class="proj-pick">
-      <select class="select" id="projSel" aria-label="プロジェクト"></select>
-      <button class="btn small" id="btnNewProj">＋ プロジェクト</button>
-      <button class="btn small" id="btnProjSet">公開範囲</button>
-    </div>
-    <div class="spacer"></div>
-    <div class="who"><span class="lbl">表示名</span><input id="meName" placeholder="担当者名" maxlength="14"></div>
-    <div class="conn"><span class="dot" id="connDot"></span><span id="connTxt">接続中…</span></div>
+<div id="app">
+  <header class="nav">
+    <button class="back" id="navBack" hidden aria-label="戻る">←</button>
+    <h1 id="navTitle">検図台</h1>
+    <div class="navact" id="navAct"></div>
   </header>
-
-  <div class="banner" id="banner" hidden></div>
-
-  <div class="main">
-    <aside class="rail">
-      <div class="rail-head">
-        <h2>図面リスト</h2><span class="spacer"></span>
-        <button class="btn small" id="btnNewDwg">＋ 図面</button>
-      </div>
-      <div class="scroll" id="dwgList"></div>
-    </aside>
-
-    <section class="stage">
-      <div class="titleblock" id="tblock"></div>
-
-      <div class="toolbar" id="toolbar">
-        <button class="btn" id="btnPin" aria-pressed="false">指摘を打つ</button>
-        <button class="btn" id="btnRev">＋ 版を追加</button>
-        <span style="width:1px;height:20px;background:var(--line)"></span>
-        <div class="seg" role="group" aria-label="比較表示">
-          <button data-cmp="none" aria-pressed="true">単票</button>
-          <button data-cmp="overlay" aria-pressed="false">重ね</button>
-          <button data-cmp="wipe" aria-pressed="false">ワイプ</button>
-          <button data-cmp="side" aria-pressed="false">並べて</button>
-        </div>
-        <label class="slider" id="cmpCtl" hidden>
-          <span id="cmpLabel">透過</span>
-          <input type="range" id="cmpRange" min="0" max="100" value="50">
-          <b class="mono" id="cmpVal" style="font-weight:500;width:34px">50%</b>
-        </label>
-        <span class="spacer"></span>
-        <div class="seg" role="group" aria-label="表示倍率">
-          <button id="zOut" title="縮小">−</button>
-          <button id="zFit" class="mono" style="min-width:56px">100%</button>
-          <button id="zIn" title="拡大">＋</button>
-        </div>
-        <button class="btn" id="btnInvert" aria-pressed="false" title="黒背景・白線で表示">反転</button>
-        <button class="btn" id="btnCsv">検図リスト</button>
-        <button class="btn primary" id="btnApprove">検図結果を記録</button>
-      </div>
-
-      <div class="revbar" id="revbar"></div>
-      <div class="sheet-wrap" id="sheetWrap"></div>
-    </section>
-
-    <aside class="side">
-      <div class="side-head">
-        <h2>指摘事項</h2><span class="spacer"></span>
-        <span class="mono" id="markStat" style="font-size:11px;color:var(--ink-3)"></span>
-      </div>
-      <div class="filters" id="filters">
-        <button class="f" data-f="status:open" aria-pressed="true">未対応</button>
-        <button class="f" data-f="status:doing" aria-pressed="true">対応中</button>
-        <button class="f" data-f="status:done" aria-pressed="false">完了</button>
-        <span style="width:1px;background:var(--line-2)"></span>
-        <button class="f" data-f="rev:cur" aria-pressed="false">この版のみ</button>
-        <button class="f" data-f="mine:1" aria-pressed="false">自分宛</button>
-        <button class="f" data-f="over:1" aria-pressed="false">期限超過</button>
-      </div>
-      <div class="scroll" id="threads"></div>
-      <div class="detail" id="detail" hidden></div>
-    </aside>
-  </div>
+  <main id="main"></main>
 </div>
-<div id="modalHost"></div>
 <div id="toastHost"></div>
 <script>
 "use strict";
-/* ---------------- utils ---------------- */
+/* ============ utils ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=(s)=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const uid=(p)=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const nowISO=()=>new Date().toISOString();
+const today=()=>new Date().toISOString().slice(0,10);
 const fdate=(iso)=>{const d=new Date(iso);return isNaN(d)?"":`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;};
 const REVLET=(i)=>String.fromCharCode(65+Math.min(i,25));
-const today=()=>new Date().toISOString().slice(0,10);
 function overdue(m){return !!(m&&m.due&&m.status!=="done"&&m.due<today());}
 function toast(msg){
   const t=document.createElement("div");t.className="toast";t.textContent=msg;
-  $("#toastHost").appendChild(t);setTimeout(()=>t.remove(),2600);
+  $("#toastHost").appendChild(t);setTimeout(()=>t.remove(),2800);
 }
-function dialog({title,body,ok="登録",onOk,wide}){
-  const host=$("#modalHost");
-  host.innerHTML=`<div class="mask"><div class="modal" role="dialog" aria-modal="true"${wide?' style="width:min(660px,100%)"':""}>
-    <h3>${esc(title)}</h3><div class="body">${body}</div>
-    <div class="foot"><button class="btn" data-x>キャンセル</button><button class="btn primary" data-ok>${esc(ok)}</button></div>
-  </div></div>`;
-  const close=()=>{host.innerHTML="";document.removeEventListener("keydown",key);};
-  const key=(e)=>{if(e.key==="Escape")close();};
-  document.addEventListener("keydown",key);
-  $("[data-x]",host).onclick=close;
-  $(".mask",host).onclick=(e)=>{if(e.target===$(".mask",host))close();};
-  $("[data-ok]",host).onclick=async()=>{const r=await onOk($(".modal",host));if(r!==false)close();};
-  const f=$("input,select,textarea",host); if(f)f.focus();
-  return {close,root:$(".modal",host)};
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
+
+/* ============ state ============ */
+const KINDS=["意匠","構造","設備","法規","その他"];
+const STATUS={open:"未対応",doing:"対応中",done:"完了"};
+const COLORS={shu:"#BC3B2B",blue:"#234B85",green:"#2C6A4C",ink:"#1A2430"};
+const THREE_BASE="https://cdn.jsdelivr.net/npm/three@0.128.0";
+const VW=1000;
+const S={db:null,assets:null,dl:null,sample:null,editor:false,ready:false,me:"",
+  projects:[],pid:null,drawings:[],did:null,revs:[],marks:[],
+  view:"2d",revId:null,cmpId:null,mode:"overlay",ratio:50,zoom:1,invert:false,
+  pinMode:false,selMark:null,filt:{open:1,doing:1,done:0,mine:0,over:0}};
+const E={tool:"select",color:"shu",width:2,show:true,all:false,sel:null,shapes:[],mine:[]};
+const V={host:null,renderer:null,scene:null,camera:null,controls:null,model:null,
+  loaded:null,pending:false,proj:"persp",restore:null,ro:null};
+const bucket={projects:[],vault:[]};
+const subs={};
+
+const rootOf=(p)=>p&&p.visibility==="private"?"vault":"projects";
+const curProj=()=>S.projects.find(p=>p.id===S.pid)||null;
+const curDwg=()=>S.drawings.find(d=>d.id===S.did)||null;
+const revsIn=(v)=>S.revs.filter(r=>(r.view||"2d")===(v||S.view));
+const has3D=()=>S.revs.some(r=>r.view==="3d");
+const curRev=()=>{const l=revsIn();return l.find(r=>r.id===S.revId)||l[l.length-1]||null;};
+const cmpRev=()=>S.revs.find(r=>r.id===S.cmpId)||null;
+const base=()=>{const p=curProj();return p?`${rootOf(p)}/${p.id}`:null;};
+const dwgPath=()=>base()&&S.did?`${base()}/drawings/${S.did}`:null;
+const ratioOf=()=>{const r=curRev();return r&&r.src==="asset"&&r.w&&r.h?r.h/r.w:841/1189;};
+const VH=()=>1000*ratioOf();
+const marks3D=()=>S.marks.filter(m=>m.view==="3d");
+const openCount=()=>S.marks.filter(m=>m.status!=="done").length;
+function need(){if(!S.db){toast("共有バックエンドに接続していません");return false;}return true;}
+
+/* ============ router ============ */
+const R={stack:[{s:"home",o:{}}]};
+const SCREENS={};
+const cur=()=>R.stack[R.stack.length-1];
+function go(s,o){
+  if(s==="import")resetImport();
+  if(s==="ai"&&AI.did!==S.did){AI.cands=null;AI.did=S.did;}
+  R.stack.push({s,o:o||{}});paint();scrollTo(0,0);
+}
+function back(){if(R.stack.length>1){R.stack.pop();paint();}}
+function replace(s,o){R.stack[R.stack.length-1]={s,o:o||{}};paint();}
+function home(){R.stack=[{s:"home",o:{}}];paint();}
+function refresh(){const c=cur();if(SCREENS[c.s]&&SCREENS[c.s].live===false)return;paint();}
+function paint(){
+  const c=cur(),sc=SCREENS[c.s]||SCREENS.home;
+  $("#navBack").hidden=R.stack.length<=1;
+  const t=sc.title?sc.title(c.o):"検図台";
+  $("#navTitle").innerHTML=t;
+  const act=$("#navAct");act.innerHTML="";
+  const main=$("#main");main.innerHTML="";
+  const host=el("div","wrap"+(sc.full?" full":""));
+  main.appendChild(host);
+  try{sc.body(host,c.o);}catch(e){host.innerHTML=`<div class="empty"><b>表示できませんでした</b>${esc(e&&e.message||"")}</div>`;}
+  if(sc.act)sc.act(act,c.o);
+}
+$("#navBack").onclick=back;
+document.addEventListener("keydown",(e)=>{
+  if(/input|textarea|select/i.test(e.target.tagName))return;
+  if(e.key==="Escape")back();
+});
+
+/* ============ boot ============ */
+try{S.me=localStorage.getItem("kz.me")||"";}catch(e){S.me="";}
+function setMe(v){S.me=v.trim();try{localStorage.setItem("kz.me",S.me);}catch(e){}}
+
+async function start(){
+  paint();
+  const use=(n)=>(window.claude&&claude.use)?Promise.resolve(claude.use(n)).catch(()=>null):Promise.resolve(null);
+  const [db,assets,dl,sm]=await Promise.all([use("db"),use("assets"),use("downloads"),use("sample")]);
+  S.db=db;S.assets=assets;S.dl=dl;S.sample=sm;S.editor=!!assets;S.ready=true;
+  if(!db){paint();return;}
+  subProjects();
 }
 
-/* ---------------- sample drawings (procedural) ---------------- */
+/* ============ subscriptions ============ */
+function subProjects(){
+  ["projects","vault"].forEach(rt=>{
+    if(subs[rt])subs[rt]();
+    subs[rt]=S.db.collection(rt).onSnapshot(
+      snap=>{bucket[rt]=snap.docs.map(d=>({...d.data(),id:d.id}));mergeProjects();},
+      ()=>{bucket[rt]=[];mergeProjects();});
+  });
+}
+function mergeProjects(){
+  S.projects=[...bucket.projects,...bucket.vault].sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt)));
+  if(!S.pid||!curProj())pickProject(S.projects[0]?S.projects[0].id:null);
+  else refresh();
+}
+function pickProject(pid){
+  S.pid=pid;S.did=null;S.drawings=[];S.revs=[];S.marks=[];S.selMark=null;E.shapes=[];
+  ["dwg","rev","mark","edit"].forEach(k=>{if(subs[k]){subs[k]();delete subs[k];}});
+  if(S.db&&pid){
+    subs.dwg=S.db.collection(`${base()}/drawings`).onSnapshot(snap=>{
+      S.drawings=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.no).localeCompare(String(b.no)));
+      refresh();
+    },()=>{});
+  }
+  refresh();
+}
+function pickDrawing(did){
+  S.did=did;S.revs=[];S.marks=[];E.shapes=[];S.selMark=null;S.revId=null;S.cmpId=null;S.view="2d";
+  ["rev","mark","edit"].forEach(k=>{if(subs[k]){subs[k]();delete subs[k];}});
+  if(S.db&&did){
+    subs.rev=S.db.collection(`${dwgPath()}/revs`).onSnapshot(snap=>{
+      S.revs=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
+      if(!revsIn().length&&S.revs.length)S.view=S.revs[0].view||"2d";
+      const rl=revsIn();
+      if(!S.revId||!rl.some(r=>r.id===S.revId))S.revId=rl.length?rl[rl.length-1].id:null;
+      refresh();
+    },()=>{});
+    subs.mark=S.db.collection(`${dwgPath()}/marks`).onSnapshot(snap=>{
+      S.marks=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(a.no||0)-(b.no||0));
+      refresh();
+    },()=>{});
+    subs.edit=S.db.collection(`${dwgPath()}/edits`).onSnapshot(snap=>{
+      E.shapes=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
+      refresh();
+    },()=>{});
+  }
+}
+
+/* ============ sheet helpers ============ */
+function layerHTML(rev,ink){
+  if(!rev)return "";
+  if(rev.src==="gen")return genSVG(rev.gen,ink);
+  if(rev.src==="model")return `<div class="empty">3Dモデル</div>`;
+  return `<img src="/_blob/${esc(rev.asset)}" alt="Rev.${esc(rev.rev)} の図面">`;
+}
+function sheetAspect(rev){
+  if(rev&&rev.src==="asset"&&rev.w&&rev.h)return `${rev.w} / ${rev.h}`;
+  return "1189 / 841";
+}
+function pinsHTML(opts){
+  const o=opts||{};
+  const r=curRev();
+  return S.marks.filter(m=>(m.view||"2d")==="2d")
+    .filter(m=>!o.thisRev||!r||m.rev===r.rev)
+    .map(m=>`<button class="pin ${m.status==="done"?"done":""}" data-mid="${esc(m.id)}"
+      aria-current="${m.id===S.selMark}" style="left:${(m.x*100).toFixed(2)}%;top:${(m.y*100).toFixed(2)}%"
+      title="${esc(m.title)}"><span>${m.no}</span></button>`).join("");
+}
+function visibleShapes(){
+  const r=curRev();
+  return E.shapes.filter(s=>E.all||!r||s.rev===r.rev);
+}
+function sheetHTML(o){
+  const r=o.rev,c=o.cmp,two=!!c;
+  const topStyle=o.mode==="overlay"?`opacity:${o.ratio/100}`:o.mode==="wipe"?`clip-path:inset(0 ${100-o.ratio}% 0 0)`:"";
+  return `<div class="sheet${S.invert?" invert":""}${o.pick?" picking":""}" id="sheet"
+    style="aspect-ratio:${sheetAspect(r)};width:min(${Math.round(1189*S.zoom)}px, ${Math.round(100*S.zoom)}%)">
+    ${two?`<div class="layer">${layerHTML(c,"var(--shu)")}</div>`:""}
+    <div class="layer" style="${topStyle}">${layerHTML(r,two?"var(--accent)":"var(--sheet-ink)")}</div>
+    ${two&&o.mode==="wipe"?`<div style="position:absolute;top:0;bottom:0;left:${o.ratio}%;width:1px;background:var(--accent)"></div>`:""}
+    ${o.edits!==false?`<svg class="editlayer" viewBox="0 0 ${VW} ${VH()}" preserveAspectRatio="none"
+      style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">${visibleShapes().map(s=>shapeSVG(s,s.id===E.sel)).join("")}</svg>`:""}
+    ${o.pins!==false?`<div class="pinlayer">${pinsHTML(o)}</div>`:""}
+  </div>`;
+}
+function ensureHost(){
+  if(V.host)return V.host;
+  const h=el("div","stage3d");
+  h.innerHTML=`<div class="pinlayer" id="pin3d"></div><div class="hud" id="hud3d"></div>`;
+  V.host=h;return h;
+}
+
+</script>
+<script>
 function dimH(x1,x2,y,label,ink){
   return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${ink}" stroke-width="1"/>
   <line x1="${x1-5}" y1="${y+5}" x2="${x1+5}" y2="${y-5}" stroke="${ink}" stroke-width="1.4"/>
   <line x1="${x2-5}" y1="${y+5}" x2="${x2+5}" y2="${y-5}" stroke="${ink}" stroke-width="1.4"/>
   <text x="${(x1+x2)/2}" y="${y-7}" fill="${ink}" font-family="Roboto Mono, monospace" font-size="13" text-anchor="middle">${label}</text>`;
 }
+
 function dimV(y1,y2,x,label,ink){
   return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${ink}" stroke-width="1"/>
   <line x1="${x-5}" y1="${y1+5}" x2="${x+5}" y2="${y1-5}" stroke="${ink}" stroke-width="1.4"/>
   <line x1="${x-5}" y1="${y2+5}" x2="${x+5}" y2="${y2-5}" stroke="${ink}" stroke-width="1.4"/>
   <text x="${x-8}" y="${(y1+y2)/2}" fill="${ink}" font-family="Roboto Mono, monospace" font-size="13" text-anchor="middle" transform="rotate(-90 ${x-8} ${(y1+y2)/2})">${label}</text>`;
 }
+
 function room(x1,y1,x2,y2,name,area,ink){
   const cx=(x1+x2)/2, cy=(y1+y2)/2;
   return `<text x="${cx}" y="${cy}" fill="${ink}" font-size="17" text-anchor="middle" font-family="Zen Kaku Gothic New, sans-serif">${name}</text>
   <text x="${cx}" y="${cy+18}" fill="${ink}" font-size="11" text-anchor="middle" font-family="Roboto Mono, monospace" opacity="0.75">${area}</text>`;
 }
+
 function genPlan(variant,ink){
   const XS=[200,395,590,785,980], YS=[190,415,640];
   const P=variant==="b"?845:785;
@@ -417,6 +443,7 @@ function genPlan(variant,ink){
   s+=`<text x="56" y="790" fill="${ink}" font-size="13" font-family="Roboto Mono, monospace">S = 1:200   UNIT: mm</text>`;
   return s;
 }
+
 function genElev(ink){
   let s=`<rect x="34" y="34" width="1121" height="773" fill="none" stroke="${ink}" stroke-width="2"/>`;
   s+=`<line x1="140" y1="660" x2="1050" y2="660" stroke="${ink}" stroke-width="5.5"/>
@@ -446,276 +473,15 @@ function genElev(ink){
   s+=`<text x="56" y="790" fill="${ink}" font-size="13" font-family="Roboto Mono, monospace">S = 1:200   UNIT: mm</text>`;
   return s;
 }
+
 function genSVG(kind,ink){
   const inner=kind==="elev"?genElev(ink):genPlan(kind==="plan-b"?"b":"a",ink);
   return `<svg viewBox="0 0 1189 841" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="サンプル図面">${inner}</svg>`;
 }
-</script>
-<script>
+
+
 /* ---------------- state ---------------- */
-const S={db:null,assets:null,dl:null,editor:false,ready:false,
-  projects:[],pid:null,drawings:[],did:null,revs:[],marks:[],
-  view:"2d",revId:null,cmpId:null,mode:"none",ratio:50,zoom:1,invert:false,pinMode:false,selMark:null,
-  filt:{open:1,doing:1,done:0,curRev:0},me:"",sample:null};
-const bucket={projects:[],vault:[]};
-const subs={};
-const KINDS=["意匠","構造","設備","法規","その他"];
-const STATUS={open:"未対応",doing:"対応中",done:"完了"};
-const rootOf=(p)=>p&&p.visibility==="private"?"vault":"projects";
-const curProj=()=>S.projects.find(p=>p.id===S.pid)||null;
-const curDwg=()=>S.drawings.find(d=>d.id===S.did)||null;
-const revsIn=(v)=>S.revs.filter(r=>(r.view||"2d")===(v||S.view));
-const has3D=()=>S.revs.some(r=>r.view==="3d");
-const curRev=()=>{const l=revsIn();return l.find(r=>r.id===S.revId)||l[l.length-1]||null;};
-const cmpRev=()=>S.revs.find(r=>r.id===S.cmpId)||null;
-const base=()=>{const p=curProj();return p?`${rootOf(p)}/${p.id}`:null;};
-const dwgPath=()=>base()&&S.did?`${base()}/drawings/${S.did}`:null;
-const need=()=>{if(!S.db){toast("共有バックエンドに接続していません");return false;}return true;};
 
-/* ---------------- boot ---------------- */
-try{S.me=localStorage.getItem("kz.me")||"";}catch(e){S.me="";}
-$("#meName").value=S.me;
-$("#meName").oninput=(e)=>{S.me=e.target.value.trim();try{localStorage.setItem("kz.me",S.me);}catch(err){}};
-setConn("接続中…","");
-renderAll();
-
-(async()=>{
-  const use=(n)=>(window.claude&&claude.use)?Promise.resolve(claude.use(n)).catch(()=>null):Promise.resolve(null);
-  const [db,assets,dl,sm]=await Promise.all([use("db"),use("assets"),use("downloads"),use("sample")]);
-  S.db=db;S.assets=assets;S.dl=dl;S.sample=sm;S.editor=!!assets;S.ready=true;
-  $("#btnCsv").hidden=!dl;
-  if(!db){
-    setConn("未接続（閲覧のみ）","off");
-    banner("共有バックエンドに接続できません。公開されたこのページを claude.ai で開くと、図面と指摘がチームで共有されます。");
-    renderAll();return;
-  }
-  setConn(S.editor?"接続済み・編集権限あり":"接続済み・閲覧と指摘","on");
-  subProjects();
-})();
-
-function setConn(t,k){$("#connTxt").textContent=t;$("#connDot").className="dot"+(k?" "+k:"");}
-function banner(t){const b=$("#banner");b.hidden=!t;b.textContent=t||"";}
-
-/* ---------------- subscriptions ---------------- */
-function subProjects(){
-  ["projects","vault"].forEach(rt=>{
-    if(subs[rt])subs[rt]();
-    subs[rt]=S.db.collection(rt).onSnapshot(
-      snap=>{bucket[rt]=snap.docs.map(d=>({...d.data(),id:d.id,_root:rt}));mergeProjects();},
-      ()=>{bucket[rt]=[];mergeProjects();}
-    );
-  });
-}
-function mergeProjects(){
-  S.projects=[...bucket.projects,...bucket.vault].sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt)));
-  if(!S.pid||!curProj())selectProject(S.projects[0]?S.projects[0].id:null,true);
-  else renderProjects();
-}
-function selectProject(pid,silent){
-  S.pid=pid;S.did=null;S.drawings=[];S.revs=[];S.marks=[];S.selMark=null;
-  ["dwg","rev","mark"].forEach(k=>{if(subs[k]){subs[k]();delete subs[k];}});
-  if(S.db&&pid){
-    subs.dwg=S.db.collection(`${base()}/drawings`).onSnapshot(snap=>{
-      S.drawings=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.no).localeCompare(String(b.no)));
-      if(!S.did||!curDwg())selectDrawing(S.drawings[0]?S.drawings[0].id:null);
-      else renderAll();
-    },()=>{});
-  }
-  renderAll();
-}
-function selectDrawing(did){
-  S.did=did;S.revs=[];S.marks=[];S.selMark=null;S.revId=null;S.cmpId=null;
-  ["rev","mark"].forEach(k=>{if(subs[k]){subs[k]();delete subs[k];}});
-  if(S.db&&did){
-    subs.rev=S.db.collection(`${dwgPath()}/revs`).onSnapshot(snap=>{
-      S.revs=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
-      if(!revsIn().length&&S.revs.length)S.view=(S.revs[0].view||"2d");
-      const rl=revsIn();
-      if(!S.revId||!rl.some(r=>r.id===S.revId))S.revId=rl.length?rl[rl.length-1].id:null;
-      renderStage();
-    },()=>{});
-    subs.mark=S.db.collection(`${dwgPath()}/marks`).onSnapshot(snap=>{
-      S.marks=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(a.no||0)-(b.no||0));
-      renderStage();renderThreads();renderDwgList();
-    },()=>{});
-  }
-  renderAll();
-}
-
-/* ---------------- render ---------------- */
-function renderAll(){renderProjects();renderDwgList();renderStage();renderThreads();}
-
-function renderProjects(){
-  const sel=$("#projSel");
-  sel.innerHTML=S.projects.length
-    ? S.projects.map(p=>`<option value="${esc(p.id)}"${p.id===S.pid?" selected":""}>${p.visibility==="private"?"非公開 / ":""}${esc(p.name)}</option>`).join("")
-    : `<option>プロジェクトがありません</option>`;
-  sel.disabled=!S.projects.length;
-}
-
-function renderDwgList(){
-  const host=$("#dwgList");
-  if(!S.db&&!S.ready){host.innerHTML=`<div style="padding:14px;display:grid;gap:9px">${'<div class="skel"></div>'.repeat(5)}</div>`;return;}
-  if(!S.projects.length){
-    host.innerHTML=`<div class="empty"><b>まだプロジェクトがありません</b>「＋ プロジェクト」から工事名称を登録すると、図面と検図記録をここに集約できます。</div>`;return;
-  }
-  if(!S.drawings.length){
-    host.innerHTML=`<div class="empty"><b>図面が登録されていません</b>「＋ 図面」で図面番号と図面名称を登録し、紙の原図を撮影して版として取り込みます。</div>`;return;
-  }
-  host.innerHTML=S.drawings.map(d=>{
-    const open=d.id===S.did?S.marks.filter(m=>m.status!=="done").length:(d.openCount||0);
-    const rv=d.id===S.did?(S.revs.length?S.revs[S.revs.length-1].rev:"—"):(d.lastRev||"—");
-    const rl=d.review&&d.review.result;
-    return `<button class="dwg" data-did="${esc(d.id)}" aria-current="${d.id===S.did}">
-      <span class="dwg-no mono">${esc(d.no)}</span><span></span>
-      <span class="count ${open?"":"zero"}">${open}</span>
-      <span class="dwg-title">${esc(d.title)}</span>
-      <span class="dwg-meta"><span class="rev-tag mono">Rev.${esc(rv)}</span><span>${esc(d.discipline||"")}</span>${d.kind&&d.kind!=="図面"?`<span class="chip">${esc(d.kind)}</span>`:""}
-      ${rl?`<span style="color:var(--${rl==="要修正"?"shu":"ok"})">${esc(rl)}</span>`:`<span>検図前</span>`}</span>
-    </button>`;
-  }).join("");
-  $$(".dwg",host).forEach(b=>b.onclick=()=>selectDrawing(b.dataset.did));
-}
-
-function renderTitleBlock(){
-  const p=curProj(),d=curDwg(),r=curRev();
-  const vis=p?(p.visibility==="private"
-    ? `<span class="vis private">非公開</span>`
-    : `<span class="vis open">オープン</span>`):"";
-  $("#tblock").innerHTML=`
-    <div class="tb"><i>工事名称</i><b>${p?esc(p.name):"—"} ${vis}${p&&p.sample?' <span class="chip">サンプル</span>':""}</b></div>
-    <div class="tb"><i>図面番号</i><b class="mono">${d?esc(d.no):"—"}</b></div>
-    <div class="tb"><i>図面名称</i><b>${d?esc(d.title):"—"}</b></div>
-    <div class="tb"><i>縮尺</i><b class="mono">${d?esc(d.scale||"—"):"—"}</b></div>
-    <div class="tb"><i>版 / 検図</i><b class="mono">${r?"Rev."+esc(r.rev):"—"} <span style="color:var(--ink-3)">/</span> ${
-      d&&d.review?`<span style="color:var(--${d.review.result==="要修正"?"shu":"ok"})">${esc(d.review.result)}</span>`:"未実施"}</b></div>`;
-}
-
-function layerHTML(rev,ink){
-  if(!rev)return "";
-  if(rev.src==="gen")return genSVG(rev.gen,ink);
-  return `<img src="/_blob/${esc(rev.asset)}" alt="${esc(rev.rev)}版の図面">`;
-}
-function sheetAspect(rev){
-  if(rev&&rev.src==="asset"&&rev.w&&rev.h)return `${rev.w} / ${rev.h}`;
-  return "1189 / 841";
-}
-function sheetStyle(rev){
-  return `aspect-ratio:${sheetAspect(rev)};width:min(${Math.round(1189*S.zoom)}px, ${Math.round(100*S.zoom)}%)`;
-}
-function pinsHTML(){
-  const r=curRev();
-  return S.marks.filter(m=>!S.filt.curRev||!r||m.rev===r.rev).map(m=>
-    `<button class="pin ${m.status==="done"?"done":""}" data-mid="${esc(m.id)}" aria-current="${m.id===S.selMark}"
-      style="left:${(m.x*100).toFixed(2)}%;top:${(m.y*100).toFixed(2)}%" title="${esc(m.title)}"><span>${m.no}</span></button>`
-  ).join("");
-}
-function renderStage(){
-  renderTitleBlock();renderRevbar();
-  const w=$("#sheetWrap"),r=curRev(),c=cmpRev();
-  const noRev=!S.did||!r;
-  $("#btnPin").disabled=noRev;$("#btnRev").disabled=!S.did;$("#btnApprove").disabled=!S.did;
-  if(!S.did){
-    w.innerHTML=`<div class="empty"><b>図面を選んでください</b>左の図面リストから選ぶと、版の履歴と指摘がここに表示されます。</div>`;return;
-  }
-  if(!r){
-    w.innerHTML=`<div class="empty"><b>まだ版が登録されていません</b>紙の原図を真上から撮影するか、スキャンした画像を「＋ 版を追加」から取り込みます。台形の歪みはその場で補正できます。</div>`;return;
-  }
-  const inv=S.invert?" invert":"";
-  const pick=S.pinMode?" picking":"";
-  if(S.mode==="side"&&c){
-    w.innerHTML=`<div style="display:flex;gap:14px;width:100%;align-items:flex-start;justify-content:center">
-      <div style="flex:1;min-width:0"><div class="lbl" style="margin-bottom:5px">Rev.${esc(c.rev)}（比較）</div>
-        <div class="sheet${inv}" style="aspect-ratio:${sheetAspect(c)};width:100%"><div class="layer">${layerHTML(c,"var(--sheet-ink)")}</div></div></div>
-      <div style="flex:1;min-width:0"><div class="lbl" style="margin-bottom:5px">Rev.${esc(r.rev)}（現在）</div>
-        <div class="sheet${inv}${pick}" id="sheet" style="aspect-ratio:${sheetAspect(r)};width:100%">
-          <div class="layer">${layerHTML(r,"var(--sheet-ink)")}</div><div class="pinlayer">${pinsHTML()}</div></div></div>
-    </div>`;
-  }else{
-    const two=(S.mode==="overlay"||S.mode==="wipe")&&c;
-    const topStyle=S.mode==="overlay"?`opacity:${S.ratio/100}`
-      :S.mode==="wipe"?`clip-path:inset(0 ${100-S.ratio}% 0 0)`:"";
-    w.innerHTML=`<div class="sheet${inv}${pick}" id="sheet" style="${sheetStyle(r)}">
-      ${two?`<div class="layer">${layerHTML(c,"var(--shu)")}</div>`:""}
-      <div class="layer top" style="${topStyle}">${layerHTML(r,two?"var(--accent)":"var(--sheet-ink)")}</div>
-      ${two&&S.mode==="wipe"?`<div style="position:absolute;top:0;bottom:0;left:${S.ratio}%;width:1px;background:var(--accent);box-shadow:0 0 0 1px rgba(255,255,255,.6)"></div>`:""}
-      <div class="pinlayer">${pinsHTML()}</div></div>`;
-  }
-  const sh=$("#sheet");
-  if(sh){
-    sh.onclick=(e)=>{
-      if(!S.pinMode)return;
-      if(e.target.closest(".pin"))return;
-      const b=sh.getBoundingClientRect();
-      newMark((e.clientX-b.left)/b.width,(e.clientY-b.top)/b.height);
-    };
-    $$(".pin",sh).forEach(p=>p.onclick=(e)=>{e.stopPropagation();S.selMark=p.dataset.mid;renderStage();renderThreads();});
-  }
-  $("#zFit").textContent=Math.round(S.zoom*100)+"%";
-}
-function renderRevbar(){
-  const bar=$("#revbar");
-  if(!S.did){bar.innerHTML="";return;}
-  bar.innerHTML=revsIn().map(r=>{
-    const cur=r.id===S.revId,cmp=r.id===S.cmpId;
-    return `<button class="rev${cmp?" cmp":""}" data-rid="${esc(r.id)}" aria-current="${cur}">
-      <b>Rev.${esc(r.rev)}</b><i>${esc(fdate(r.at))} ${esc(r.by||"")}</i></button>`;
-  }).join("")||`<span class="mono" style="padding:9px 0;color:var(--ink-3);font-size:12px">版なし</span>`;
-  $$(".rev",bar).forEach(b=>{
-    b.onclick=()=>{S.revId=b.dataset.rid;if(S.cmpId===S.revId)S.cmpId=null;renderStage();renderThreads();};
-    b.oncontextmenu=(e)=>{e.preventDefault();S.cmpId=S.cmpId===b.dataset.rid?null:b.dataset.rid;renderStage();};
-    b.title="クリックで表示 / 右クリックで比較対象に指定";
-  });
-}
-function visibleMarks(){
-  const r=curRev();
-  return S.marks.filter(m=>S.filt[m.status||"open"]).filter(m=>!S.filt.curRev||!r||m.rev===r.rev);
-}
-function renderThreads(){
-  const host=$("#threads"),list=visibleMarks();
-  const openN=S.marks.filter(m=>m.status!=="done").length;
-  $("#markStat").textContent=S.marks.length?`未対応 ${openN} / 全 ${S.marks.length}`:"";
-  if(!S.did){host.innerHTML=`<div class="empty">図面を選ぶと指摘が表示されます。</div>`;renderDetail();return;}
-  if(!list.length){
-    host.innerHTML=`<div class="empty"><b>該当する指摘はありません</b>「指摘を打つ」を押して図面上の位置をクリックすると、その座標に指摘を残せます。</div>`;
-    renderDetail();return;
-  }
-  host.innerHTML=list.map(m=>`<button class="thread" data-mid="${esc(m.id)}" aria-current="${m.id===S.selMark}">
-    <span class="th-top"><span class="num ${m.status==="done"?"done":""}">#${m.no}</span>
-      <span class="chip kind-${esc(m.kind)}">${esc(m.kind)}</span>
-      <span class="chip">${esc(STATUS[m.status]||"未対応")}</span>
-      <span class="chip mono">Rev.${esc(m.rev)}</span></span>
-    <span class="th-title">${esc(m.title)}</span>
-    <span class="th-sub"><span>${esc(m.by||"—")}</span><span class="mono">${esc(fdate(m.at))}</span>${m.replies&&m.replies.length?`<span>返信 ${m.replies.length}</span>`:""}${
-      m.assignee?`<span>→ ${esc(m.assignee)}</span>`:""}${
-      m.due?`<span class="mono"${overdue(m)?' style="color:var(--shu);font-weight:700"':""}>期限 ${esc(m.due)}</span>`:""}</span>
-  </button>`).join("");
-  $$(".thread",host).forEach(b=>b.onclick=()=>{S.selMark=b.dataset.mid;renderThreads();renderStage();});
-  renderDetail();
-}
-function renderDetail(){
-  const d=$("#detail"),m=S.marks.find(x=>x.id===S.selMark);
-  if(!m){d.hidden=true;d.innerHTML="";return;}
-  d.hidden=false;
-  d.innerHTML=`<div class="th-top"><span class="num ${m.status==="done"?"done":""}">#${m.no}</span>
-    <span class="chip kind-${esc(m.kind)}">${esc(m.kind)}</span><span class="chip mono">Rev.${esc(m.rev)}</span>
-    <span class="spacer" style="flex:1"></span><button class="btn small" data-del>削除</button></div>
-  <div style="font-size:14px;font-weight:500;margin-top:4px">${esc(m.title)}</div>
-  <div style="font-size:12.5px;color:var(--ink-2);white-space:pre-wrap;margin-top:4px">${esc(m.body||"")}</div>
-  <div class="th-sub" style="margin-top:6px"><span>${esc(m.by||"—")}</span><span class="mono">${esc(fdate(m.at))}</span></div>
-  ${(m.replies||[]).map(r=>`<div class="reply"><div class="rmeta"><b>${esc(r.by||"—")}</b> <span class="mono">${esc(fdate(r.at))}</span></div><p>${esc(r.text)}</p></div>`).join("")}
-  <div class="row" role="group" aria-label="対応状態">
-    ${Object.entries(STATUS).map(([k,v])=>`<button class="f" data-st="${k}" aria-pressed="${(m.status||"open")===k}">${v}</button>`).join("")}
-  </div>
-  <textarea id="replyBox" placeholder="回答・対応内容を書く" style="margin-top:9px"></textarea>
-  <div class="row"><button class="btn primary" data-reply>返信する</button></div>`;
-  $$("[data-st]",d).forEach(b=>b.onclick=()=>setStatus(m,b.dataset.st));
-  $("[data-reply]",d).onclick=()=>addReply(m);
-  $("[data-del]",d).onclick=()=>{if(confirm(`指摘 #${m.no} を削除します。よろしいですか。`))delMark(m);};
-}
-</script>
-<script>
-/* ---------------- 画像処理：台形補正・白飛ばし ---------------- */
 function solveH(dst,src){
   const A=[],b=[];
   for(let i=0;i<4;i++){
@@ -733,6 +499,7 @@ function solveH(dst,src){
   }
   return b.concat([1]);
 }
+
 function warp(img,quad,maxSide){
   const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
   let W=Math.round(Math.max(d(quad[0],quad[1]),d(quad[3],quad[2])));
@@ -759,6 +526,7 @@ function warp(img,quad,maxSide){
   out.getContext("2d").putImageData(oi,0,0);
   return out;
 }
+
 function finish(cv,mode){
   if(mode==="raw")return cv;
   const ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
@@ -779,10 +547,11 @@ function finish(cv,mode){
   ctx.putImageData(im,0,0);
   return cv;
 }
+
 const toBlob=(cv,mode)=>new Promise(res=>cv.toBlob(res,mode==="line"?"image/png":"image/jpeg",0.92));
 
 /* ---------------- PDF ---------------- */
-let pdfLib=null;
+
 function loadPdfJs(){
   if(pdfLib)return Promise.resolve(pdfLib);
   return new Promise((res,rej)=>{
@@ -795,6 +564,7 @@ function loadPdfJs(){
     document.head.appendChild(s);
   });
 }
+
 async function pdfPageToCanvas(doc,n,maxSide){
   const page=await doc.getPage(n);
   const v1=page.getViewport({scale:1});
@@ -807,454 +577,6 @@ async function pdfPageToCanvas(doc,n,maxSide){
 }
 
 /* ---------------- 取り込み（版の追加） ---------------- */
-function nextRevLetter(){
-  const used=revsIn("2d").map(r=>r.rev);
-  for(let i=0;i<26;i++){const l=REVLET(i);if(!used.includes(l))return l;}
-  return String(S.revs.length+1);
-}
-function openCapture(){
-  if(!need())return;
-  if(!S.assets){toast("図面の取り込みには編集権限が必要です（このアーティファクトを「編集可」で共有してもらってください）");return;}
-  const st={img:null,quad:null,mode:"shadow",warp:true,canvas:null,pdfDoc:null,page:1,pdfBlob:null};
-  const dlg=dialog({title:"版を追加 — 原図の取り込み",wide:true,ok:"この内容で登録",onOk:()=>register(dlg,st)});
-  step1(dlg,st);
-}
-function step1(dlg,st){
-  $(".body",dlg.root).innerHTML=`
-    <div class="note">紙の図面は<b>真上から撮影</b>して台形補正するのが最短です。A3以下はスキャナ（300dpi・グレースケール）が最もきれいに残ります。</div>
-    <div style="display:grid;gap:9px">
-      <label class="opt"><div><strong>カメラで撮影する</strong><small>スマートフォンで開いている場合、その場でカメラが起動します。図面の四隅が画面に入るように、影が落ちない向きで。</small>
-        <input type="file" accept="image/*" capture="environment" id="capCam" style="margin-top:7px"></div></label>
-      <label class="opt"><div><strong>画像ファイル（JPG / PNG）</strong><small>スキャナで取り込んだ画像、既に撮影済みの写真。</small>
-        <input type="file" accept="image/*" id="capFile" style="margin-top:7px"></div></label>
-      <label class="opt"><div><strong>PDF</strong><small>CADからの出力やスキャンPDF。ページを選んで画像として取り込みます。</small>
-        <input type="file" accept="application/pdf" id="capPdf" style="margin-top:7px"></div></label>
-    </div>
-    <div class="note">撮影のコツ： ①真上から ②蛍光灯の映り込みを避ける ③図面枠の四隅を画面内に ④なるべく明るい場所で</div>`;
-  $("[data-ok]",dlg.root).disabled=true;
-  const onImg=(e)=>{
-    const f=e.target.files&&e.target.files[0];if(!f)return;
-    const img=new Image();img.onload=()=>{st.img=img;st.pdfBlob=null;step2(dlg,st);};
-    img.onerror=()=>toast("画像を読み込めませんでした");
-    img.src=URL.createObjectURL(f);
-  };
-  $("#capCam",dlg.root).onchange=onImg;
-  $("#capFile",dlg.root).onchange=onImg;
-  $("#capGlb",dlg.root).onchange=async(e)=>{
-    const f=e.target.files&&e.target.files[0];if(!f)return;
-    $(".body",dlg.root).innerHTML=`<div class="note">3Dモデルを登録しています… 大きなモデルは少し時間がかかります。</div>`;
-    try{
-      const buf=await f.arrayBuffer();
-      if(buf.byteLength>14.5*1024*1024)throw new Error("size");
-      const wrapped=JSON.stringify({format:/\.gltf$/i.test(f.name)?"gltf":"glb",name:f.name,b64:abToB64(buf)});
-      const up=await S.assets.upload(new Blob([wrapped],{type:"application/json"}),{type:"application/json"});
-      const rev=next3DLetter();
-      await S.db.collection(`${dwgPath()}/revs`).add({
-        rev,view:"3d",src:"model",asset:up.id,format:/\.gltf$/i.test(f.name)?"gltf":"glb",
-        note:f.name,by:S.me||"名無し",at:nowISO()});
-      await S.db.doc(dwgPath()).update({has3d:true});
-      await propagate(rev);
-      S.view="3d";S.revId=null;
-      toast(`3Dモデル Rev.${rev} を登録しました`);
-      dlg.close();renderStage();
-    }catch(err){
-      $(".body",dlg.root).innerHTML=`<div class="note" style="color:var(--shu)">${
-        err&&err.message==="size"?"ファイルが大きすぎます（約14MBまで）。不要なオブジェクトを削るか、テクスチャを縮小して書き出してください。"
-        :"3Dモデルを登録できませんでした。GLB形式での書き出しをお試しください。"}</div>`;
-    }
-  };
-  $("#capPdf",dlg.root).onchange=async(e)=>{
-    const f=e.target.files&&e.target.files[0];if(!f)return;
-    $(".body",dlg.root).innerHTML=`<div class="note">PDFを読み込んでいます…</div>`;
-    try{
-      const lib=await loadPdfJs();
-      const buf=await f.arrayBuffer();
-      st.pdfBlob=f;
-      st.pdfDoc=await lib.getDocument({data:buf,isEvalSupported:false}).promise;
-      st.page=1;stepPdf(dlg,st);
-    }catch(err){
-      $(".body",dlg.root).innerHTML=`<div class="note" style="color:var(--shu)">PDFを読み込めませんでした。CADから画像（PNG/JPG）で書き出して取り込んでください。</div>`;
-    }
-  };
-}
-async function stepPdf(dlg,st){
-  const n=st.pdfDoc.numPages;
-  $(".body",dlg.root).innerHTML=`
-    <div class="row" style="margin:0">
-      <span class="lbl">ページ</span>
-      <select class="select" id="pg">${Array.from({length:n},(_,i)=>`<option value="${i+1}"${i+1===st.page?" selected":""}>${i+1} / ${n}</option>`).join("")}</select>
-      <span class="spacer" style="flex:1"></span>
-      <span class="lbl">仕上げ</span>
-      <select class="select" id="fin"><option value="raw">そのまま</option><option value="shadow">白飛ばし</option><option value="line">線画（2値）</option></select>
-    </div>
-    <div id="pv" style="display:grid;place-items:center;background:var(--sheet);border:1px solid var(--line);min-height:220px;padding:8px"></div>
-    <div class="note">元のPDFも一緒に保管されます（版の履歴からいつでも取り出せます）。</div>`;
-  $("[data-ok]",dlg.root).disabled=true;
-  const draw=async()=>{
-    $("#pv",dlg.root).innerHTML=`<span class="note">描画中…</span>`;
-    try{
-      const cv=await pdfPageToCanvas(st.pdfDoc,st.page,2000);
-      st.canvas=finish(cv,$("#fin",dlg.root).value);
-      st.canvas.style.maxWidth="100%";st.canvas.style.height="auto";
-      $("#pv",dlg.root).innerHTML="";$("#pv",dlg.root).appendChild(st.canvas);
-      $("[data-ok]",dlg.root).disabled=false;
-    }catch(e){$("#pv",dlg.root).innerHTML=`<span class="note" style="color:var(--shu)">このページを描画できませんでした。</span>`;}
-  };
-  $("#pg",dlg.root).onchange=(e)=>{st.page=+e.target.value;draw();};
-  $("#fin",dlg.root).onchange=draw;
-  draw();
-}
-function step2(dlg,st){
-  const img=st.img;
-  const box=Math.min(620,Math.max(320,window.innerWidth-140));
-  const sc=Math.min(box/img.width,420/img.height);
-  const cw=Math.round(img.width*sc),ch=Math.round(img.height*sc);
-  const ins=0.06;
-  st.quad=[[img.width*ins,img.height*ins],[img.width*(1-ins),img.height*ins],
-           [img.width*(1-ins),img.height*(1-ins)],[img.width*ins,img.height*(1-ins)]];
-  $(".body",dlg.root).innerHTML=`
-    <div class="note">図面枠の<b>四隅</b>に○を合わせてください。合わせた四角形が正対した図面になります。</div>
-    <div style="display:grid;place-items:center"><canvas id="edit" width="${cw}" height="${ch}" style="touch-action:none;max-width:100%;border:1px solid var(--line);background:#fff"></canvas></div>
-    <div class="row" style="margin:0">
-      <button class="btn small" id="wtoggle" aria-pressed="true">台形補正する</button>
-      <span class="spacer" style="flex:1"></span>
-      <span class="lbl">仕上げ</span>
-      <select class="select" id="fin"><option value="shadow" selected>白飛ばし（推奨）</option><option value="line">線画（2値）</option><option value="raw">そのまま</option></select>
-      <button class="btn" id="prev">プレビュー</button>
-    </div>
-    <div id="pv" style="display:none;place-items:center;background:var(--sheet);border:1px solid var(--line);padding:8px"></div>`;
-  $("[data-ok]",dlg.root).disabled=true;
-  const cv=$("#edit",dlg.root),cx=cv.getContext("2d");
-  const P=()=>st.quad.map(p=>[p[0]*sc,p[1]*sc]);
-  const paint=()=>{
-    cx.clearRect(0,0,cw,ch);cx.drawImage(img,0,0,cw,ch);
-    if(!st.warp)return;
-    const q=P();
-    cx.beginPath();q.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.closePath();
-    cx.fillStyle="rgba(35,75,133,.13)";cx.fill();
-    cx.strokeStyle="#234B85";cx.lineWidth=2;cx.stroke();
-    q.forEach(p=>{cx.beginPath();cx.arc(p[0],p[1],9,0,7);cx.fillStyle="#fff";cx.fill();
-      cx.strokeStyle="#BC3B2B";cx.lineWidth=2.5;cx.stroke();});
-  };
-  let drag=-1;
-  cv.onpointerdown=(e)=>{
-    if(!st.warp)return;
-    const b=cv.getBoundingClientRect(),k=cw/b.width;
-    const x=(e.clientX-b.left)*k,y=(e.clientY-b.top)*k;
-    const q=P();let best=-1,bd=26;
-    q.forEach((p,i)=>{const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=i;}});
-    if(best>=0){drag=best;cv.setPointerCapture(e.pointerId);}
-  };
-  cv.onpointermove=(e)=>{
-    if(drag<0)return;
-    const b=cv.getBoundingClientRect(),k=cw/b.width;
-    st.quad[drag]=[Math.max(0,Math.min(img.width,(e.clientX-b.left)*k/sc)),
-                   Math.max(0,Math.min(img.height,(e.clientY-b.top)*k/sc))];
-    paint();
-  };
-  cv.onpointerup=()=>{drag=-1;};
-  $("#wtoggle",dlg.root).onclick=(e)=>{st.warp=!st.warp;e.currentTarget.setAttribute("aria-pressed",st.warp);
-    e.currentTarget.textContent=st.warp?"台形補正する":"補正しない";paint();};
-  $("#prev",dlg.root).onclick=async()=>{
-    const btn=$("#prev",dlg.root);btn.disabled=true;btn.textContent="処理中…";
-    await new Promise(r=>setTimeout(r,20));
-    let out;
-    if(st.warp)out=warp(img,st.quad,2000);
-    else{
-      const k=Math.min(1,2000/Math.max(img.width,img.height));
-      out=document.createElement("canvas");out.width=Math.round(img.width*k);out.height=Math.round(img.height*k);
-      out.getContext("2d").drawImage(img,0,0,out.width,out.height);
-    }
-    st.canvas=finish(out,$("#fin",dlg.root).value);
-    st.canvas.style.maxWidth="100%";st.canvas.style.height="auto";
-    const pv=$("#pv",dlg.root);pv.style.display="grid";pv.innerHTML="";pv.appendChild(st.canvas);
-    btn.disabled=false;btn.textContent="再プレビュー";
-    $("[data-ok]",dlg.root).disabled=false;
-  };
-  paint();
-}
-async function register(dlg,st){
-  if(!st.canvas){toast("プレビューを作成してください");return false;}
-  const ok=$("[data-ok]",dlg.root);ok.disabled=true;ok.textContent="登録中…";
-  try{
-    const blob=await toBlob(st.canvas,$("#fin",dlg.root)?$("#fin",dlg.root).value:"shadow");
-    const up=await S.assets.upload(blob);
-    let pdfId=null;
-    if(st.pdfBlob){try{pdfId=(await S.assets.upload(st.pdfBlob,{type:"application/pdf"})).id;}catch(e){}}
-    const rev=nextRevLetter();
-    const note=prompt("この版の変更内容（任意）","")||"";
-    await S.db.collection(`${dwgPath()}/revs`).add({
-      rev,src:"asset",asset:up.id,pdf:pdfId,w:st.canvas.width,h:st.canvas.height,
-      note,by:S.me||"名無し",at:nowISO()});
-    await S.db.doc(dwgPath()).update({lastRev:rev,status:"検図中"});
-    await propagate(rev);
-    toast(`Rev.${rev} を登録しました`);
-  }catch(e){
-    toast("登録できませんでした："+(e&&e.code?e.code:"エラー"));
-    ok.disabled=false;ok.textContent="この内容で登録";return false;
-  }
-}
-</script>
-<script>
-/* ---------------- プロジェクト・図面 ---------------- */
-function newProject(){
-  if(!need())return;
-  let vis="open";
-  const dlg=dialog({title:"プロジェクトを作成",ok:"作成",body:`
-    <div class="field"><span>工事名称</span><input id="pn" placeholder="例：桜台コミュニティセンター 新築工事"></div>
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="flex:1"><span>工事番号</span><input id="pc" placeholder="2026-014"></div>
-      <div class="field" style="flex:1"><span>設計段階</span>
-        <select id="pp"><option>基本設計</option><option selected>実施設計</option><option>施工図</option><option>竣工図</option></select></div>
-    </div>
-    <div class="field"><span>公開範囲</span></div>
-    <label class="opt" data-vis="open" data-on="true"><div><strong>オープン</strong>
-      <small>このページを開ける人全員が図面を閲覧し、指摘を書き込めます。共同設計者や施主を含めた検図に。</small></div></label>
-    <label class="opt" data-vis="private" data-on="false"><div><strong>プライベート</strong>
-      <small>「編集可」で共有された人だけが読み書きできます。閲覧のみの人には図面の存在自体が見えません（サーバー側で制限されます）。</small></div></label>
-    <div class="note" id="visNote"></div>`,
-    onOk:async(root)=>{
-      const name=$("#pn",root).value.trim();
-      if(!name){toast("工事名称を入力してください");return false;}
-      if(vis==="private"&&!S.editor){toast("プライベートの作成には編集権限が必要です");return false;}
-      const id=uid("p-");
-      await S.db.doc(`${vis==="private"?"vault":"projects"}/${id}`).set({
-        id,name,code:$("#pc",root).value.trim(),phase:$("#pp",root).value,visibility:vis,
-        by:S.me||"名無し",createdAt:nowISO()});
-      S.pid=id;toast("プロジェクトを作成しました");
-    }});
-  const note=$("#visNote",dlg.root);
-  const sync=()=>{$$("[data-vis]",dlg.root).forEach(o=>o.dataset.on=String(o.dataset.vis===vis));
-    note.textContent=vis==="private"
-      ?(S.editor?"あなたは編集権限を持っているため、この非公開プロジェクトを作成・閲覧できます。":"編集権限がないため、プライベートは選べません。")
-      :"公開範囲はあとから切り替えられます。";};
-  $$("[data-vis]",dlg.root).forEach(o=>o.onclick=()=>{vis=o.dataset.vis;sync();});
-  sync();
-}
-function projectSettings(){
-  const p=curProj();if(!p){toast("プロジェクトがありません");return;}
-  if(!need())return;
-  let vis=p.visibility==="private"?"private":"open";
-  const dlg=dialog({title:`公開範囲 — ${p.name}`,ok:"変更する",body:`
-    <label class="opt" data-vis="open"><div><strong>オープン</strong>
-      <small>このページを開ける人全員が閲覧・指摘できます。保存先は共有領域（projects）です。</small></div></label>
-    <label class="opt" data-vis="private"><div><strong>プライベート</strong>
-      <small>編集権限を持つ人だけが読み書きできる領域（vault）に保管します。閲覧のみの共有相手には、図面も指摘も返りません。</small></div></label>
-    <div class="note">切り替えると図面・版・指摘をまとめて保管領域ごと移します。図面の画像データそのものは、推測できないURLで引き続き保管されます。</div>`,
-    onOk:async(root)=>{
-      if(vis===(p.visibility||"open"))return true;
-      if(!S.editor){toast("公開範囲の変更には編集権限が必要です");return false;}
-      const ok=$("[data-ok]",root);ok.disabled=true;ok.textContent="移行中…";
-      try{await moveProject(p,vis);toast(vis==="private"?"プライベートに変更しました":"オープンに変更しました");}
-      catch(e){toast("変更できませんでした");ok.disabled=false;ok.textContent="変更する";return false;}
-    }});
-  const sync=()=>$$("[data-vis]",dlg.root).forEach(o=>o.dataset.on=String(o.dataset.vis===vis));
-  $$("[data-vis]",dlg.root).forEach(o=>o.onclick=()=>{vis=o.dataset.vis;sync();});
-  sync();
-}
-async function moveProject(p,vis){
-  const from=rootOf(p),to=vis==="private"?"vault":"projects";
-  if(from===to)return;
-  const dws=await S.db.collection(`${from}/${p.id}/drawings`).get();
-  for(const d of dws.docs){
-    for(const sub of ["revs","marks"]){
-      const snap=await S.db.collection(`${from}/${p.id}/drawings/${d.id}/${sub}`).get();
-      for(const x of snap.docs){
-        await S.db.doc(`${to}/${p.id}/drawings/${d.id}/${sub}/${x.id}`).set(x.data());
-        await S.db.doc(`${from}/${p.id}/drawings/${d.id}/${sub}/${x.id}`).delete();
-      }
-    }
-    await S.db.doc(`${to}/${p.id}/drawings/${d.id}`).set(d.data());
-    await S.db.doc(`${from}/${p.id}/drawings/${d.id}`).delete();
-  }
-  const {_root,...body}=p;
-  await S.db.doc(`${to}/${p.id}`).set({...body,visibility:vis});
-  await S.db.doc(`${from}/${p.id}`).delete();
-}
-function newDrawing(){
-  if(!need())return;
-  if(!curProj()){toast("先にプロジェクトを作成してください");return;}
-  dialog({title:"図面を登録",ok:"登録",body:`
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="width:130px"><span>図面番号</span><input id="dn" placeholder="A-101"></div>
-      <div class="field" style="flex:1"><span>図面名称</span><input id="dt" placeholder="1階平面図"></div>
-    </div>
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="flex:1"><span>分野</span>
-        <select id="dd"><option>意匠</option><option>構造</option><option>設備</option><option>外構</option></select></div>
-      <div class="field" style="flex:1"><span>種別</span>
-        <select id="dk"><option>図面</option><option>パース</option><option>3Dモデル</option></select></div>
-      <div class="field" style="flex:1"><span>縮尺</span><input id="ds" placeholder="1:100" value="1:100"></div>
-    </div>`,
-    onOk:async(root)=>{
-      const no=$("#dn",root).value.trim(),title=$("#dt",root).value.trim();
-      if(!no||!title){toast("図面番号と図面名称を入力してください");return false;}
-      const ref=await S.db.collection(`${base()}/drawings`).add({
-        no,title,discipline:$("#dd",root).value,kind:$("#dk",root).value,scale:$("#ds",root).value.trim(),
-        status:"作図中",lastRev:"—",openCount:0,by:S.me||"名無し",createdAt:nowISO()});
-      selectDrawing(ref.id);toast("図面を登録しました");
-    }});
-}
-
-/* ---------------- 指摘 ---------------- */
-function newMark(x,y){
-  if(!need())return;
-  const r=curRev();if(!r)return;
-  dialog({title:"指摘を追加",ok:"起票",body:`
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="width:130px"><span>分類</span>
-        <select id="mk">${KINDS.map(k=>`<option>${k}</option>`).join("")}</select></div>
-      <div class="field" style="flex:1"><span>件名</span><input id="mt" placeholder="例：会議室Aの扉が柱に干渉"></div>
-    </div>
-    <div class="field"><span>内容</span><textarea id="mb" placeholder="根拠・依頼事項・確認したい点"></textarea></div>
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="flex:1"><span>担当</span><input id="ma" placeholder="回答する人"></div>
-      <div class="field" style="width:160px"><span>回答期限</span><input id="mdue" type="date"></div>
-    </div>
-    <div class="note mono">位置 X:${(x*100).toFixed(1)}% / Y:${(y*100).toFixed(1)}%　Rev.${esc(r.rev)}</div>`,
-    onOk:async(root)=>{
-      const title=$("#mt",root).value.trim();
-      if(!title){toast("件名を入力してください");return false;}
-      const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
-      await S.db.collection(`${dwgPath()}/marks`).add({
-        no,x,y,rev:r.rev,kind:$("#mk",root).value,title,body:$("#mb",root).value.trim(),
-        assignee:$("#ma",root).value.trim(),due:$("#mdue",root).value||"",
-        status:"open",replies:[],by:S.me||"名無し",at:nowISO()});
-      await bumpOpen(1);
-      S.pinMode=false;$("#btnPin").setAttribute("aria-pressed","false");
-      toast(`指摘 #${no} を起票しました`);
-    }});
-}
-async function bumpOpen(delta){
-  const d=curDwg();if(!d)return;
-  try{await S.db.doc(dwgPath()).update({openCount:Math.max(0,(d.openCount||0)+delta)});}catch(e){}
-}
-async function setStatus(m,st){
-  if(!need())return;
-  const was=(m.status||"open")==="done",now=st==="done";
-  await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({status:st,
-    resolvedBy:now?(S.me||"名無し"):null,resolvedAt:now?nowISO():null});
-  if(was!==now)await bumpOpen(now?-1:1);
-}
-async function addReply(m){
-  if(!need())return;
-  const box=$("#replyBox"),text=box.value.trim();
-  if(!text)return;
-  const replies=[...(m.replies||[]),{by:S.me||"名無し",text,at:nowISO()}];
-  box.value="";
-  await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({replies});
-}
-async function delMark(m){
-  if(!need())return;
-  await S.db.doc(`${dwgPath()}/marks/${m.id}`).delete();
-  if((m.status||"open")!=="done")await bumpOpen(-1);
-  S.selMark=null;
-}
-
-/* ---------------- 検図結果・書き出し ---------------- */
-function approve(){
-  if(!need())return;
-  const d=curDwg();if(!d)return;
-  let res="承認";
-  const dlg=dialog({title:`検図結果 — ${d.no} ${d.title}`,ok:"記録する",body:`
-    <div style="display:grid;gap:8px">
-      ${["承認","条件付承認","要修正"].map(r=>`<label class="opt" data-r="${r}"><div><strong>${r}</strong><small>${
-        r==="承認"?"この版で確定。以降の変更は新しい版として起票します。":
-        r==="条件付承認"?"軽微な指摘の是正を前提に先行して進めます。":"未対応の指摘を反映した次の版が必要です。"}</small></div></label>`).join("")}
-    </div>
-    <div class="field"><span>所見</span><textarea id="rn" placeholder="検図者の所見・条件"></textarea></div>
-    <div class="note">未対応の指摘：${S.marks.filter(m=>m.status!=="done").length} 件</div>`,
-    onOk:async(root)=>{
-      await S.db.doc(dwgPath()).update({status:res==="要修正"?"修正中":"検図済",
-        review:{result:res,by:S.me||"名無し",at:nowISO(),note:$("#rn",root).value.trim(),rev:(curRev()||{}).rev||""}});
-      toast(`検図結果「${res}」を記録しました`);
-    }});
-  const sync=()=>$$("[data-r]",dlg.root).forEach(o=>o.dataset.on=String(o.dataset.r===res));
-  $$("[data-r]",dlg.root).forEach(o=>o.onclick=()=>{res=o.dataset.r;sync();});
-  sync();
-}
-async function exportCsv(){
-  if(!S.dl){toast("この環境では書き出せません");return;}
-  const p=curProj(),d=curDwg();
-  if(!d){toast("図面を選んでください");return;}
-  const q=(v)=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
-  const rows=[["工事名称","図面番号","図面名称","No","分類","状態","件名","内容","起票者","起票日","担当","回答期限","版","対応者","対応日","返信"]];
-  S.marks.forEach(m=>rows.push([p.name,d.no,d.title,m.no,m.kind,STATUS[m.status]||"未対応",m.title,m.body,
-    m.by,fdate(m.at),m.assignee||"",m.due||"","Rev."+m.rev,m.resolvedBy||"",m.resolvedAt?fdate(m.resolvedAt):"",
-    (m.replies||[]).map(r=>`${r.by}: ${r.text}`).join(" / ")]));
-  const csv="﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n");
-  try{await S.dl.save({filename:`検図リスト_${d.no}_${fdate(nowISO())}.csv`,data:csv});}
-  catch(e){if(e&&e.code!=="declined")toast("書き出せませんでした");}
-}
-
-/* ---------------- 操作 ---------------- */
-$("#projSel").onchange=(e)=>selectProject(e.target.value);
-$("#btnNewProj").onclick=newProject;
-$("#btnProjSet").onclick=projectSettings;
-$("#btnNewDwg").onclick=newDrawing;
-$("#btnRev").onclick=openCapture;
-$("#btnApprove").onclick=approve;
-$("#btnCsv").onclick=exportCsv;
-$("#btnPin").onclick=(e)=>{
-  S.pinMode=!S.pinMode;e.currentTarget.setAttribute("aria-pressed",String(S.pinMode));
-  if(S.pinMode)toast("図面上の位置をクリックすると指摘を起票できます");
-  renderStage();
-};
-$("#btnInvert").onclick=(e)=>{S.invert=!S.invert;e.currentTarget.setAttribute("aria-pressed",String(S.invert));renderStage();};
-$$("[data-cmp]").forEach(b=>b.onclick=()=>{
-  S.mode=b.dataset.cmp;
-  $$("[data-cmp]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-  const on=S.mode==="overlay"||S.mode==="wipe";
-  $("#cmpCtl").hidden=!on;
-  $("#cmpLabel").textContent=S.mode==="wipe"?"境界":"透過";
-  if(S.mode!=="none"&&!S.cmpId){
-    const others=revsIn().filter(r=>r.id!==S.revId);
-    if(others.length)S.cmpId=others[others.length-1].id;
-    else toast("比較するには版が2つ以上必要です");
-  }
-  renderStage();
-});
-$("#cmpRange").oninput=(e)=>{S.ratio=+e.target.value;$("#cmpVal").textContent=S.ratio+"%";renderStage();};
-$("#zIn").onclick=()=>{S.zoom=Math.min(4,S.zoom+0.25);renderStage();};
-$("#zOut").onclick=()=>{S.zoom=Math.max(0.5,S.zoom-0.25);renderStage();};
-$("#zFit").onclick=()=>{S.zoom=1;renderStage();};
-$$(".f",$("#filters")).forEach(b=>b.onclick=()=>{
-  const [k,v]=b.dataset.f.split(":");
-  if(k==="status")S.filt[v]=S.filt[v]?0:1;
-  else if(k==="rev")S.filt.curRev=S.filt.curRev?0:1;
-  else S.filt[k]=S.filt[k]?0:1;
-  b.setAttribute("aria-pressed",String(!!(k==="status"?S.filt[v]:k==="rev"?S.filt.curRev:S.filt[k])));
-  renderThreads();renderStage();
-});
-document.addEventListener("keydown",(e)=>{
-  if(/input|textarea|select/i.test(e.target.tagName))return;
-  if(e.key==="p"){$("#btnPin").click();}
-  if(e.key==="+"||e.key==="=")$("#zIn").click();
-  if(e.key==="-")$("#zOut").click();
-  if(e.key==="0")$("#zFit").click();
-});
-</script>
-<script>
-/* ---------------- 赤入れ（共同編集レイヤー） ---------------- */
-const E={tool:"select",color:"shu",width:2,show:true,all:false,sel:null,shapes:[],mine:[]};
-const COLORS={shu:"#BC3B2B",blue:"#234B85",green:"#2C6A4C",ink:"#1A2430"};
-const ratioOf=()=>{const r=curRev();return r&&r.src==="asset"&&r.w&&r.h?r.h/r.w:841/1189;};
-const VW=1000, VH=()=>1000*ratioOf();
-
-const _selectDrawing=selectDrawing;
-selectDrawing=function(did){
-  if(subs.edit){subs.edit();delete subs.edit;}
-  E.shapes=[];E.sel=null;E.mine=[];
-  _selectDrawing(did);
-  if(S.db&&did){
-    subs.edit=S.db.collection(`${dwgPath()}/edits`).onSnapshot(snap=>{
-      E.shapes=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
-      renderStage();
-    },()=>{});
-  }
-};
-const _renderStage=renderStage;
-renderStage=function(){_renderStage();mountEdits();syncEditBar();};
 
 function cloudPath(x1,y1,x2,y2){
   const r=Math.max(6,Math.min(Math.abs(x2-x1),Math.abs(y2-y1))/9);
@@ -1272,6 +594,7 @@ function cloudPath(x1,y1,x2,y2){
   const [X1,X2]=[Math.min(x1,x2),Math.max(x1,x2)],[Y1,Y2]=[Math.min(y1,y2),Math.max(y1,y2)];
   return `M${X1} ${Y1}`+seg(X1,Y1,X2,Y1)+seg(X2,Y1,X2,Y2)+seg(X2,Y2,X1,Y2)+seg(X1,Y2,X1,Y1);
 }
+
 function shapeSVG(s,sel){
   const c=COLORS[s.color]||COLORS.shu, w=(s.width||2)*1.6, ar=VH();
   const X=(p)=>(p[0]*VW).toFixed(1), Y=(p)=>(p[1]*ar).toFixed(1);
@@ -1304,287 +627,19 @@ function shapeSVG(s,sel){
   const box=sel?`<g opacity="0.9">${hitb.replace(/rgba\(0,0,0,0\)/g,COLORS.blue).replace(/stroke-width="[\d.]+"/,'stroke-width="1.5" stroke-dasharray="6 4"')}</g>`:"";
   return `<g data-eid="${esc(s.id)}" style="cursor:${E.tool==="select"?"move":"inherit"}">${box}${hitb}${body}</g>`;
 }
-function visibleShapes(){
-  const r=curRev();
-  return E.shapes.filter(s=>E.all||!r||s.rev===r.rev);
-}
-function mountEdits(){
-  const sh=$("#sheet");if(!sh)return;
-  const old=$(".editlayer",sh);if(old)old.remove();
-  if(!E.show)return;
-  const ns="http://www.w3.org/2000/svg";
-  const svg=document.createElementNS(ns,"svg");
-  svg.setAttribute("class","editlayer");
-  svg.setAttribute("viewBox",`0 0 ${VW} ${VH()}`);
-  svg.setAttribute("preserveAspectRatio","none");
-  svg.style.cssText="position:absolute;inset:0;width:100%;height:100%;"+
-    (E.tool==="select"?"pointer-events:none":"pointer-events:auto;cursor:crosshair;touch-action:none");
-  svg.innerHTML=visibleShapes().map(s=>shapeSVG(s,s.id===E.sel)).join("");
-  if(E.tool==="select"){
-    $$("g[data-eid]",svg).forEach(g=>{g.style.pointerEvents="auto";});
-  }
-  const pin=$(".pinlayer",sh);
-  sh.insertBefore(svg,pin||null);
-  wireEdit(sh,svg);
-}
-function ptOf(e,sh){
-  const b=sh.getBoundingClientRect();
-  return [Math.max(0,Math.min(1,(e.clientX-b.left)/b.width)),Math.max(0,Math.min(1,(e.clientY-b.top)/b.height))];
-}
-function wireEdit(sh,svg){
-  const ns="http://www.w3.org/2000/svg";
-  if(E.tool==="select"){
-    let drag=null;
-    $$("g[data-eid]",svg).forEach(g=>{
-      g.onpointerdown=(e)=>{
-        e.stopPropagation();
-        const id=g.dataset.eid,s=E.shapes.find(x=>x.id===id);
-        if(!s)return;
-        E.sel=id;renderStage();
-        const g2=$(`g[data-eid="${id}"]`,$(".editlayer",$("#sheet")));
-        if(!g2)return;
-        const start=ptOf(e,sh),orig=s.pts.map(p=>[...p]);
-        drag={s,start,orig,moved:false};
-        g2.setPointerCapture(e.pointerId);
-        g2.onpointermove=(ev)=>{
-          if(!drag)return;
-          const p=ptOf(ev,sh),dx=p[0]-drag.start[0],dy=p[1]-drag.start[1];
-          if(Math.abs(dx)+Math.abs(dy)>0.002)drag.moved=true;
-          drag.s.pts=drag.orig.map(q=>[q[0]+dx,q[1]+dy]);
-          const layer=$(".editlayer",$("#sheet"));
-          if(layer)layer.innerHTML=visibleShapes().map(x=>shapeSVG(x,x.id===E.sel)).join("");
-        };
-        g2.onpointerup=async()=>{
-          const d=drag;drag=null;
-          if(d&&d.moved&&S.db){try{await S.db.doc(`${dwgPath()}/edits/${d.s.id}`).update({pts:d.s.pts});}catch(err){}}
-          renderStage();
-        };
-      };
-      g.ondblclick=(e)=>{
-        const s=E.shapes.find(x=>x.id===g.dataset.eid);
-        if(!s||s.type!=="text")return;
-        e.stopPropagation();
-        const t=prompt("文字を修正",s.text||"");
-        if(t!=null&&S.db)S.db.doc(`${dwgPath()}/edits/${s.id}`).update({text:t,editedBy:S.me||"名無し",editedAt:nowISO()});
-      };
-    });
-    return;
-  }
-  let cur=null,el=null;
-  svg.onpointerdown=(e)=>{
-    if(!S.db){toast("接続していません");return;}
-    if(!curRev())return;
-    const p=ptOf(e,sh);
-    if(E.tool==="text"){
-      const t=prompt("記入する文字");
-      if(t)addShape({type:"text",pts:[p],text:t});
-      return;
-    }
-    cur={type:E.tool,pts:[p,p]};
-    if(E.tool==="pen")cur.pts=[p];
-    el=document.createElementNS(ns,"g");
-    svg.appendChild(el);
-    svg.setPointerCapture(e.pointerId);
-  };
-  svg.onpointermove=(e)=>{
-    if(!cur)return;
-    const p=ptOf(e,sh);
-    if(E.tool==="pen"){
-      const last=cur.pts[cur.pts.length-1];
-      if(Math.hypot(p[0]-last[0],p[1]-last[1])>0.003)cur.pts.push(p);
-    }else cur.pts[1]=p;
-    el.innerHTML=shapeSVG({...cur,id:"_tmp",color:E.color,width:E.width});
-  };
-  svg.onpointerup=()=>{
-    if(!cur)return;
-    const s=cur;cur=null;if(el)el.remove();el=null;
-    const a=s.pts[0],b=s.pts[s.pts.length-1];
-    if(s.type!=="pen"&&Math.hypot(b[0]-a[0],b[1]-a[1])<0.008)return;
-    if(s.type==="pen"&&s.pts.length<2)return;
-    addShape(s);
-  };
-}
-async function addShape(s){
-  if(!need())return;
-  const r=curRev();if(!r)return;
-  const doc={...s,color:E.color,width:E.width,rev:r.rev,by:S.me||"名無し",at:nowISO()};
-  try{
-    const ref=await S.db.collection(`${dwgPath()}/edits`).add(doc);
-    E.mine.push(ref.id);
-  }catch(e){toast("書き込めませんでした");}
-}
-async function delShape(){
-  if(!E.sel||!need())return;
-  const id=E.sel;E.sel=null;
-  try{await S.db.doc(`${dwgPath()}/edits/${id}`).delete();}catch(e){}
-}
-async function undoShape(){
-  const id=E.mine.pop();
-  if(!id||!need())return;
-  try{await S.db.doc(`${dwgPath()}/edits/${id}`).delete();}catch(e){}
-}
-async function recolorSel(){
-  if(!E.sel||!need())return;
-  try{await S.db.doc(`${dwgPath()}/edits/${E.sel}`).update({color:E.color,width:E.width});}catch(e){}
-}
-
-/* 赤入れツールバー */
-const TOOLS=[["select","選択・移動"],["pen","ペン"],["line","直線"],["arrow","引出し"],["rect","矩形"],["cloud","雲マーク"],["text","文字"]];
-(function buildEditBar(){
-  const bar=document.createElement("div");
-  bar.className="toolbar";bar.id="editbar";
-  bar.innerHTML=`
-    <span class="lbl" style="margin-right:2px">赤入れ</span>
-    <div class="seg" role="group" aria-label="作図ツール">
-      ${TOOLS.map(([k,l])=>`<button data-tool="${k}" aria-pressed="${k==="select"}">${l}</button>`).join("")}
-    </div>
-    <div class="seg" role="group" aria-label="色">
-      ${Object.entries(COLORS).map(([k,v])=>`<button data-color="${k}" aria-pressed="${k==="shu"}" title="${k}">
-        <span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:${v};vertical-align:-2px"></span></button>`).join("")}
-    </div>
-    <div class="seg" role="group" aria-label="線の太さ">
-      <button data-w="1" aria-pressed="false">細</button><button data-w="2" aria-pressed="true">中</button><button data-w="4" aria-pressed="false">太</button>
-    </div>
-    <button class="btn" id="eDel" disabled>選択を削除</button>
-    <button class="btn" id="eUndo">元に戻す</button>
-    <span class="spacer" style="flex:1"></span>
-    <button class="btn" id="eAll" aria-pressed="false">他の版の赤入れも表示</button>
-    <button class="btn" id="eShow" aria-pressed="true">赤入れを表示</button>
-    <span class="mono" id="eCount" style="font-size:11px;color:var(--ink-3)"></span>`;
-  $("#revbar").before(bar);
-  $$("[data-tool]",bar).forEach(b=>b.onclick=()=>{
-    E.tool=b.dataset.tool;E.sel=null;
-    $$("[data-tool]",bar).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-    if(E.tool!=="select"&&S.pinMode){S.pinMode=false;$("#btnPin").setAttribute("aria-pressed","false");}
-    renderStage();
-  });
-  $$("[data-color]",bar).forEach(b=>b.onclick=()=>{
-    E.color=b.dataset.color;
-    $$("[data-color]",bar).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-    if(E.sel)recolorSel();
-  });
-  $$("[data-w]",bar).forEach(b=>b.onclick=()=>{
-    E.width=+b.dataset.w;
-    $$("[data-w]",bar).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-    if(E.sel)recolorSel();
-  });
-  $("#eDel",bar).onclick=delShape;
-  $("#eUndo",bar).onclick=undoShape;
-  $("#eAll",bar).onclick=(e)=>{E.all=!E.all;e.currentTarget.setAttribute("aria-pressed",String(E.all));renderStage();};
-  $("#eShow",bar).onclick=(e)=>{E.show=!E.show;e.currentTarget.setAttribute("aria-pressed",String(E.show));renderStage();};
-})();
-function syncEditBar(){
-  const d=$("#eDel");if(!d)return;
-  d.disabled=!E.sel;
-  const n=visibleShapes().length;
-  const who=[...new Set(E.shapes.map(s=>s.by).filter(Boolean))];
-  $("#eCount").textContent=n?`${n} 要素 / ${who.length} 名`:"";
-}
-document.addEventListener("keydown",(e)=>{
-  if(/input|textarea|select/i.test(e.target.tagName))return;
-  if((e.key==="Delete"||e.key==="Backspace")&&E.sel){e.preventDefault();delShape();}
-  if(e.key==="Escape"){E.sel=null;renderStage();}
-  if((e.metaKey||e.ctrlKey)&&e.key==="z"){e.preventDefault();undoShape();}
-});
-
-/* ---------------- SVG / ベクター取り込みを追加 ---------------- */
-function step1(dlg,st){
-  $(".body",dlg.root).innerHTML=`
-    <div class="note">紙の図面は<b>真上から撮影</b>して台形補正するのが最短です。A3以下はスキャナ（300dpi・グレースケール）が最もきれいに残ります。</div>
-    <div style="display:grid;gap:9px">
-      <label class="opt"><div><strong>カメラで撮影する</strong><small>スマートフォンで開いている場合、その場でカメラが起動します。図面の四隅が画面に入るように、影が落ちない向きで。</small>
-        <input type="file" accept="image/*" capture="environment" id="capCam" style="margin-top:7px"></div></label>
-      <label class="opt"><div><strong>画像ファイル（JPG / PNG）</strong><small>スキャナで取り込んだ画像、既に撮影済みの写真。</small>
-        <input type="file" accept="image/jpeg,image/png,image/webp" id="capFile" style="margin-top:7px"></div></label>
-      <label class="opt"><div><strong>PDF</strong><small>CADからの出力やスキャンPDF。ページを選んで取り込み、元のPDFも一緒に保管します。</small>
-        <input type="file" accept="application/pdf" id="capPdf" style="margin-top:7px"></div></label>
-      <label class="opt"><div><strong>SVG（ベクターデータ）</strong><small>CADやIllustratorからの書き出し。線のまま原寸で保持され、拡大しても劣化しません。</small>
-        <input type="file" accept="image/svg+xml,.svg" id="capSvg" style="margin-top:7px"></div></label>
-      <label class="opt"><div><strong>3Dモデル（GLB / glTF）</strong><small>BIM・SketchUp・Blender からの書き出し。パースとして回して見られ、モデルの表面に指摘を打てます。約14MBまで。</small>
-        <input type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" id="capGlb" style="margin-top:7px"></div></label>
-    </div>
-    <div class="note">どの形式でも、取り込んだ図面の上に全員で赤入れできます。原図は書き換わりません。</div>`;
-  $("[data-ok]",dlg.root).disabled=true;
-  const onImg=(e)=>{
-    const f=e.target.files&&e.target.files[0];if(!f)return;
-    const img=new Image();img.onload=()=>{st.img=img;st.pdfBlob=null;step2(dlg,st);};
-    img.onerror=()=>toast("画像を読み込めませんでした");
-    img.src=URL.createObjectURL(f);
-  };
-  $("#capCam",dlg.root).onchange=onImg;
-  $("#capFile",dlg.root).onchange=onImg;
-  $("#capSvg",dlg.root).onchange=async(e)=>{
-    const f=e.target.files&&e.target.files[0];if(!f)return;
-    $(".body",dlg.root).innerHTML=`<div class="note">SVGを登録しています…</div>`;
-    try{
-      const text=await f.text();
-      const m=text.match(/viewBox\s*=\s*"([-\d.\s]+)"/);
-      let w=1189,h=841;
-      if(m){const v=m[1].trim().split(/\s+/).map(Number);if(v.length===4&&v[2]&&v[3]){w=v[2];h=v[3];}}
-      const up=await S.assets.upload(f,{type:"image/svg+xml"});
-      const rev=nextRevLetter();
-      await S.db.collection(`${dwgPath()}/revs`).add({
-        rev,src:"asset",asset:up.id,w:Math.round(w),h:Math.round(h),vector:true,
-        note:$("#svgNote")?$("#svgNote").value:"",by:S.me||"名無し",at:nowISO()});
-      await S.db.doc(dwgPath()).update({lastRev:rev,status:"検図中"});
-    await propagate(rev);
-      toast(`Rev.${rev}（ベクター）を登録しました`);
-      dlg.close();
-    }catch(err){
-      $(".body",dlg.root).innerHTML=`<div class="note" style="color:var(--shu)">SVGを登録できませんでした。ファイルサイズ（2MBまで）と形式を確認してください。</div>`;
-    }
-  };
-  $("#capPdf",dlg.root).onchange=async(e)=>{
-    const f=e.target.files&&e.target.files[0];if(!f)return;
-    $(".body",dlg.root).innerHTML=`<div class="note">PDFを読み込んでいます…</div>`;
-    try{
-      const lib=await loadPdfJs();
-      const buf=await f.arrayBuffer();
-      st.pdfBlob=f;
-      st.pdfDoc=await lib.getDocument({data:buf,isEvalSupported:false}).promise;
-      st.page=1;stepPdf(dlg,st);
-    }catch(err){
-      $(".body",dlg.root).innerHTML=`<div class="note" style="color:var(--shu)">PDFを読み込めませんでした。CADから画像（PNG/JPG）またはSVGで書き出して取り込んでください。</div>`;
-    }
-  };
-}
-renderAll();
-</script>
-<script>
-/* ---------------- 3D / パース ---------------- */
-const V={host:null,renderer:null,scene:null,camera:null,controls:null,model:null,
-  loaded:null,pending:false,proj:"persp",restore:null,ro:null};
-const THREE_BASE="https://cdn.jsdelivr.net/npm/three@0.128.0";
 
 function abToB64(buf){
   const b=new Uint8Array(buf);let s="";
   for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));
   return btoa(s);
 }
+
 function b64ToAb(b64){
   const bin=atob(b64),u=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
   return u.buffer;
 }
-function next3DLetter(){
-  const used=S.revs.filter(r=>r.view==="3d").map(r=>r.rev);
-  for(let i=0;i<26;i++){const l=REVLET(i);if(!used.includes(l))return l;}
-  return String(used.length+1);
-}
-function loadScript(src){
-  return new Promise((res,rej)=>{
-    const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error(src));
-    document.head.appendChild(s);
-  });
-}
-async function loadThree(){
-  if(window.THREE&&THREE.GLTFLoader&&THREE.OrbitControls)return;
-  if(!window.THREE)await loadScript(THREE_BASE+"/build/three.min.js");
-  if(!THREE.OrbitControls)await loadScript(THREE_BASE+"/examples/js/controls/OrbitControls.js");
-  if(!THREE.GLTFLoader)await loadScript(THREE_BASE+"/examples/js/loaders/GLTFLoader.js");
-}
 
-/* サンプル：平面図と同じ 31.2m × 18m・3階建てのボリューム */
 function genBuilding(){
   const g=new THREE.Group();
   const wall=new THREE.MeshLambertMaterial({color:0xE7E2D9});
@@ -1612,13 +667,22 @@ function genBuilding(){
   return g;
 }
 
-function ensureHost(){
-  if(V.host)return V.host;
-  const h=document.createElement("div");
-  h.className="stage3d";
-  h.innerHTML=`<div class="pinlayer" id="pin3d"></div><div class="hud" id="hud3d"></div>`;
-  V.host=h;return h;
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error(src));
+    document.head.appendChild(s);
+  });
 }
+
+async function loadThree(){
+  if(window.THREE&&THREE.GLTFLoader&&THREE.OrbitControls)return;
+  if(!window.THREE)await loadScript(THREE_BASE+"/build/three.min.js");
+  if(!THREE.OrbitControls)await loadScript(THREE_BASE+"/examples/js/controls/OrbitControls.js");
+  if(!THREE.GLTFLoader)await loadScript(THREE_BASE+"/examples/js/loaders/GLTFLoader.js");
+}
+
+/* サンプル：平面図と同じ 31.2m × 18m・3階建てのボリューム */
+
 function initThree(){
   if(V.renderer)return;
   const h=V.host;
@@ -1636,6 +700,7 @@ function initThree(){
   V.ro.observe(h);
   V.renderer.domElement.addEventListener("pointerdown",onPick3D);
 }
+
 function makeCamera(kind){
   const h=V.host,w=Math.max(1,h.clientWidth),ht=Math.max(1,h.clientHeight),a=w/ht;
   const prev=V.camera;
@@ -1657,6 +722,7 @@ function makeCamera(kind){
   V.proj=kind;
   resize3D();
 }
+
 function resize3D(){
   if(!V.renderer||!V.host)return;
   const w=Math.max(1,V.host.clientWidth),h=Math.max(1,V.host.clientHeight);
@@ -1668,6 +734,7 @@ function resize3D(){
   V.camera.updateProjectionMatrix();
   requestRender();
 }
+
 function requestRender(){
   if(V.pending||!V.renderer)return;
   V.pending=true;
@@ -1677,11 +744,13 @@ function requestRender(){
     updatePins3D();updateHud();
   });
 }
+
 function updateHud(){
   const el=$("#hud3d",V.host);if(!el)return;
   const p=V.camera.position;
   el.textContent=`${V.proj==="iso"?"アイソメ":"パース"}  X ${p.x.toFixed(1)}  Y ${p.y.toFixed(1)}  Z ${p.z.toFixed(1)}  ／ ドラッグ=回転・ホイール=ズーム・右ドラッグ=平行移動`;
 }
+
 function fitCamera(dir){
   if(!V.model)return;
   const box=new THREE.Box3().setFromObject(V.model);
@@ -1697,6 +766,7 @@ function fitCamera(dir){
   }
   V.camera.updateProjectionMatrix();V.controls.update();requestRender();
 }
+
 async function load3D(rev){
   if(V.loaded===rev.id)return;
   V.loaded=rev.id;
@@ -1727,10 +797,12 @@ async function load3D(rev){
   if(V.restore){applyCam(V.restore);V.restore=null;}
   requestRender();
 }
+
 function camState(){
   return {p:V.camera.position.toArray().map(n=>+n.toFixed(3)),
           t:V.controls.target.toArray().map(n=>+n.toFixed(3)),iso:V.proj==="iso"};
 }
+
 function applyCam(c){
   if(!c||!c.p)return;
   if(c.iso&&V.proj!=="iso")makeCamera("iso");
@@ -1738,7 +810,7 @@ function applyCam(c){
   V.camera.position.fromArray(c.p);V.controls.target.fromArray(c.t||[0,5,0]);
   V.controls.update();requestRender();
 }
-function marks3D(){return S.marks.filter(m=>m.view==="3d");}
+
 function updatePins3D(){
   const host=$("#pin3d",V.host);if(!host)return;
   const list=marks3D();
@@ -1752,7 +824,7 @@ function updatePins3D(){
       const m=S.marks.find(x=>x.id===b.dataset.mid);
       S.selMark=b.dataset.mid;
       if(m&&m.cam)applyCam(m.cam);
-      renderThreads();updatePins3D();
+      go("mark");
     });
   }
   const v=new THREE.Vector3();
@@ -1765,6 +837,7 @@ function updatePins3D(){
     el.style.top=((-v.y+1)/2*100).toFixed(2)+"%";
   });
 }
+
 function onPick3D(e){
   if(!S.pinMode||e.button!==0)return;
   const r=V.host.getBoundingClientRect();
@@ -1774,373 +847,7 @@ function onPick3D(e){
   if(!hit){toast("モデルの表面をクリックしてください");return;}
   newMark3D(hit.point.toArray().map(n=>+n.toFixed(3)));
 }
-function newMark3D(p){
-  if(!need())return;
-  const r=curRev();if(!r)return;
-  const cam=camState();
-  dialog({title:"3Dモデル上に指摘を追加",ok:"起票",body:`
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="width:130px"><span>分類</span>
-        <select id="mk">${KINDS.map(k=>`<option>${k}</option>`).join("")}</select></div>
-      <div class="field" style="flex:1"><span>件名</span><input id="mt" placeholder="例：庇の出が短く雨掛かりが大きい"></div>
-    </div>
-    <div class="field"><span>内容</span><textarea id="mb" placeholder="根拠・依頼事項・確認したい点"></textarea></div>
-    <div class="row" style="margin:0;gap:10px">
-      <div class="field" style="flex:1"><span>担当</span><input id="ma" placeholder="回答する人"></div>
-      <div class="field" style="width:160px"><span>回答期限</span><input id="mdue" type="date"></div>
-    </div>
-    <div class="note mono">位置 X:${p[0]} Y:${p[1]} Z:${p[2]}　Rev.${esc(r.rev)}（3D）</div>
-    <div class="note">いま見ているアングルも一緒に保存されます。指摘を開くと、この視点に戻ります。</div>`,
-    onOk:async(root)=>{
-      const title=$("#mt",root).value.trim();
-      if(!title){toast("件名を入力してください");return false;}
-      const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
-      await S.db.collection(`${dwgPath()}/marks`).add({
-        no,view:"3d",p,cam,x:0,y:0,rev:r.rev,kind:$("#mk",root).value,title,
-        body:$("#mb",root).value.trim(),assignee:$("#ma",root).value.trim(),due:$("#mdue",root).value||"",
-        status:"open",replies:[],by:S.me||"名無し",at:nowISO()});
-      await bumpOpen(1);
-      S.pinMode=false;$("#btnPin").setAttribute("aria-pressed","false");
-      renderStage();
-      toast(`指摘 #${no} を起票しました`);
-    }});
-}
-async function savePerspective(){
-  if(!need()||!S.assets){toast("パースの保存には編集権限が必要です");return;}
-  V.renderer.render(V.scene,V.camera);
-  const blob=await new Promise(r=>V.renderer.domElement.toBlob(r,"image/jpeg",0.92));
-  if(!blob)return;
-  toast("パースを書き出しています…");
-  try{
-    const up=await S.assets.upload(blob);
-    const rev=nextRevLetter();
-    await S.db.collection(`${dwgPath()}/revs`).add({
-      rev,view:"2d",src:"asset",asset:up.id,w:V.renderer.domElement.width,h:V.renderer.domElement.height,
-      note:"3Dビューから書き出したパース",by:S.me||"名無し",at:nowISO()});
-    await S.db.doc(dwgPath()).update({lastRev:rev});
-    await propagate(rev);
-    S.view="2d";S.revId=null;renderStage();
-    toast(`パースを Rev.${rev} として保存しました。赤入れできます。`);
-  }catch(e){toast("保存できませんでした");}
-}
 
-/* 2D / 3D の切り替えとツールバー */
-(function build3DBar(){
-  const vt=document.createElement("div");
-  vt.className="seg";vt.id="viewToggle";vt.setAttribute("role","group");vt.setAttribute("aria-label","表示の切り替え");
-  vt.innerHTML=`<button data-v="2d" aria-pressed="true">図面</button><button data-v="3d" aria-pressed="false">3D パース</button>`;
-  $("#toolbar").prepend(vt);
-  $$("[data-v]",vt).forEach(b=>b.onclick=()=>{
-    const v=b.dataset.v;
-    if(v==="3d"&&!has3D()){toast("この図面にはまだ3Dモデルがありません。「＋ 版を追加」からGLB/glTFを登録できます。");return;}
-    S.view=v;S.revId=null;S.selMark=null;renderStage();renderThreads();
-  });
-  const bar=document.createElement("div");
-  bar.className="toolbar";bar.id="bar3d";bar.hidden=true;
-  bar.innerHTML=`
-    <span class="lbl" style="margin-right:2px">視点</span>
-    <div class="seg" role="group" aria-label="投影">
-      <button data-proj="persp" aria-pressed="true">パース</button><button data-proj="iso" aria-pressed="false">アイソメ</button>
-    </div>
-    <div class="seg" role="group" aria-label="方位">
-      <button data-dir="s">南</button><button data-dir="e">東</button><button data-dir="n">北</button><button data-dir="w">西</button><button data-dir="top">上</button>
-    </div>
-    <button class="btn" id="v3dFit">全体を表示</button>
-    <span class="spacer" style="flex:1"></span>
-    <button class="btn" id="v3dShot">このアングルをパースとして保存</button>`;
-  $("#revbar").before(bar);
-  $$("[data-proj]",bar).forEach(b=>b.onclick=()=>{
-    if(!V.renderer)return;
-    makeCamera(b.dataset.proj);fitCamera();
-    $$("[data-proj]",bar).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-  });
-  const DIRS={s:[0,.28,1],n:[0,.28,-1],e:[1,.28,0],w:[-1,.28,0],top:[0.001,1,0.001]};
-  $$("[data-dir]",bar).forEach(b=>b.onclick=()=>{
-    if(!V.model)return;
-    fitCamera(new THREE.Vector3(...DIRS[b.dataset.dir]).normalize());
-  });
-  $("#v3dFit",bar).onclick=()=>fitCamera();
-  $("#v3dShot",bar).onclick=savePerspective;
-})();
-
-function sync3DBars(){
-  const is3=S.view==="3d";
-  $$("#viewToggle [data-v]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.v==="3d")===is3)));
-  const t3=$("#viewToggle [data-v='3d']");
-  if(t3){t3.disabled=!has3D()&&!is3;t3.title=has3D()?"3Dモデルで見る":"3Dモデル未登録";}
-  $("#bar3d").hidden=!is3;
-  $("#editbar").hidden=is3;
-  const cmpSeg=$("[data-cmp]")?$("[data-cmp]").parentElement:null;
-  if(cmpSeg)cmpSeg.hidden=is3;
-  $("#cmpCtl").hidden=is3||!(S.mode==="overlay"||S.mode==="wipe");
-  const zoomSeg=$("#zIn")?$("#zIn").parentElement:null;
-  if(zoomSeg)zoomSeg.hidden=is3;
-  $("#btnInvert").hidden=is3;
-}
-
-/* 2Dのピンは2Dの指摘のみ */
-function pinsHTML(){
-  const r=curRev();
-  return S.marks.filter(m=>(m.view||"2d")==="2d").filter(m=>!S.filt.curRev||!r||m.rev===r.rev).map(m=>
-    `<button class="pin ${m.status==="done"?"done":""}" data-mid="${esc(m.id)}" aria-current="${m.id===S.selMark}"
-      style="left:${(m.x*100).toFixed(2)}%;top:${(m.y*100).toFixed(2)}%" title="${esc(m.title)}"><span>${m.no}</span></button>`
-  ).join("");
-}
-
-const _renderStage2=renderStage;
-renderStage=function(){
-  if(S.view!=="3d"){_renderStage2();sync3DBars();return;}
-  renderTitleBlock();renderRevbar();sync3DBars();
-  const w=$("#sheetWrap"),r=curRev();
-  $("#btnRev").disabled=!S.did;$("#btnApprove").disabled=!S.did;$("#btnPin").disabled=!r;
-  if(!r){
-    w.innerHTML=`<div class="empty"><b>3Dモデルが登録されていません</b>「＋ 版を追加」からGLB / glTFを取り込むと、ここでパースとして回して見られます。</div>`;
-    return;
-  }
-  const host=ensureHost();
-  if(host.parentElement!==w){w.innerHTML="";w.style.padding="0";w.style.placeItems="stretch";w.appendChild(host);}
-  host.classList.toggle("picking",!!S.pinMode);
-  (async()=>{
-    try{
-      await loadThree();
-      initThree();
-      resize3D();
-      await load3D(r);
-      updatePins3D();
-    }catch(e){
-      w.innerHTML=`<div class="empty"><b>3D表示を読み込めませんでした</b>ネットワークを確認して開き直してください。図面表示には戻れます。</div>`;
-    }
-  })();
-};
-const _rt=renderThreads;
-renderThreads=function(){
-  _rt();
-  $$(".thread",$("#threads")).forEach(b=>{
-    const m=S.marks.find(x=>x.id===b.dataset.mid);if(!m)return;
-    if(m.view==="3d"){
-      const top=$(".th-top",b);
-      if(top&&!$(".is3d",top)){
-        const c=document.createElement("span");c.className="chip is3d";c.textContent="3D";
-        top.insertBefore(c,top.children[1]||null);
-      }
-    }
-    b.onclick=()=>{
-      S.selMark=m.id;
-      const v=m.view||"2d";
-      if(v!==S.view&&(v!=="3d"||has3D())){S.view=v;S.revId=null;}
-      if(v==="3d"&&m.cam)V.restore=m.cam;
-      else if(v==="3d"&&m.cam===undefined&&V.renderer)V.restore=null;
-      if(v==="3d"&&V.renderer&&V.loaded)applyCam(m.cam);
-      renderThreads();renderStage();
-    };
-  });
-};
-/* 2Dに戻したら sheet-wrap の余白を戻す */
-const _rs3=renderStage;
-renderStage=function(){
-  if(S.view!=="3d"){const w=$("#sheetWrap");if(w){w.style.padding="";w.style.placeItems="";}}
-  _rs3();
-};
-renderAll();
-</script>
-<script>
-/* ================= 担当・期限・フィルタ ================= */
-function visibleMarks(){
-  const r=curRev();
-  return S.marks
-    .filter(m=>S.filt[m.status||"open"])
-    .filter(m=>!S.filt.curRev||!r||m.rev===r.rev)
-    .filter(m=>!S.filt.mine||(m.assignee&&S.me&&m.assignee===S.me))
-    .filter(m=>!S.filt.over||overdue(m));
-}
-const _renderDetailBase=renderDetail;
-renderDetail=function(){
-  _renderDetailBase();
-  const d=$("#detail");
-  if(d.hidden)return;
-  const m=S.marks.find(x=>x.id===S.selMark);
-  if(!m)return;
-  const row=document.createElement("div");
-  row.className="row";
-  const inp='background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:4px 8px';
-  row.innerHTML=`<span class="lbl">担当</span><input id="asg" value="${esc(m.assignee||"")}" placeholder="未定" style="${inp};width:104px">
-    <span class="lbl">期限</span><input id="dueI" type="date" value="${esc(m.due||"")}" style="${inp}">
-    <button class="btn small" id="asgMe">自分が担当</button><button class="btn small" id="asgSave">保存</button>`;
-  const anchor=$('.row[role="group"]',d);
-  d.insertBefore(row,anchor);
-  $("#asgMe",row).onclick=()=>{$("#asg",row).value=S.me||"";};
-  $("#asgSave",row).onclick=async()=>{
-    if(!need())return;
-    await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({assignee:$("#asg",row).value.trim(),due:$("#dueI",row).value||""});
-    toast("担当と期限を保存しました");
-  };
-};
-
-/* ================= 図面間の参照と波及 ================= */
-async function propagate(rev){
-  const d=curDwg();
-  if(!d||!S.db)return;
-  try{
-    const snap=await S.db.collection(`${base()}/drawings`).where("refIds","array-contains",S.did).get();
-    for(const x of snap.docs){
-      if(x.id===S.did)continue;
-      await S.db.doc(`${base()}/drawings/${x.id}`).update({stale:{no:d.no,title:d.title,rev,at:nowISO()}});
-    }
-  }catch(e){}
-}
-function editRefs(){
-  if(!need())return;
-  const d=curDwg();if(!d){toast("図面を選んでください");return;}
-  const others=S.drawings.filter(x=>x.id!==d.id);
-  if(!others.length){toast("関連付けられる図面が他にありません");return;}
-  const cur=d.refIds||[];
-  dialog({title:`関連図面 — ${d.no} ${d.title}`,ok:"保存",body:`
-    <div class="note">ここで選んだ図面に新しい版が上がると、この図面に「要確認」が立ちます。平面と立面、平面と面積表のように、片方を直すともう片方に波及する組み合わせを選んでください。</div>
-    <div style="display:grid;gap:6px;max-height:260px;overflow:auto">
-      ${others.map(o=>`<label class="opt" style="padding:7px 10px"><input type="checkbox" value="${esc(o.id)}" ${cur.includes(o.id)?"checked":""} style="margin-right:8px">
-        <div><strong>${esc(o.no)} ${esc(o.title)}</strong><small>${esc(o.discipline||"")} ${esc(o.kind||"図面")}</small></div></label>`).join("")}
-    </div>`,
-    onOk:async(root)=>{
-      const ids=$$("input[type=checkbox]",root).filter(c=>c.checked).map(c=>c.value);
-      await S.db.doc(dwgPath()).update({refIds:ids,
-        refs:ids.map(id=>{const o=S.drawings.find(x=>x.id===id);return o?{id,no:o.no,title:o.title}:{id};})});
-      toast(`関連図面を ${ids.length} 件設定しました`);
-    }});
-}
-(function buildStaleBar(){
-  const bar=document.createElement("div");
-  bar.className="banner";bar.id="staleBar";bar.hidden=true;
-  $("#revbar").before(bar);
-})();
-function syncStale(){
-  const bar=$("#staleBar"),d=curDwg();
-  if(!d||!d.stale){bar.hidden=true;return;}
-  bar.hidden=false;
-  bar.innerHTML=`<b>整合の確認が必要です</b><span>${esc(d.stale.no)} ${esc(d.stale.title)} が Rev.${esc(d.stale.rev)} に更新されました（${esc(fdate(d.stale.at))}）。</span>
-    <span style="flex:1"></span><button class="btn small" id="staleOk">確認済みにする</button>`;
-  $("#staleOk",bar).onclick=async()=>{
-    if(!need())return;
-    await S.db.doc(dwgPath()).update({stale:null});
-    toast("確認済みにしました");
-  };
-}
-const _rdlBase=renderDwgList;
-renderDwgList=function(){
-  _rdlBase();
-  S.drawings.forEach(d=>{
-    if(!d.stale)return;
-    const b=$(`.dwg[data-did="${d.id}"]`);
-    if(!b)return;
-    const meta=$(".dwg-meta",b);
-    if(meta&&!$(".stale",meta)){
-      const c=document.createElement("span");
-      c.className="chip stale";c.textContent="要確認";
-      c.style.cssText="border-color:var(--warn);color:var(--warn);background:var(--warn-soft)";
-      meta.appendChild(c);
-    }
-  });
-};
-
-/* ================= 発行セット ================= */
-async function snapshotSet(){
-  const items=[];
-  for(const d of S.drawings){
-    let last=null;
-    try{
-      const snap=await S.db.collection(`${base()}/drawings/${d.id}/revs`).get();
-      const revs=snap.docs.map(x=>({...x.data(),id:x.id}))
-        .filter(r=>(r.view||"2d")==="2d")
-        .sort((a,b)=>String(a.at).localeCompare(String(b.at)));
-      last=revs[revs.length-1]||null;
-    }catch(e){}
-    items.push({did:d.id,no:d.no,title:d.title,kind:d.kind||"図面",
-      rev:last?last.rev:"—",revId:last?last.id:"",at:last?last.at:"",
-      review:d.review?d.review.result:""});
-  }
-  return items.sort((a,b)=>String(a.no).localeCompare(String(b.no)));
-}
-async function openSets(){
-  if(!need())return;
-  const p=curProj();if(!p){toast("プロジェクトを選んでください");return;}
-  const dlg=dialog({title:`発行セット — ${p.name}`,wide:true,ok:"閉じる",onOk:()=>true});
-  $("[data-x]",dlg.root).hidden=true;
-  const body=$(".body",dlg.root);
-  const draw=async()=>{
-    body.innerHTML=`<div class="note">読み込んでいます…</div>`;
-    let sets=[];
-    try{
-      const snap=await S.db.collection(`${base()}/sets`).get();
-      sets=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
-    }catch(e){}
-    body.innerHTML=`
-      <div class="note">ある時点の各図面の版を凍結して記録します。確認申請・見積・施工でどの版を渡したかが、あとから必ず問われます。</div>
-      <div style="border:1px solid var(--line);border-radius:7px;padding:11px 12px;display:grid;gap:9px">
-        <div class="row" style="margin:0;gap:10px">
-          <div class="field" style="flex:1"><span>セット名</span><input id="sn" placeholder="実施設計 第1回発行"></div>
-          <div class="field" style="width:190px"><span>宛先</span><input id="sto" placeholder="施主 / 確認検査機関"></div>
-        </div>
-        <div class="field"><span>備考</span><input id="sno" placeholder="任意"></div>
-        <div class="row" style="margin:0"><button class="btn primary" id="smk">現在の版でセットを作成</button>
-          <span class="note" style="margin:0">対象 ${S.drawings.length} 図面</span></div>
-      </div>
-      <div style="display:grid;gap:7px">
-        ${sets.length?sets.map(s=>`<button class="thread" data-sid="${esc(s.id)}" style="border:1px solid var(--line);border-radius:7px">
-          <span class="th-top"><span class="num">${esc(fdate(s.at))}</span><span class="chip">${esc(s.items.length)} 図面</span>${s.to?`<span class="chip">${esc(s.to)}</span>`:""}</span>
-          <span class="th-title">${esc(s.name)}</span>
-          <span class="th-sub"><span>${esc(s.by||"—")}</span>${s.note?`<span>${esc(s.note)}</span>`:""}</span>
-        </button>`).join(""):`<div class="note">まだ発行セットはありません。</div>`}
-      </div>
-      <div id="setDetail"></div>`;
-    $("#smk",body).onclick=async()=>{
-      const name=$("#sn",body).value.trim();
-      if(!name){toast("セット名を入力してください");return;}
-      const btn=$("#smk",body);btn.disabled=true;btn.textContent="集計中…";
-      try{
-        const items=await snapshotSet();
-        await S.db.collection(`${base()}/sets`).add({name,to:$("#sto",body).value.trim(),
-          note:$("#sno",body).value.trim(),items,by:S.me||"名無し",at:nowISO()});
-        toast(`「${name}」を発行セットとして記録しました`);
-        draw();
-      }catch(e){toast("作成できませんでした");btn.disabled=false;btn.textContent="現在の版でセットを作成";}
-    };
-    $$("[data-sid]",body).forEach(b=>b.onclick=()=>{
-      const st=sets.find(x=>x.id===b.dataset.sid);
-      const host=$("#setDetail",body);
-      host.innerHTML=`<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
-        <div class="row" style="margin:0 0 8px"><b>${esc(st.name)}</b><span class="spacer" style="flex:1"></span>
-          <button class="btn small" id="setCsv">図面目録をCSVで書き出す</button></div>
-        <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
-          <thead><tr>${["図面番号","図面名称","種別","版","検図","操作"].map(h=>
-            `<th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3)">${h}</th>`).join("")}</tr></thead>
-          <tbody>${st.items.map(it=>`<tr>
-            <td class="mono" style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.no)}</td>
-            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.title)}</td>
-            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.kind||"図面")}</td>
-            <td class="mono" style="padding:5px 8px;border-bottom:1px solid var(--line-2)">Rev.${esc(it.rev)}</td>
-            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.review||"—")}</td>
-            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${it.revId?`<button class="btn small" data-open="${esc(it.did)}" data-rev="${esc(it.revId)}">この版を開く</button>`:"—"}</td>
-          </tr>`).join("")}</tbody></table></div></div>`;
-      $$("[data-open]",host).forEach(x=>x.onclick=()=>{
-        dlg.close();
-        S.view="2d";
-        selectDrawing(x.dataset.open);
-        setTimeout(()=>{S.revId=x.dataset.rev;renderStage();},450);
-      });
-      const csv=$("#setCsv",host);
-      if(!S.dl)csv.hidden=true;
-      else csv.onclick=async()=>{
-        const q=(v)=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
-        const rows=[["工事名称","セット名","発行日","宛先","図面番号","図面名称","種別","版","検図"]];
-        st.items.forEach(it=>rows.push([p.name,st.name,fdate(st.at),st.to||"",it.no,it.title,it.kind||"図面","Rev."+it.rev,it.review||""]));
-        try{await S.dl.save({filename:`図面目録_${st.name}.csv`,data:"﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n")});}
-        catch(e){if(e&&e.code!=="declined")toast("書き出せませんでした");}
-      };
-    });
-  };
-  draw();
-}
-
-/* ================= 差分から改訂雲を自動生成 ================= */
 function revToCanvas(rev,W){
   return new Promise((res,rej)=>{
     const img=new Image();
@@ -2157,6 +864,7 @@ function revToCanvas(rev,W){
     }else img.src="/_blob/"+rev.asset;
   });
 }
+
 function diffBoxes(ca,cb,cols){
   const W=ca.width,H=ca.height;
   const A=ca.getContext("2d").getImageData(0,0,W,H).data;
@@ -2202,27 +910,7 @@ function diffBoxes(ca,cb,cols){
   });
   return keep.slice(0,12);
 }
-async function autoCloud(){
-  if(!need())return;
-  const r=curRev(),c=cmpRev();
-  if(!r||!c){toast("比較する版を選んでください（版の右クリックで比較対象を指定）");return;}
-  toast("変更箇所を解析しています…");
-  try{
-    const [ca,cb]=await Promise.all([revToCanvas(c,1100),revToCanvas(r,1100)]);
-    if(ca.height!==cb.height){toast("版の縦横比が違うため比較できません");return;}
-    const boxes=diffBoxes(ca,cb,88);
-    if(!boxes.length){toast("画像上の変更箇所は検出されませんでした");return;}
-    if(!confirm(`変更箇所を ${boxes.length} か所検出しました。Rev.${r.rev} に改訂雲を打ちますか。`))return;
-    for(const b of boxes){
-      await S.db.collection(`${dwgPath()}/edits`).add({
-        type:"cloud",pts:[[b.x1,b.y1],[b.x2,b.y2]],color:"shu",width:2,
-        rev:r.rev,auto:true,by:S.me||"名無し",at:nowISO()});
-    }
-    toast(`改訂雲を ${boxes.length} か所に打ちました`);
-  }catch(e){toast("解析できませんでした");}
-}
 
-/* ================= AI検図（作図サポート） ================= */
 const AI_PROMPT=(p,d,r)=>`あなたは日本の建築実務で検図を担当する一級建築士です。添付画像は「${p.name}」（${p.phase||"設計"}）の図面 ${d.no}「${d.title}」（分野：${d.discipline||"意匠"}／縮尺：${d.scale||"不明"}／Rev.${r.rev}）です。
 
 この図面を読み、設計レビューで指摘すべき点を重要な順に最大6件挙げてください。着目するのは次の観点です。
@@ -2241,120 +929,1234 @@ const AI_PROMPT=(p,d,r)=>`あなたは日本の建築実務で検図を担当す
 x,y は指摘箇所を囲む矩形の左上、w,h はその幅と高さ。いずれも画像全体を 1.0 とした割合。
 kind は 意匠 / 構造 / 設備 / 法規 / その他 のいずれか。severity は 高 / 中 / 低。`;
 
-async function aiReview(){
-  if(!need())return;
-  if(!S.sample){toast("この環境ではAI検図を使えません");return;}
-  const r=curRev(),d=curDwg(),p=curProj();
-  if(!r||r.view==="3d"){toast("2Dの図面を表示してから実行してください");return;}
-  const caps=await S.sample.limits().catch(()=>null);
-  if(!caps||!caps.images){toast("この環境では図面画像をAIに渡せません");return;}
-  const dlg=dialog({title:`AI検図 — ${d.no} ${d.title}（Rev.${r.rev}）`,wide:true,ok:"閉じる",onOk:()=>true});
-  $("[data-x]",dlg.root).hidden=true;
-  const body=$(".body",dlg.root);
-  body.innerHTML=`<div class="note">図面を読み込んでいます…</div>`;
-  let cands=[];
-  try{
-    const cv=await revToCanvas(r,1500);
-    const blob=await new Promise(ok=>cv.toBlob(ok,"image/jpeg",0.92));
-    body.innerHTML=`<div class="note">Claude が図面を読んでいます。20〜40秒ほどかかります…</div>`;
-    const out=await S.sample.json(AI_PROMPT(p,d,r),{images:[blob],modelTier:"complex"});
-    cands=(Array.isArray(out)?out:(out&&out.items)||[]).filter(c=>c&&c.title);
-  }catch(e){
-    body.innerHTML=`<div class="note" style="color:var(--shu)">${
-      e&&e.code==="not_granted"?"AIの利用が許可されませんでした。":
-      e&&e.code==="rate_limited"?"混み合っています。少し時間をおいて実行してください。":
-      "読み取れませんでした。図面の解像度を上げて登録し直すと通ることがあります。"}</div>`;
-    return;
-  }
-  if(!cands.length){body.innerHTML=`<div class="note">指摘候補は挙がりませんでした。</div>`;return;}
-  const SEV={"高":"var(--shu)","中":"var(--warn)","低":"var(--ink-3)"};
-  const paint=()=>{
-    body.innerHTML=`
-      <div class="note">AIが挙げた候補です。<b>そのまま記録されることはありません</b>。採用したものだけが指摘として起票され、図面にも改訂雲と件名が入ります。内容は必ず人の目で確かめてください。</div>
-      <div style="display:grid;gap:8px">
-        ${cands.map((c,i)=>c.done?`<div class="note" style="padding:8px 10px;border:1px solid var(--line-2);border-radius:6px">#${i+1} ${esc(c.title)} — ${c.done==="ok"?"起票しました":"却下しました"}</div>`
-        :`<div style="border:1px solid var(--line);border-radius:7px;padding:10px 12px">
-          <div class="th-top"><span class="chip kind-${esc(c.kind||"その他")}">${esc(c.kind||"その他")}</span>
-            <span class="chip" style="border-color:${SEV[c.severity]||"var(--line)"};color:${SEV[c.severity]||"var(--ink-2)"}">重要度 ${esc(c.severity||"中")}</span>
-            <span class="mono" style="font-size:10.5px;color:var(--ink-3)">位置 ${Math.round((+c.x||0)*100)}%, ${Math.round((+c.y||0)*100)}%</span></div>
-          <div style="font-size:13.5px;font-weight:500;margin-top:3px">${esc(c.title)}</div>
-          <div style="font-size:12.5px;color:var(--ink-2);margin-top:3px">${esc(c.body||"")}</div>
-          <div class="row"><button class="btn primary" data-ok="${i}">採用して起票</button>
-            <button class="btn" data-ng="${i}">却下</button></div>
-        </div>`).join("")}
-      </div>
-      <div class="row"><button class="btn" id="aiAll">残りをすべて採用</button></div>`;
-    $$("[data-ok]",body).forEach(b=>b.onclick=()=>adopt(+b.dataset.ok));
-    $$("[data-ng]",body).forEach(b=>b.onclick=()=>{cands[+b.dataset.ng].done="ng";paint();});
-    $("#aiAll",body).onclick=async()=>{
-      for(let i=0;i<cands.length;i++)if(!cands[i].done)await adopt(i,true);
-      paint();
-    };
-  };
-  const adopt=async(i,quiet)=>{
-    const c=cands[i];
-    const x=Math.min(.98,Math.max(0,+c.x||0)),y=Math.min(.98,Math.max(0,+c.y||0));
-    const w=Math.min(1-x,Math.max(.04,+c.w||.12)),h=Math.min(1-y,Math.max(.04,+c.h||.10));
-    const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
+async function snapshotSet(){
+  const items=[];
+  for(const d of S.drawings){
+    let last=null;
     try{
-      await S.db.collection(`${dwgPath()}/marks`).add({
-        no,x:x+w/2,y:y+h/2,rev:r.rev,kind:KINDS.includes(c.kind)?c.kind:"その他",
-        title:String(c.title).slice(0,80),body:String(c.body||""),severity:c.severity||"中",
-        ai:true,assignee:"",due:"",status:"open",replies:[],by:`AI検図（${S.me||"名無し"}）`,at:nowISO()});
-      await S.db.collection(`${dwgPath()}/edits`).add({
-        type:"cloud",pts:[[x,y],[x+w,y+h]],color:"shu",width:2,rev:r.rev,ai:true,by:S.me||"名無し",at:nowISO()});
-      await S.db.collection(`${dwgPath()}/edits`).add({
-        type:"text",pts:[[x,Math.max(.02,y-.012)]],text:`#${no} ${String(c.title).slice(0,26)}`,
-        color:"shu",width:1,rev:r.rev,ai:true,by:S.me||"名無し",at:nowISO()});
-      await bumpOpen(1);
-      c.done="ok";
-      if(!quiet){paint();toast(`指摘 #${no} を起票し、図面に雲マークを打ちました`);}
-    }catch(e){toast("起票できませんでした");}
-  };
-  paint();
+      const snap=await S.db.collection(`${base()}/drawings/${d.id}/revs`).get();
+      const revs=snap.docs.map(x=>({...x.data(),id:x.id}))
+        .filter(r=>(r.view||"2d")==="2d")
+        .sort((a,b)=>String(a.at).localeCompare(String(b.at)));
+      last=revs[revs.length-1]||null;
+    }catch(e){}
+    items.push({did:d.id,no:d.no,title:d.title,kind:d.kind||"図面",
+      rev:last?last.rev:"—",revId:last?last.id:"",at:last?last.at:"",
+      review:d.review?d.review.result:""});
+  }
+  return items.sort((a,b)=>String(a.no).localeCompare(String(b.no)));
 }
 
-/* ================= ツールバーへの追加 ================= */
-(function buildExtras(){
-  const setBtn=document.createElement("button");
-  setBtn.className="btn small";setBtn.id="btnSets";setBtn.textContent="発行セット";
-  $("#btnProjSet").after(setBtn);
-  setBtn.onclick=openSets;
-
-  const wrap=document.createElement("span");
-  wrap.style.cssText="display:contents";
-  wrap.innerHTML=`<button class="btn" id="btnAi">AI検図</button>
-    <button class="btn" id="btnCloud">変更箇所に雲マーク</button>
-    <button class="btn" id="btnRefs">関連図面</button>`;
-  $("#cmpCtl").after(wrap);
-  $("#btnAi").onclick=aiReview;
-  $("#btnCloud").onclick=autoCloud;
-  $("#btnRefs").onclick=editRefs;
-})();
-
-const _syncBars=sync3DBars;
-sync3DBars=function(){
-  _syncBars();
-  const is3=S.view==="3d";
-  $("#btnAi").hidden=is3||!S.sample;
-  $("#btnCloud").hidden=is3;
-  $("#btnRefs").hidden=is3;
-  syncStale();
-};
-const _rt2=renderThreads;
-renderThreads=function(){
-  _rt2();
-  $$(".thread",$("#threads")).forEach(b=>{
-    const m=S.marks.find(x=>x.id===b.dataset.mid);
-    if(!m||!m.ai)return;
-    const top=$(".th-top",b);
-    if(top&&!$(".isai",top)){
-      const c=document.createElement("span");
-      c.className="chip isai";c.textContent="AI";
-      c.style.cssText="border-color:var(--accent);color:var(--accent)";
-      top.insertBefore(c,top.children[1]||null);
+async function propagate(rev){
+  const d=curDwg();
+  if(!d||!S.db)return;
+  try{
+    const snap=await S.db.collection(`${base()}/drawings`).where("refIds","array-contains",S.did).get();
+    for(const x of snap.docs){
+      if(x.id===S.did)continue;
+      await S.db.doc(`${base()}/drawings/${x.id}`).update({stale:{no:d.no,title:d.title,rev,at:nowISO()}});
     }
-  });
+  }catch(e){}
+}
+
+function nextRevLetter(){
+  const used=revsIn("2d").map(r=>r.rev);
+  for(let i=0;i<26;i++){const l=REVLET(i);if(!used.includes(l))return l;}
+  return String(S.revs.length+1);
+}
+
+function next3DLetter(){
+  const used=S.revs.filter(r=>r.view==="3d").map(r=>r.rev);
+  for(let i=0;i<26;i++){const l=REVLET(i);if(!used.includes(l))return l;}
+  return String(used.length+1);
+}
+</script>
+<script>
+/* ============ ホーム ============ */
+SCREENS.home={
+  title:()=>`検図台<small>${curProj()?esc(curProj().name):(S.ready?"プロジェクト未選択":"接続中…")}</small>`,
+  act:(a)=>{a.innerHTML=`<button class="btn small" id="aSet">設定</button>`;$("#aSet",a).onclick=()=>go("settings");},
+  body:(h)=>{
+    if(!S.ready){h.innerHTML=`<div class="card" style="padding:16px;display:grid;gap:11px">${'<div class="skel"></div>'.repeat(6)}</div>`;return;}
+    if(!S.db)h.appendChild(el("div","banner","共有バックエンドに接続していません。claude.ai で公開ページを開くと、チームで図面と指摘を共有できます。"));
+    const p=curProj();
+    const pc=el("div","card");
+    pc.innerHTML=`<h2>プロジェクト</h2>
+      <button class="item" id="pSel">
+        <span class="t">${p?esc(p.name):"プロジェクトを選ぶ"}</span>
+        <span class="s">${p?`${esc(p.code||"")} ${esc(p.phase||"")}`:"まだ登録がありません"}
+          ${p?`<span class="chip ${p.visibility==="private"?"warn":"ok"}">${p.visibility==="private"?"非公開":"オープン"}</span>`:""}
+          ${p&&p.sample?`<span class="chip">サンプル</span>`:""}</span>
+        <span class="r"><span class="chev">›</span></span></button>`;
+    h.appendChild(pc);
+    $("#pSel",pc).onclick=()=>go("projects");
+    if(!p)return;
+
+    const dc=el("div","card");
+    dc.innerHTML=`<h2>図面 ${S.drawings.length?`（${S.drawings.length}）`:""}</h2>`;
+    if(!S.drawings.length){
+      dc.appendChild(el("div","empty","<b>図面がまだありません</b>図面番号と図面名称を登録し、紙の原図を撮影して版として取り込みます。"));
+    }else{
+      S.drawings.forEach(d=>{
+        const b=el("button","item");
+        const n=d.id===S.did?openCount():(d.openCount||0);
+        b.innerHTML=`<span class="t">${esc(d.no)}　${esc(d.title)}</span>
+          <span class="s"><span class="mono">Rev.${esc(d.lastRev||"—")}</span><span>${esc(d.discipline||"")}</span>
+            ${d.kind&&d.kind!=="図面"?`<span class="chip">${esc(d.kind)}</span>`:""}
+            ${d.stale?`<span class="chip warn">要確認</span>`:""}
+            ${d.review?`<span class="chip ${d.review.result==="要修正"?"shu":"ok"}">${esc(d.review.result)}</span>`:""}</span>
+          <span class="r"><span class="badge ${n?"":"zero"}">${n}</span><span class="chev">›</span></span>`;
+        b.onclick=()=>{pickDrawing(d.id);go("drawing");};
+        dc.appendChild(b);
+      });
+    }
+    h.appendChild(dc);
+    const acts=el("div","row");
+    acts.innerHTML=`<button class="btn primary grow" id="nd">＋ 図面を登録</button>
+      <button class="btn grow" id="ns">発行セット</button>`;
+    h.appendChild(acts);
+    $("#nd",acts).onclick=()=>go("newdrawing");
+    $("#ns",acts).onclick=()=>go("sets");
+  }
 };
-renderAll();
+
+SCREENS.projects={
+  title:()=>"プロジェクト",
+  body:(h)=>{
+    const c=el("div","card");
+    c.innerHTML=`<h2>プロジェクト一覧</h2>`;
+    if(!S.projects.length)c.appendChild(el("div","empty","<b>まだありません</b>工事名称を登録すると、図面と検図記録をここに集約できます。"));
+    S.projects.forEach(p=>{
+      const b=el("button","item");
+      b.innerHTML=`<span class="t">${esc(p.name)}</span>
+        <span class="s">${esc(p.code||"")} ${esc(p.phase||"")}
+          <span class="chip ${p.visibility==="private"?"warn":"ok"}">${p.visibility==="private"?"非公開":"オープン"}</span>
+          ${p.sample?`<span class="chip">サンプル</span>`:""}</span>
+        <span class="r">${p.id===S.pid?`<span class="chip ok">選択中</span>`:""}<span class="chev">›</span></span>`;
+      b.onclick=()=>{pickProject(p.id);home();};
+      c.appendChild(b);
+    });
+    h.appendChild(c);
+    const a=el("div","row");
+    a.innerHTML=`<button class="btn primary grow" id="np">＋ プロジェクトを作成</button>
+      ${curProj()?`<button class="btn grow" id="vz">公開範囲を変える</button>`:""}`;
+    h.appendChild(a);
+    $("#np",a).onclick=()=>go("newproject");
+    if($("#vz",a))$("#vz",a).onclick=()=>go("visibility");
+  }
+};
+
+/* ============ 図面ハブ ============ */
+SCREENS.drawing={
+  title:()=>{const d=curDwg();return d?`${esc(d.no)}<small>${esc(d.title)}</small>`:"図面";},
+  body:(h)=>{
+    const d=curDwg(),r=curRev();
+    if(!d){h.innerHTML=`<div class="empty">図面が選ばれていません。</div>`;return;}
+    if(d.stale){
+      const b=el("div","banner");
+      b.innerHTML=`<div class="grow"><b>整合の確認が必要です</b><br>${esc(d.stale.no)} ${esc(d.stale.title)} が Rev.${esc(d.stale.rev)} に更新されました（${esc(fdate(d.stale.at))}）。</div>
+        <button class="btn small" id="sok">確認済みにする</button>`;
+      h.appendChild(b);
+      $("#sok",b).onclick=async()=>{if(!need())return;await S.db.doc(dwgPath()).update({stale:null});toast("確認済みにしました");};
+    }
+    if(r){
+      const pv=el("button","preview");
+      pv.innerHTML=`<div class="sheet" style="aspect-ratio:${sheetAspect(r)}">
+        <div class="layer">${layerHTML(r,"var(--sheet-ink)")}</div>
+        <div class="pinlayer">${pinsHTML({})}</div></div>`;
+      pv.onclick=()=>go(S.view==="3d"?"three":"viewer");
+      h.appendChild(pv);
+    }else{
+      h.appendChild(el("div","empty","<b>まだ版が登録されていません</b>紙の原図を撮影するか、PDF・SVG・3Dモデルを取り込んでください。"));
+    }
+    const meta=el("button","item card");
+    meta.style.borderBottom="0";
+    meta.innerHTML=`<span class="t">版 Rev.${esc(r?r.rev:"—")}${S.view==="3d"?"（3D）":""}</span>
+      <span class="s">${r?`${esc(fdate(r.at))}　${esc(r.by||"")}　${esc(r.note||"")}`:"版なし"}</span>
+      <span class="r"><span class="mono">${revsIn().length} 版</span><span class="chev">›</span></span>`;
+    meta.onclick=()=>go("revs");
+    h.appendChild(meta);
+
+    const t=el("div","tiles");
+    const tile=(id,name,sub,dis)=>`<button class="tile" id="${id}" ${dis?"disabled":""}><b>${name}</b><small>${sub}</small></button>`;
+    t.innerHTML=
+      tile("t1",`指摘事項　${openCount()?`<span class="badge">${openCount()}</span>`:""}`,"位置を指した指摘と回答")+
+      tile("t2","図面を見る","拡大・ピンの確認・指摘を打つ",!r)+
+      tile("t3","赤入れ","雲マーク・引出し・文字を全員で",!r||S.view==="3d")+
+      tile("t4","版を比較","重ね・ワイプ・変更箇所の自動検出",revsIn("2d").length<2)+
+      tile("t5","3D パース",has3D()?"回して見る・モデル上に指摘":"3Dモデル未登録",!has3D())+
+      tile("t6","AI検図",S.sample?"Claudeが指摘候補を挙げる":"この環境では使えません",!r||!S.sample||S.view==="3d")+
+      tile("t7","版を追加","撮影・画像・PDF・SVG・3Dモデル")+
+      tile("t8","関連図面",(d.refIds&&d.refIds.length)?`${d.refIds.length} 件と連動`:"更新の波及先を決める")+
+      tile("t9","検図結果",d.review?`${esc(d.review.result)}（${esc(d.review.by||"")}）`:"承認・条件付承認・要修正")+
+      tile("t10","検図リスト",S.dl?"指摘一覧をCSVで書き出す":"この環境では書き出せません",!S.dl);
+    h.appendChild(t);
+    const on=(id,fn)=>{const b=$("#"+id,t);if(b&&!b.disabled)b.onclick=fn;};
+    on("t1",()=>go("marks"));on("t2",()=>go("viewer"));on("t3",()=>go("draw"));
+    on("t4",()=>go("compare"));on("t5",()=>{S.view="3d";S.revId=null;go("three");});
+    on("t6",()=>go("ai"));on("t7",()=>go("import"));on("t8",()=>go("refs"));
+    on("t9",()=>go("review"));on("t10",exportCsv);
+  }
+};
+
+SCREENS.revs={
+  title:()=>"版の履歴",
+  body:(h)=>{
+    const c=el("div","card");
+    c.innerHTML=`<h2>この図面の版</h2>`;
+    const all=S.revs.slice().reverse();
+    if(!all.length)c.appendChild(el("div","empty","<b>版がありません</b>「版を追加」から取り込んでください。"));
+    all.forEach(r=>{
+      const b=el("button","item");
+      b.innerHTML=`<span class="t">Rev.${esc(r.rev)} ${r.view==="3d"?'<span class="chip">3D</span>':""}
+        ${r.id===S.revId?'<span class="chip ok">表示中</span>':""}${r.id===S.cmpId?'<span class="chip shu">比較対象</span>':""}</span>
+        <span class="s">${esc(fdate(r.at))}　${esc(r.by||"")}${r.note?`　${esc(r.note)}`:""}</span>
+        <span class="r"><span class="chev">›</span></span>`;
+      b.onclick=()=>{S.view=r.view||"2d";S.revId=r.id;if(S.cmpId===r.id)S.cmpId=null;back();};
+      c.appendChild(b);
+    });
+    h.appendChild(c);
+    h.appendChild(el("div","note","版を選ぶと、その版が表示されます。比較したい版は「版を比較」の画面で選べます。"));
+    if(S.revs.some(r=>r.pdf)){
+      const dl=el("button","btn wide",'元のPDFを保存する');
+      h.appendChild(dl);
+      dl.onclick=async()=>{
+        const r=S.revs.filter(x=>x.pdf).pop();
+        if(!S.dl){toast("この環境では保存できません");return;}
+        try{
+          const res=await fetch("/_blob/"+r.pdf);
+          await S.dl.save({filename:`${(curDwg()||{}).no||"図面"}_Rev${r.rev}.pdf`,data:await res.blob()});
+        }catch(e){if(e&&e.code!=="declined")toast("保存できませんでした");}
+      };
+    }
+  }
+};
+
+/* ============ 図面ビュー ============ */
+function wirePins(host){
+  $$(".pin",host).forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();S.selMark=b.dataset.mid;go("mark");
+  });
+}
+SCREENS.viewer={
+  full:true,
+  title:()=>{const d=curDwg(),r=curRev();return `図面<small>${d?esc(d.no):""} Rev.${r?esc(r.rev):"—"}</small>`;},
+  body:(h)=>{
+    const r=curRev();
+    const bar=el("div","stagebar");
+    bar.innerHTML=`<button class="btn" id="pm" aria-pressed="${S.pinMode}">指摘を打つ</button>
+      <div class="seg"><button id="zo">−</button><button id="zf" class="mono" style="min-width:58px">${Math.round(S.zoom*100)}%</button><button id="zi">＋</button></div>
+      <button class="btn" id="iv" aria-pressed="${S.invert}">反転</button>
+      <span class="grow"></span>
+      <span class="note">${S.marks.filter(m=>(m.view||"2d")==="2d").length} 件の指摘</span>`;
+    h.appendChild(bar);
+    const wrap=el("div","sheet-wrap");
+    wrap.innerHTML=sheetHTML({rev:r,pick:S.pinMode,edits:true});
+    h.appendChild(wrap);
+    wirePins(wrap);
+    $("#pm",bar).onclick=()=>{S.pinMode=!S.pinMode;paint();if(S.pinMode)toast("図面上の位置をタップすると指摘を起票できます");};
+    $("#zi",bar).onclick=()=>{S.zoom=Math.min(4,S.zoom+.25);paint();};
+    $("#zo",bar).onclick=()=>{S.zoom=Math.max(.5,S.zoom-.25);paint();};
+    $("#zf",bar).onclick=()=>{S.zoom=1;paint();};
+    $("#iv",bar).onclick=()=>{S.invert=!S.invert;paint();};
+    const sh=$("#sheet",wrap);
+    if(sh)sh.onclick=(e)=>{
+      if(!S.pinMode||e.target.closest(".pin"))return;
+      const b=sh.getBoundingClientRect();
+      go("newmark",{x:(e.clientX-b.left)/b.width,y:(e.clientY-b.top)/b.height});
+    };
+  }
+};
+
+/* ============ 指摘 ============ */
+function markRow(m){
+  const b=el("button","item");
+  b.innerHTML=`<span class="t"><span class="mono" style="color:var(--${m.status==="done"?"ok":"shu"})">#${m.no}</span>
+      ${esc(m.title)}</span>
+    <span class="s"><span class="chip kind-${esc(m.kind)}">${esc(m.kind)}</span>
+      <span class="chip">${esc(STATUS[m.status]||"未対応")}</span>
+      <span class="chip mono">Rev.${esc(m.rev)}</span>
+      ${m.view==="3d"?'<span class="chip">3D</span>':""}${m.ai?'<span class="chip" style="border-color:var(--accent);color:var(--accent)">AI</span>':""}
+      <span>${esc(m.by||"—")}</span>${m.assignee?`<span>→ ${esc(m.assignee)}</span>`:""}
+      ${m.due?`<span class="mono" ${overdue(m)?'style="color:var(--shu);font-weight:700"':""}>期限 ${esc(m.due)}</span>`:""}
+      ${m.replies&&m.replies.length?`<span>返信 ${m.replies.length}</span>`:""}</span>
+    <span class="r"><span class="chev">›</span></span>`;
+  b.onclick=()=>{S.selMark=m.id;go("mark");};
+  return b;
+}
+SCREENS.marks={
+  title:()=>`指摘事項<small>未対応 ${openCount()} / 全 ${S.marks.length}</small>`,
+  body:(h)=>{
+    const f=el("div","row");
+    const F=[["open","未対応"],["doing","対応中"],["done","完了"],["mine","自分宛"],["over","期限超過"]];
+    f.innerHTML=F.map(([k,l])=>`<button class="btn small" data-f="${k}" aria-pressed="${!!S.filt[k]}">${l}</button>`).join("");
+    h.appendChild(f);
+    $$("[data-f]",f).forEach(b=>b.onclick=()=>{S.filt[b.dataset.f]=S.filt[b.dataset.f]?0:1;paint();});
+    const list=S.marks.filter(m=>S.filt[m.status||"open"])
+      .filter(m=>!S.filt.mine||(m.assignee&&S.me&&m.assignee===S.me))
+      .filter(m=>!S.filt.over||overdue(m));
+    const c=el("div","card");
+    if(!list.length)c.appendChild(el("div","empty","<b>該当する指摘はありません</b>「図面を見る」から位置をタップすると起票できます。"));
+    list.forEach(m=>c.appendChild(markRow(m)));
+    h.appendChild(c);
+    const a=el("button","btn primary wide","図面から指摘を起票する");
+    a.onclick=()=>{S.pinMode=true;go(S.view==="3d"?"three":"viewer");};
+    h.appendChild(a);
+  }
+};
+SCREENS.mark={
+  title:()=>{const m=S.marks.find(x=>x.id===S.selMark);return m?`指摘 #${m.no}`:"指摘";},
+  body:(h)=>{
+    const m=S.marks.find(x=>x.id===S.selMark);
+    if(!m){h.innerHTML=`<div class="empty">この指摘は削除されました。</div>`;return;}
+    const c=el("div","card");c.style.padding="14px";
+    c.innerHTML=`<div class="row" style="gap:6px">
+        <span class="chip kind-${esc(m.kind)}">${esc(m.kind)}</span>
+        <span class="chip mono">Rev.${esc(m.rev)}</span>
+        ${m.view==="3d"?'<span class="chip">3D</span>':""}
+        ${m.ai?'<span class="chip" style="border-color:var(--accent);color:var(--accent)">AI検図</span>':""}
+        ${m.severity?`<span class="chip">重要度 ${esc(m.severity)}</span>`:""}</div>
+      <div style="font-size:17px;font-weight:500;margin-top:8px">${esc(m.title)}</div>
+      <div style="font-size:14px;color:var(--ink-2);white-space:pre-wrap;margin-top:6px">${esc(m.body||"")}</div>
+      <div class="note" style="margin-top:8px">${esc(m.by||"—")}　${esc(fdate(m.at))}</div>
+      ${(m.replies||[]).map(r=>`<div class="reply"><div class="rmeta"><b>${esc(r.by||"—")}</b> ${esc(fdate(r.at))}</div><p>${esc(r.text)}</p></div>`).join("")}`;
+    h.appendChild(c);
+
+    const st=el("div","seg");
+    st.innerHTML=Object.entries(STATUS).map(([k,v])=>`<button data-st="${k}" aria-pressed="${(m.status||"open")===k}">${v}</button>`).join("");
+    h.appendChild(st);
+    $$("[data-st]",st).forEach(b=>b.onclick=async()=>{
+      if(!need())return;
+      const was=(m.status||"open")==="done",now=b.dataset.st==="done";
+      await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({status:b.dataset.st,
+        resolvedBy:now?(S.me||"名無し"):null,resolvedAt:now?nowISO():null});
+      if(was!==now)await bumpOpen(now?-1:1);
+    });
+
+    const asg=el("div","card");asg.style.padding="12px";
+    asg.innerHTML=`<div class="row">
+      <div class="field grow"><span>担当</span><input id="asg" value="${esc(m.assignee||"")}" placeholder="未定"></div>
+      <div class="field" style="width:170px"><span>回答期限</span><input id="due" type="date" value="${esc(m.due||"")}"></div></div>
+      <div class="row" style="margin-top:9px"><button class="btn small" id="me">自分が担当</button>
+      <button class="btn small primary" id="sv">保存</button></div>`;
+    h.appendChild(asg);
+    $("#me",asg).onclick=()=>{$("#asg",asg).value=S.me||"";};
+    $("#sv",asg).onclick=async()=>{
+      if(!need())return;
+      await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({assignee:$("#asg",asg).value.trim(),due:$("#due",asg).value||""});
+      toast("担当と期限を保存しました");
+    };
+
+    const rp=el("div","field");
+    rp.innerHTML=`<span>回答・対応内容</span><textarea id="rb" placeholder="回答を書く"></textarea>`;
+    h.appendChild(rp);
+    const btns=el("div","row");
+    btns.innerHTML=`<button class="btn primary grow" id="sr">返信する</button>
+      <button class="btn danger" id="dl">削除</button>`;
+    h.appendChild(btns);
+    $("#sr",btns).onclick=async()=>{
+      if(!need())return;
+      const t=$("#rb",rp).value.trim();if(!t)return;
+      await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({replies:[...(m.replies||[]),{by:S.me||"名無し",text:t,at:nowISO()}]});
+    };
+    $("#dl",btns).onclick=async()=>{
+      if(!need())return;
+      if(!confirm(`指摘 #${m.no} を削除します。よろしいですか。`))return;
+      await S.db.doc(`${dwgPath()}/marks/${m.id}`).delete();
+      if((m.status||"open")!=="done")await bumpOpen(-1);
+      S.selMark=null;back();
+    };
+    if(m.view==="3d"&&m.cam){
+      const g=el("button","btn wide","このアングルで3Dを見る");
+      g.onclick=()=>{S.view="3d";S.revId=null;V.restore=m.cam;go("three");};
+      h.appendChild(g);
+    }
+  }
+};
+async function bumpOpen(delta){
+  const d=curDwg();if(!d||!S.db)return;
+  try{await S.db.doc(dwgPath()).update({openCount:Math.max(0,(d.openCount||0)+delta)});}catch(e){}
+}
+SCREENS.newmark={
+  live:false,
+  title:()=>"指摘を追加",
+  body:(h,o)=>{
+    const r=curRev();
+    const c=el("div","card");c.style.padding="14px";
+    c.innerHTML=`<div class="row">
+        <div class="field" style="width:150px"><span>分類</span><select id="k">${KINDS.map(x=>`<option>${x}</option>`).join("")}</select></div>
+        <div class="field grow"><span>件名</span><input id="t" placeholder="例：会議室Aの扉が柱に干渉"></div></div>
+      <div class="field" style="margin-top:10px"><span>内容</span><textarea id="b" placeholder="根拠・依頼事項・確認したい点"></textarea></div>
+      <div class="row" style="margin-top:10px">
+        <div class="field grow"><span>担当</span><input id="a" placeholder="回答する人"></div>
+        <div class="field" style="width:170px"><span>回答期限</span><input id="d" type="date"></div></div>
+      <div class="note mono" style="margin-top:10px">${o.p?`位置 X:${o.p[0]} Y:${o.p[1]} Z:${o.p[2]}（3D）`:`位置 X:${(o.x*100).toFixed(1)}% / Y:${(o.y*100).toFixed(1)}%`}　Rev.${esc(r?r.rev:"—")}</div>
+      ${o.p?`<div class="note">いま見ているアングルも一緒に保存されます。</div>`:""}`;
+    h.appendChild(c);
+    const b=el("button","btn primary wide","起票する");
+    h.appendChild(b);
+    b.onclick=async()=>{
+      if(!need())return;
+      const title=$("#t",c).value.trim();
+      if(!title){toast("件名を入力してください");return;}
+      b.disabled=true;
+      const no=(S.marks.reduce((x,v)=>Math.max(x,v.no||0),0))+1;
+      const doc={no,rev:r?r.rev:"—",kind:$("#k",c).value,title,body:$("#b",c).value.trim(),
+        assignee:$("#a",c).value.trim(),due:$("#d",c).value||"",status:"open",replies:[],
+        by:S.me||"名無し",at:nowISO()};
+      if(o.p){doc.view="3d";doc.p=o.p;doc.cam=o.cam;doc.x=0;doc.y=0;}
+      else{doc.x=o.x;doc.y=o.y;}
+      try{
+        await S.db.collection(`${dwgPath()}/marks`).add(doc);
+        await bumpOpen(1);
+        S.pinMode=false;
+        toast(`指摘 #${no} を起票しました`);back();
+      }catch(e){toast("起票できませんでした");b.disabled=false;}
+    };
+  }
+};
+
+/* ============ 赤入れ ============ */
+const TOOLS=[["select","選択"],["pen","ペン"],["line","直線"],["arrow","引出し"],["rect","矩形"],["cloud","雲マーク"],["text","文字"]];
+function ptOf(e,sh){
+  const b=sh.getBoundingClientRect();
+  return [Math.max(0,Math.min(1,(e.clientX-b.left)/b.width)),Math.max(0,Math.min(1,(e.clientY-b.top)/b.height))];
+}
+async function addShape(s){
+  if(!need())return;
+  const r=curRev();if(!r)return;
+  try{
+    const ref=await S.db.collection(`${dwgPath()}/edits`).add({...s,color:E.color,width:E.width,
+      rev:r.rev,by:S.me||"名無し",at:nowISO()});
+    E.mine.push(ref.id);
+  }catch(e){toast("書き込めませんでした");}
+}
+function redrawEdits(wrap){
+  const svg=$(".editlayer",wrap);
+  if(svg)svg.innerHTML=visibleShapes().map(s=>shapeSVG(s,s.id===E.sel)).join("");
+}
+function wireDraw(wrap){
+  const sh=$("#sheet",wrap),svg=$(".editlayer",wrap);
+  if(!sh||!svg)return;
+  const ns="http://www.w3.org/2000/svg";
+  if(E.tool==="select"){
+    svg.style.pointerEvents="none";
+    $$("g[data-eid]",svg).forEach(g=>{
+      g.style.pointerEvents="auto";g.style.cursor="move";
+      g.onpointerdown=(e)=>{
+        e.stopPropagation();
+        const s=E.shapes.find(x=>x.id===g.dataset.eid);
+        if(!s)return;
+        E.sel=s.id;redrawEdits(wrap);wireDraw(wrap);
+        const g2=$(`g[data-eid="${s.id}"]`,$(".editlayer",wrap));
+        if(!g2)return;
+        const start=ptOf(e,sh),orig=s.pts.map(p=>[...p]);
+        let moved=false;
+        g2.setPointerCapture(e.pointerId);
+        g2.onpointermove=(ev)=>{
+          const p=ptOf(ev,sh),dx=p[0]-start[0],dy=p[1]-start[1];
+          if(Math.abs(dx)+Math.abs(dy)>.002)moved=true;
+          s.pts=orig.map(q=>[q[0]+dx,q[1]+dy]);
+          redrawEdits(wrap);
+        };
+        g2.onpointerup=async()=>{
+          if(moved&&S.db){try{await S.db.doc(`${dwgPath()}/edits/${s.id}`).update({pts:s.pts});}catch(err){}}
+          paint();
+        };
+      };
+      g.ondblclick=async(e)=>{
+        const s=E.shapes.find(x=>x.id===g.dataset.eid);
+        if(!s||s.type!=="text")return;
+        e.stopPropagation();
+        const t=prompt("文字を修正",s.text||"");
+        if(t!=null&&S.db)await S.db.doc(`${dwgPath()}/edits/${s.id}`).update({text:t});
+      };
+    });
+    return;
+  }
+  svg.style.pointerEvents="auto";svg.style.cursor="crosshair";svg.style.touchAction="none";
+  let cur=null,tmp=null;
+  svg.onpointerdown=(e)=>{
+    if(!S.db){toast("接続していません");return;}
+    if(!curRev())return;
+    const p=ptOf(e,sh);
+    if(E.tool==="text"){const t=prompt("記入する文字");if(t)addShape({type:"text",pts:[p],text:t});return;}
+    cur={type:E.tool,pts:E.tool==="pen"?[p]:[p,p]};
+    tmp=document.createElementNS(ns,"g");svg.appendChild(tmp);
+    svg.setPointerCapture(e.pointerId);
+  };
+  svg.onpointermove=(e)=>{
+    if(!cur)return;
+    const p=ptOf(e,sh);
+    if(E.tool==="pen"){
+      const last=cur.pts[cur.pts.length-1];
+      if(Math.hypot(p[0]-last[0],p[1]-last[1])>.003)cur.pts.push(p);
+    }else cur.pts[1]=p;
+    tmp.innerHTML=shapeSVG({...cur,id:"_t",color:E.color,width:E.width});
+  };
+  svg.onpointerup=()=>{
+    if(!cur)return;
+    const s=cur;cur=null;if(tmp)tmp.remove();tmp=null;
+    const a=s.pts[0],b=s.pts[s.pts.length-1];
+    if(s.type!=="pen"&&Math.hypot(b[0]-a[0],b[1]-a[1])<.008)return;
+    if(s.type==="pen"&&s.pts.length<2)return;
+    addShape(s);
+  };
+}
+SCREENS.draw={
+  full:true,
+  title:()=>{const r=curRev();return `赤入れ<small>Rev.${r?esc(r.rev):"—"}　${visibleShapes().length} 要素</small>`;},
+  body:(h)=>{
+    const r=curRev();
+    const bar=el("div","stagebar");
+    bar.innerHTML=`<div class="seg">${TOOLS.map(([k,l])=>`<button data-tool="${k}" aria-pressed="${E.tool===k}">${l}</button>`).join("")}</div>
+      <div class="seg">${Object.entries(COLORS).map(([k,v])=>`<button data-color="${k}" aria-pressed="${E.color===k}" title="${k}">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${v};vertical-align:-2px"></span></button>`).join("")}</div>
+      <div class="seg"><button data-w="1" aria-pressed="${E.width===1}">細</button><button data-w="2" aria-pressed="${E.width===2}">中</button><button data-w="4" aria-pressed="${E.width===4}">太</button></div>
+      <button class="btn" id="ed" ${E.sel?"":"disabled"}>選択を削除</button>
+      <button class="btn" id="eu">元に戻す</button>
+      <span class="grow"></span>
+      <button class="btn" id="ea" aria-pressed="${E.all}">他の版も表示</button>`;
+    h.appendChild(bar);
+    const wrap=el("div","sheet-wrap");
+    wrap.innerHTML=sheetHTML({rev:r,edits:true,pins:false});
+    h.appendChild(wrap);
+    wireDraw(wrap);
+    $$("[data-tool]",bar).forEach(b=>b.onclick=()=>{E.tool=b.dataset.tool;E.sel=null;paint();});
+    $$("[data-color]",bar).forEach(b=>b.onclick=async()=>{
+      E.color=b.dataset.color;
+      if(E.sel&&S.db)await S.db.doc(`${dwgPath()}/edits/${E.sel}`).update({color:E.color});
+      paint();
+    });
+    $$("[data-w]",bar).forEach(b=>b.onclick=async()=>{
+      E.width=+b.dataset.w;
+      if(E.sel&&S.db)await S.db.doc(`${dwgPath()}/edits/${E.sel}`).update({width:E.width});
+      paint();
+    });
+    $("#ed",bar).onclick=async()=>{
+      if(!E.sel||!need())return;
+      const id=E.sel;E.sel=null;
+      try{await S.db.doc(`${dwgPath()}/edits/${id}`).delete();}catch(e){}
+    };
+    $("#eu",bar).onclick=async()=>{
+      const id=E.mine.pop();
+      if(!id||!need())return;
+      try{await S.db.doc(`${dwgPath()}/edits/${id}`).delete();}catch(e){}
+    };
+    $("#ea",bar).onclick=()=>{E.all=!E.all;paint();};
+  }
+};
+
+/* ============ 版の比較 ============ */
+SCREENS.compare={
+  full:true,
+  title:()=>"版の比較",
+  body:(h)=>{
+    const list=revsIn("2d");
+    if(!S.cmpId||!list.some(r=>r.id===S.cmpId)){
+      const o=list.filter(r=>r.id!==S.revId);
+      S.cmpId=o.length?o[o.length-1].id:null;
+    }
+    const r=curRev(),c=cmpRev();
+    const bar=el("div","stagebar");
+    bar.innerHTML=`<span class="lbl">比較</span>
+      <select id="cs" class="btn">${list.map(x=>`<option value="${esc(x.id)}" ${x.id===S.cmpId?"selected":""}>Rev.${esc(x.rev)}（旧・朱）</option>`).join("")}</select>
+      <span class="lbl">現在</span>
+      <select id="rs" class="btn">${list.map(x=>`<option value="${esc(x.id)}" ${x.id===(r?r.id:"")?"selected":""}>Rev.${esc(x.rev)}（新・紺）</option>`).join("")}</select>
+      <div class="seg">${[["overlay","重ね"],["wipe","ワイプ"],["side","並べて"]].map(([k,l])=>
+        `<button data-m="${k}" aria-pressed="${S.mode===k}">${l}</button>`).join("")}</div>
+      ${S.mode!=="side"?`<input type="range" id="rg" min="0" max="100" value="${S.ratio}" style="accent-color:var(--accent);width:120px">
+        <b class="mono" style="font-weight:500;width:40px">${S.ratio}%</b>`:""}
+      <span class="grow"></span>
+      <button class="btn primary" id="ac">変更箇所に雲マーク</button>`;
+    h.appendChild(bar);
+    const wrap=el("div","sheet-wrap");
+    if(S.mode==="side"&&c){
+      wrap.innerHTML=`<div style="display:flex;gap:14px;width:100%;align-items:flex-start">
+        <div class="grow"><div class="lbl" style="margin-bottom:5px">Rev.${esc(c.rev)}（旧）</div>
+          <div class="sheet" style="aspect-ratio:${sheetAspect(c)};width:100%"><div class="layer">${layerHTML(c,"var(--sheet-ink)")}</div></div></div>
+        <div class="grow"><div class="lbl" style="margin-bottom:5px">Rev.${esc(r.rev)}（新）</div>
+          <div class="sheet" style="aspect-ratio:${sheetAspect(r)};width:100%"><div class="layer">${layerHTML(r,"var(--sheet-ink)")}</div></div></div></div>`;
+    }else{
+      wrap.innerHTML=sheetHTML({rev:r,cmp:c,mode:S.mode,ratio:S.ratio,pins:false,edits:true});
+    }
+    h.appendChild(wrap);
+    $("#cs",bar).onchange=(e)=>{S.cmpId=e.target.value;paint();};
+    $("#rs",bar).onchange=(e)=>{S.revId=e.target.value;paint();};
+    $$("[data-m]",bar).forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;paint();});
+    if($("#rg",bar))$("#rg",bar).oninput=(e)=>{S.ratio=+e.target.value;paint();};
+    $("#ac",bar).onclick=autoCloud;
+  }
+};
+async function autoCloud(){
+  if(!need())return;
+  const r=curRev(),c=cmpRev();
+  if(!r||!c){toast("比較する版を選んでください");return;}
+  toast("変更箇所を解析しています…");
+  try{
+    const [ca,cb]=await Promise.all([revToCanvas(c,1100),revToCanvas(r,1100)]);
+    if(ca.height!==cb.height){toast("版の縦横比が違うため比較できません");return;}
+    const boxes=diffBoxes(ca,cb,88);
+    if(!boxes.length){toast("変更箇所は検出されませんでした");return;}
+    if(!confirm(`変更箇所を ${boxes.length} か所検出しました。Rev.${r.rev} に改訂雲を打ちますか。`))return;
+    for(const b of boxes){
+      await S.db.collection(`${dwgPath()}/edits`).add({type:"cloud",pts:[[b.x1,b.y1],[b.x2,b.y2]],
+        color:"shu",width:2,rev:r.rev,auto:true,by:S.me||"名無し",at:nowISO()});
+    }
+    toast(`改訂雲を ${boxes.length} か所に打ちました`);
+  }catch(e){toast("解析できませんでした");}
+}
+
+/* ============ 3D パース ============ */
+function newMark3D(p){go("newmark",{p,cam:camState()});}
+SCREENS.three={
+  full:true,
+  title:()=>{const r=curRev();return `3D パース<small>Rev.${r?esc(r.rev):"—"}</small>`;},
+  body:(h)=>{
+    const r=curRev();
+    if(!r||r.view!=="3d"){h.innerHTML=`<div class="empty"><b>3Dモデルが登録されていません</b>「版を追加」からGLB / glTFを取り込んでください。</div>`;return;}
+    const bar=el("div","stagebar");
+    bar.innerHTML=`<button class="btn" id="pm" aria-pressed="${S.pinMode}">指摘を打つ</button>
+      <div class="seg"><button data-proj="persp" aria-pressed="${V.proj==="persp"}">パース</button><button data-proj="iso" aria-pressed="${V.proj==="iso"}">アイソメ</button></div>
+      <div class="seg">${[["s","南"],["e","東"],["n","北"],["w","西"],["top","上"]].map(([k,l])=>`<button data-dir="${k}">${l}</button>`).join("")}</div>
+      <button class="btn" id="ft">全体</button>
+      <span class="grow"></span>
+      <button class="btn" id="ss">このアングルをパースとして保存</button>`;
+    h.appendChild(bar);
+    const stage=el("div");stage.style.cssText="flex:1;min-height:0;display:flex";
+    const host=ensureHost();
+    stage.appendChild(host);
+    h.appendChild(stage);
+    host.classList.toggle("picking",!!S.pinMode);
+    $("#pm",bar).onclick=()=>{S.pinMode=!S.pinMode;paint();if(S.pinMode)toast("モデルの表面をタップすると指摘を起票できます");};
+    $$("[data-proj]",bar).forEach(b=>b.onclick=()=>{if(!V.renderer)return;makeCamera(b.dataset.proj);fitCamera();paint();});
+    const DIRS={s:[0,.28,1],n:[0,.28,-1],e:[1,.28,0],w:[-1,.28,0],top:[.001,1,.001]};
+    $$("[data-dir]",bar).forEach(b=>b.onclick=()=>{if(V.model)fitCamera(new THREE.Vector3(...DIRS[b.dataset.dir]).normalize());});
+    $("#ft",bar).onclick=()=>fitCamera();
+    $("#ss",bar).onclick=savePerspective;
+    (async()=>{
+      try{
+        await loadThree();initThree();resize3D();await load3D(r);updatePins3D();
+      }catch(e){stage.innerHTML=`<div class="empty"><b>3D表示を読み込めませんでした</b>通信環境を確認して開き直してください。</div>`;}
+    })();
+  }
+};
+async function savePerspective(){
+  if(!need())return;
+  if(!S.assets){toast("パースの保存には編集権限が必要です");return;}
+  V.renderer.render(V.scene,V.camera);
+  const blob=await new Promise(r=>V.renderer.domElement.toBlob(r,"image/jpeg",.92));
+  if(!blob)return;
+  toast("パースを書き出しています…");
+  try{
+    const up=await S.assets.upload(blob);
+    const rev=nextRevLetter();
+    await S.db.collection(`${dwgPath()}/revs`).add({rev,view:"2d",src:"asset",asset:up.id,
+      w:V.renderer.domElement.width,h:V.renderer.domElement.height,
+      note:"3Dビューから書き出したパース",by:S.me||"名無し",at:nowISO()});
+    await S.db.doc(dwgPath()).update({lastRev:rev});
+    await propagate(rev);
+    S.view="2d";S.revId=null;
+    toast(`パースを Rev.${rev} として保存しました`);
+    go("viewer");
+  }catch(e){toast("保存できませんでした");}
+}
+
+/* ============ AI検図 ============ */
+const AI={run:false,cands:null,err:null};
+SCREENS.ai={
+  live:false,
+  title:()=>"AI検図",
+  body:(h)=>{
+    const d=curDwg(),r=curRev(),p=curProj();
+    h.appendChild(el("div","note",`表示中の <b>${esc(d.no)} ${esc(d.title)}（Rev.${esc(r?r.rev:"—")}）</b> を Claude に読ませ、指摘候補を挙げます。候補は<b>採用するまで記録されません</b>。採用すると指摘が起票され、図面のその範囲に改訂雲と件名が入ります。`));
+    const out=el("div");h.appendChild(out);
+    const run=el("button","btn primary wide","図面を読ませる");
+    h.appendChild(run);
+    const paintCands=()=>{
+      run.hidden=true;
+      const cands=AI.cands||[];
+      const SEV={"高":"var(--shu)","中":"var(--warn)","低":"var(--ink-3)"};
+      out.innerHTML=cands.length?cands.map((c,i)=>c.done
+        ?`<div class="note" style="padding:9px 11px;border:1px solid var(--line-2);border-radius:8px;margin-bottom:9px">${esc(c.title)} — ${c.done==="ok"?"起票しました":"却下しました"}</div>`
+        :`<div class="card" style="padding:13px;margin-bottom:10px">
+            <div class="row" style="gap:6px"><span class="chip kind-${esc(c.kind||"その他")}">${esc(c.kind||"その他")}</span>
+              <span class="chip" style="border-color:${SEV[c.severity]||"var(--line)"};color:${SEV[c.severity]||"var(--ink-2)"}">重要度 ${esc(c.severity||"中")}</span>
+              <span class="note mono">位置 ${Math.round((+c.x||0)*100)}%, ${Math.round((+c.y||0)*100)}%</span></div>
+            <div style="font-size:15px;font-weight:500;margin-top:5px">${esc(c.title)}</div>
+            <div style="font-size:13.5px;color:var(--ink-2);margin-top:4px">${esc(c.body||"")}</div>
+            <div class="row" style="margin-top:10px"><button class="btn primary" data-ok="${i}">採用して起票</button>
+              <button class="btn" data-ng="${i}">却下</button></div></div>`).join("")
+        :`<div class="empty">指摘候補は挙がりませんでした。</div>`;
+      $$("[data-ok]",out).forEach(b=>b.onclick=()=>adopt(+b.dataset.ok));
+      $$("[data-ng]",out).forEach(b=>b.onclick=()=>{AI.cands[+b.dataset.ng].done="ng";paintCands();});
+      if(cands.some(c=>!c.done)){
+        const all=el("button","btn wide","残りをすべて採用");
+        all.onclick=async()=>{for(let i=0;i<cands.length;i++)if(!cands[i].done)await adopt(i,true);paintCands();};
+        out.appendChild(all);
+      }
+    };
+    const adopt=async(i,quiet)=>{
+      const c=AI.cands[i],r2=curRev();
+      const x=Math.min(.98,Math.max(0,+c.x||0)),y=Math.min(.98,Math.max(0,+c.y||0));
+      const w=Math.min(1-x,Math.max(.04,+c.w||.12)),hh=Math.min(1-y,Math.max(.04,+c.h||.1));
+      const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
+      try{
+        await S.db.collection(`${dwgPath()}/marks`).add({no,x:x+w/2,y:y+hh/2,rev:r2.rev,
+          kind:KINDS.includes(c.kind)?c.kind:"その他",title:String(c.title).slice(0,80),
+          body:String(c.body||""),severity:c.severity||"中",ai:true,assignee:"",due:"",
+          status:"open",replies:[],by:`AI検図（${S.me||"名無し"}）`,at:nowISO()});
+        await S.db.collection(`${dwgPath()}/edits`).add({type:"cloud",pts:[[x,y],[x+w,y+hh]],
+          color:"shu",width:2,rev:r2.rev,ai:true,by:S.me||"名無し",at:nowISO()});
+        await S.db.collection(`${dwgPath()}/edits`).add({type:"text",pts:[[x,Math.max(.02,y-.012)]],
+          text:`#${no} ${String(c.title).slice(0,26)}`,color:"shu",width:1,rev:r2.rev,ai:true,
+          by:S.me||"名無し",at:nowISO()});
+        await bumpOpen(1);
+        c.done="ok";
+        if(!quiet){paintCands();toast(`指摘 #${no} を起票し、図面に雲マークを打ちました`);}
+      }catch(e){toast("起票できませんでした");}
+    };
+    if(AI.cands){paintCands();return;}
+    run.onclick=async()=>{
+      if(!need())return;
+      if(!S.sample){toast("この環境ではAI検図を使えません");return;}
+      run.disabled=true;run.textContent="図面を読み込んでいます…";
+      try{
+        const caps=await S.sample.limits().catch(()=>null);
+        if(!caps||!caps.images)throw new Error("images");
+        const cv=await revToCanvas(r,1500);
+        const blob=await new Promise(ok=>cv.toBlob(ok,"image/jpeg",.92));
+        run.textContent="Claude が図面を読んでいます（20〜40秒）…";
+        const res=await S.sample.json(AI_PROMPT(p,d,r),{images:[blob],modelTier:"complex"});
+        AI.cands=(Array.isArray(res)?res:(res&&res.items)||[]).filter(c=>c&&c.title);
+        paintCands();
+      }catch(e){
+        run.disabled=false;run.textContent="もう一度試す";
+        out.innerHTML=`<div class="banner shu">${
+          e&&e.message==="images"?"この環境では図面画像をAIに渡せません。":
+          e&&e.code==="not_granted"?"AIの利用が許可されませんでした。":
+          e&&e.code==="rate_limited"?"混み合っています。少し時間をおいてください。":
+          "読み取れませんでした。図面の解像度を上げて登録し直すと通ることがあります。"}</div>`;
+      }
+    };
+  }
+};
+
+/* ============ 版を追加（取り込み） ============ */
+const IMP={step:"pick",img:null,quad:null,warp:true,fin:"shadow",canvas:null,pdfDoc:null,page:1,pdfBlob:null,busy:""};
+function resetImport(){
+  Object.assign(IMP,{step:"pick",img:null,quad:null,warp:true,fin:"shadow",canvas:null,pdfDoc:null,page:1,pdfBlob:null,busy:""});
+}
+SCREENS.import={
+  live:false,
+  title:()=>"版を追加",
+  body:(h)=>{
+    if(!S.assets){
+      h.appendChild(el("div","banner","図面の取り込みには編集権限が必要です。このページを「編集可」で共有してもらってください。"));
+      return;
+    }
+    if(IMP.busy){h.appendChild(el("div","note",IMP.busy));return;}
+    if(IMP.step==="pick")return importPick(h);
+    if(IMP.step==="img")return importImg(h);
+    if(IMP.step==="pdf")return importPdf(h);
+  }
+};
+function importPick(h){
+  h.appendChild(el("div","note","紙の図面は<b>真上から撮影</b>して台形補正するのが最短です。A3以下はスキャナ（300dpi・グレースケール）が最もきれいに残ります。"));
+  const c=el("div","card");
+  const opt=(id,name,sub,accept,extra)=>`<div style="padding:13px 14px;border-bottom:1px solid var(--line-2)">
+    <b style="font-size:14.5px">${name}</b><div class="note">${sub}</div>
+    <input type="file" accept="${accept}" ${extra||""} id="${id}" style="margin-top:8px"></div>`;
+  c.innerHTML=
+    opt("fCam","カメラで撮影する","スマートフォンならその場でカメラが起動します。図面の四隅が画面に入るように、影が落ちない向きで。","image/*",'capture="environment"')+
+    opt("fImg","画像ファイル（JPG / PNG）","スキャナで取り込んだ画像、撮影済みの写真。","image/jpeg,image/png,image/webp")+
+    opt("fPdf","PDF","CAD出力やスキャンPDF。ページを選んで取り込み、元のPDFも保管します。","application/pdf")+
+    opt("fSvg","SVG（ベクター）","CADやIllustratorからの書き出し。拡大しても劣化しません。","image/svg+xml,.svg")+
+    opt("fGlb","3Dモデル（GLB / glTF）","BIM・SketchUp・Blenderからの書き出し。パースとして回して見られます。約14MBまで。",".glb,.gltf");
+  h.appendChild(c);
+  h.appendChild(el("div","note","撮影のコツ： ①真上から ②蛍光灯の映り込みを避ける ③図面枠の四隅を画面内に ④明るい場所で"));
+  const onImg=(e)=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    const img=new Image();
+    img.onload=()=>{IMP.img=img;IMP.pdfBlob=null;IMP.step="img";paint();};
+    img.onerror=()=>toast("画像を読み込めませんでした");
+    img.src=URL.createObjectURL(f);
+  };
+  $("#fCam",c).onchange=onImg;
+  $("#fImg",c).onchange=onImg;
+  $("#fPdf",c).onchange=async(e)=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    IMP.busy="PDFを読み込んでいます…";paint();
+    try{
+      const lib=await loadPdfJs();
+      IMP.pdfBlob=f;
+      IMP.pdfDoc=await lib.getDocument({data:await f.arrayBuffer(),isEvalSupported:false}).promise;
+      IMP.page=1;IMP.busy="";IMP.step="pdf";paint();
+    }catch(err){IMP.busy="";resetImport();paint();toast("PDFを読み込めませんでした。画像かSVGで書き出してください");}
+  };
+  $("#fSvg",c).onchange=async(e)=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    IMP.busy="SVGを登録しています…";paint();
+    try{
+      const text=await f.text();
+      const m=text.match(/viewBox\s*=\s*"([-\d.\s]+)"/);
+      let w=1189,hh=841;
+      if(m){const v=m[1].trim().split(/\s+/).map(Number);if(v.length===4&&v[2]&&v[3]){w=v[2];hh=v[3];}}
+      const up=await S.assets.upload(f,{type:"image/svg+xml"});
+      const rev=nextRevLetter();
+      await S.db.collection(`${dwgPath()}/revs`).add({rev,view:"2d",src:"asset",asset:up.id,
+        w:Math.round(w),h:Math.round(hh),vector:true,note:"SVGで取り込み",by:S.me||"名無し",at:nowISO()});
+      await S.db.doc(dwgPath()).update({lastRev:rev,status:"検図中"});
+      await propagate(rev);
+      resetImport();toast(`Rev.${rev}（ベクター）を登録しました`);back();
+    }catch(err){IMP.busy="";paint();toast("SVGを登録できませんでした（2MBまで）");}
+  };
+  $("#fGlb",c).onchange=async(e)=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    IMP.busy="3Dモデルを登録しています… 大きなモデルは時間がかかります。";paint();
+    try{
+      const buf=await f.arrayBuffer();
+      if(buf.byteLength>14.5*1024*1024)throw new Error("size");
+      const gltf=/\.gltf$/i.test(f.name);
+      const wrapped=JSON.stringify({format:gltf?"gltf":"glb",name:f.name,b64:abToB64(buf)});
+      const up=await S.assets.upload(new Blob([wrapped],{type:"application/json"}),{type:"application/json"});
+      const rev=next3DLetter();
+      await S.db.collection(`${dwgPath()}/revs`).add({rev,view:"3d",src:"model",asset:up.id,
+        format:gltf?"gltf":"glb",note:f.name,by:S.me||"名無し",at:nowISO()});
+      await S.db.doc(dwgPath()).update({has3d:true});
+      S.view="3d";S.revId=null;
+      resetImport();toast(`3Dモデル Rev.${rev} を登録しました`);
+      replace("three");
+    }catch(err){
+      IMP.busy="";paint();
+      toast(err&&err.message==="size"?"ファイルが大きすぎます（約14MBまで）":"3Dモデルを登録できませんでした");
+    }
+  };
+}
+function importImg(h){
+  const img=IMP.img;
+  const box=Math.min(700,Math.max(300,innerWidth-80));
+  const sc=Math.min(box/img.width,460/img.height);
+  const cw=Math.round(img.width*sc),ch=Math.round(img.height*sc);
+  if(!IMP.quad){
+    const i=.06;
+    IMP.quad=[[img.width*i,img.height*i],[img.width*(1-i),img.height*i],
+              [img.width*(1-i),img.height*(1-i)],[img.width*i,img.height*(1-i)]];
+  }
+  h.appendChild(el("div","note","図面枠の<b>四隅</b>に○を合わせてください。合わせた四角形が正対した図面になります。"));
+  const cv=el("canvas");cv.width=cw;cv.height=ch;
+  cv.style.cssText="touch-action:none;max-width:100%;border:1px solid var(--line);background:#fff;border-radius:8px";
+  h.appendChild(cv);
+  const bar=el("div","row");
+  bar.innerHTML=`<button class="btn" id="wt" aria-pressed="${IMP.warp}">${IMP.warp?"台形補正する":"補正しない"}</button>
+    <div class="field grow"><span>仕上げ</span><select id="fin">
+      <option value="shadow" ${IMP.fin==="shadow"?"selected":""}>白飛ばし（推奨）</option>
+      <option value="line" ${IMP.fin==="line"?"selected":""}>線画（2値）</option>
+      <option value="raw" ${IMP.fin==="raw"?"selected":""}>そのまま</option></select></div>
+    <button class="btn primary" id="pv">プレビューを作る</button>`;
+  h.appendChild(bar);
+  const out=el("div");h.appendChild(out);
+  const cx=cv.getContext("2d");
+  const P=()=>IMP.quad.map(p=>[p[0]*sc,p[1]*sc]);
+  const paintCv=()=>{
+    cx.clearRect(0,0,cw,ch);cx.drawImage(img,0,0,cw,ch);
+    if(!IMP.warp)return;
+    const q=P();
+    cx.beginPath();q.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.closePath();
+    cx.fillStyle="rgba(35,75,133,.13)";cx.fill();cx.strokeStyle="#234B85";cx.lineWidth=2;cx.stroke();
+    q.forEach(p=>{cx.beginPath();cx.arc(p[0],p[1],10,0,7);cx.fillStyle="#fff";cx.fill();
+      cx.strokeStyle="#BC3B2B";cx.lineWidth=2.5;cx.stroke();});
+  };
+  let drag=-1;
+  cv.onpointerdown=(e)=>{
+    if(!IMP.warp)return;
+    const b=cv.getBoundingClientRect(),k=cw/b.width;
+    const x=(e.clientX-b.left)*k,y=(e.clientY-b.top)*k,q=P();
+    let best=-1,bd=28;
+    q.forEach((p,i)=>{const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=i;}});
+    if(best>=0){drag=best;cv.setPointerCapture(e.pointerId);}
+  };
+  cv.onpointermove=(e)=>{
+    if(drag<0)return;
+    const b=cv.getBoundingClientRect(),k=cw/b.width;
+    IMP.quad[drag]=[Math.max(0,Math.min(img.width,(e.clientX-b.left)*k/sc)),
+                    Math.max(0,Math.min(img.height,(e.clientY-b.top)*k/sc))];
+    paintCv();
+  };
+  cv.onpointerup=()=>{drag=-1;};
+  $("#wt",bar).onclick=()=>{IMP.warp=!IMP.warp;paint();};
+  $("#fin",bar).onchange=(e)=>{IMP.fin=e.target.value;};
+  $("#pv",bar).onclick=async()=>{
+    const b=$("#pv",bar);b.disabled=true;b.textContent="処理中…";
+    await new Promise(r=>setTimeout(r,20));
+    let o;
+    if(IMP.warp)o=warp(img,IMP.quad,2000);
+    else{
+      const k=Math.min(1,2000/Math.max(img.width,img.height));
+      o=document.createElement("canvas");o.width=Math.round(img.width*k);o.height=Math.round(img.height*k);
+      o.getContext("2d").drawImage(img,0,0,o.width,o.height);
+    }
+    IMP.canvas=finish(o,IMP.fin);
+    IMP.canvas.style.cssText="max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px";
+    out.innerHTML="";out.appendChild(IMP.canvas);
+    out.appendChild(regBar());
+    b.disabled=false;b.textContent="もう一度作る";
+  };
+  paintCv();
+}
+function importPdf(h){
+  const n=IMP.pdfDoc.numPages;
+  const bar=el("div","row");
+  bar.innerHTML=`<div class="field" style="width:150px"><span>ページ</span><select id="pg">
+      ${Array.from({length:n},(_,i)=>`<option value="${i+1}" ${i+1===IMP.page?"selected":""}>${i+1} / ${n}</option>`).join("")}</select></div>
+    <div class="field grow"><span>仕上げ</span><select id="fin">
+      <option value="raw" ${IMP.fin==="raw"?"selected":""}>そのまま</option>
+      <option value="shadow" ${IMP.fin==="shadow"?"selected":""}>白飛ばし</option>
+      <option value="line" ${IMP.fin==="line"?"selected":""}>線画（2値）</option></select></div>`;
+  h.appendChild(bar);
+  const out=el("div","");h.appendChild(out);
+  h.appendChild(el("div","note","元のPDFも一緒に保管されます（版の履歴から取り出せます）。"));
+  const draw=async()=>{
+    out.innerHTML=`<div class="note">描画中…</div>`;
+    try{
+      const cv=await pdfPageToCanvas(IMP.pdfDoc,IMP.page,2000);
+      IMP.canvas=finish(cv,IMP.fin);
+      IMP.canvas.style.cssText="max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px";
+      out.innerHTML="";out.appendChild(IMP.canvas);out.appendChild(regBar());
+    }catch(e){out.innerHTML=`<div class="banner shu">このページを描画できませんでした。</div>`;}
+  };
+  $("#pg",bar).onchange=(e)=>{IMP.page=+e.target.value;draw();};
+  $("#fin",bar).onchange=(e)=>{IMP.fin=e.target.value;draw();};
+  draw();
+}
+function regBar(){
+  const w=el("div");
+  w.innerHTML=`<div class="field" style="margin-top:12px"><span>この版の変更内容</span>
+      <input id="nt" placeholder="例：会議室Aを拡張、倉庫を打合せコーナーに変更"></div>`;
+  const b=el("button","btn primary wide","この内容で版として登録");
+  b.style.marginTop="10px";
+  w.appendChild(b);
+  b.onclick=async()=>{
+    if(!need()||!IMP.canvas)return;
+    b.disabled=true;b.textContent="登録中…";
+    try{
+      const blob=await toBlob(IMP.canvas,IMP.fin);
+      const up=await S.assets.upload(blob);
+      let pdfId=null;
+      if(IMP.pdfBlob){try{pdfId=(await S.assets.upload(IMP.pdfBlob,{type:"application/pdf"})).id;}catch(e){}}
+      const rev=nextRevLetter();
+      await S.db.collection(`${dwgPath()}/revs`).add({rev,view:"2d",src:"asset",asset:up.id,pdf:pdfId,
+        w:IMP.canvas.width,h:IMP.canvas.height,note:$("#nt",w).value.trim(),by:S.me||"名無し",at:nowISO()});
+      await S.db.doc(dwgPath()).update({lastRev:rev,status:"検図中"});
+      await propagate(rev);
+      S.view="2d";S.revId=null;
+      resetImport();toast(`Rev.${rev} を登録しました`);back();
+    }catch(e){b.disabled=false;b.textContent="この内容で版として登録";toast("登録できませんでした");}
+  };
+  return w;
+}
+
+/* ============ 発行セット ============ */
+SCREENS.sets={
+  title:()=>"発行セット",
+  body:(h)=>{
+    h.appendChild(el("div","note","ある時点の各図面の版を凍結して記録します。確認申請・見積・施工で「どの版を渡したか」は後から必ず問われます。"));
+    const mk=el("div","card");mk.style.padding="14px";
+    mk.innerHTML=`<div class="row">
+        <div class="field grow"><span>セット名</span><input id="sn" placeholder="実施設計 第1回発行"></div>
+        <div class="field" style="width:200px"><span>宛先</span><input id="st" placeholder="施主 / 確認検査機関"></div></div>
+      <div class="field" style="margin-top:10px"><span>備考</span><input id="sm" placeholder="任意"></div>
+      <button class="btn primary wide" id="smk" style="margin-top:11px">現在の版で ${S.drawings.length} 図面を凍結する</button>`;
+    h.appendChild(mk);
+    const list=el("div","card");
+    list.innerHTML=`<h2>これまでの発行</h2><div class="empty">読み込んでいます…</div>`;
+    h.appendChild(list);
+    $("#smk",mk).onclick=async()=>{
+      if(!need())return;
+      const name=$("#sn",mk).value.trim();
+      if(!name){toast("セット名を入力してください");return;}
+      const b=$("#smk",mk);b.disabled=true;b.textContent="集計中…";
+      try{
+        const items=await snapshotSet();
+        await S.db.collection(`${base()}/sets`).add({name,to:$("#st",mk).value.trim(),
+          note:$("#sm",mk).value.trim(),items,by:S.me||"名無し",at:nowISO()});
+        toast(`「${name}」を記録しました`);paint();
+      }catch(e){toast("作成できませんでした");b.disabled=false;}
+    };
+    (async()=>{
+      let sets=[];
+      try{
+        const snap=await S.db.collection(`${base()}/sets`).get();
+        sets=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+      }catch(e){}
+      list.innerHTML=`<h2>これまでの発行</h2>`;
+      if(!sets.length){list.appendChild(el("div","empty","まだ発行セットはありません。"));return;}
+      sets.forEach(s=>{
+        const b=el("button","item");
+        b.innerHTML=`<span class="t">${esc(s.name)}</span>
+          <span class="s"><span class="mono">${esc(fdate(s.at))}</span><span class="chip">${s.items.length} 図面</span>
+            ${s.to?`<span>${esc(s.to)}</span>`:""}<span>${esc(s.by||"")}</span></span>
+          <span class="r"><span class="chev">›</span></span>`;
+        b.onclick=()=>go("set",{id:s.id,set:s});
+        list.appendChild(b);
+      });
+    })();
+  }
+};
+SCREENS.set={
+  title:(o)=>esc(o.set.name),
+  body:(h,o)=>{
+    const s=o.set,p=curProj();
+    h.appendChild(el("div","note",`${esc(fdate(s.at))}　${esc(s.to||"宛先なし")}　${esc(s.by||"")}${s.note?`　${esc(s.note)}`:""}`));
+    const c=el("div","card");c.style.overflowX="auto";
+    c.innerHTML=`<h2>図面目録</h2><table class="tbl"><thead><tr>
+      <th>図面番号</th><th>図面名称</th><th>種別</th><th>版</th><th>検図</th><th></th></tr></thead><tbody>
+      ${s.items.map(it=>`<tr><td class="mono">${esc(it.no)}</td><td>${esc(it.title)}</td>
+        <td>${esc(it.kind||"図面")}</td><td class="mono">Rev.${esc(it.rev)}</td><td>${esc(it.review||"—")}</td>
+        <td>${it.revId?`<button class="btn small" data-o="${esc(it.did)}" data-r="${esc(it.revId)}">開く</button>`:"—"}</td></tr>`).join("")}
+      </tbody></table>`;
+    h.appendChild(c);
+    $$("[data-o]",c).forEach(b=>b.onclick=()=>{
+      pickDrawing(b.dataset.o);
+      const rid=b.dataset.r;
+      setTimeout(()=>{S.revId=rid;S.view="2d";R.stack=[{s:"home",o:{}},{s:"drawing",o:{}},{s:"viewer",o:{}}];paint();},500);
+    });
+    if(S.dl){
+      const dl=el("button","btn wide","図面目録をCSVで書き出す");
+      dl.onclick=async()=>{
+        const q=(v)=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+        const rows=[["工事名称","セット名","発行日","宛先","図面番号","図面名称","種別","版","検図"]];
+        s.items.forEach(it=>rows.push([p.name,s.name,fdate(s.at),s.to||"",it.no,it.title,it.kind||"図面","Rev."+it.rev,it.review||""]));
+        try{await S.dl.save({filename:`図面目録_${s.name}.csv`,data:"﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n")});}
+        catch(e){if(e&&e.code!=="declined")toast("書き出せませんでした");}
+      };
+      h.appendChild(dl);
+    }
+  }
+};
+
+/* ============ 関連図面・検図結果 ============ */
+SCREENS.refs={
+  title:()=>"関連図面",
+  body:(h)=>{
+    const d=curDwg(),others=S.drawings.filter(x=>x.id!==d.id),cur2=d.refIds||[];
+    h.appendChild(el("div","note","ここで選んだ図面に新しい版が上がると、この図面に「要確認」が立ちます。平面と立面、平面と面積表のように、片方を直すともう片方に波及する組み合わせを選んでください。"));
+    if(!others.length){h.appendChild(el("div","empty","関連付けられる図面が他にありません。"));return;}
+    const c=el("div","card");
+    others.forEach(o=>{
+      const lab=el("label","item");lab.style.cursor="pointer";
+      lab.innerHTML=`<span class="t"><input type="checkbox" value="${esc(o.id)}" ${cur2.includes(o.id)?"checked":""}
+        style="margin-right:9px;transform:scale(1.2)">${esc(o.no)}　${esc(o.title)}</span>
+        <span class="s">${esc(o.discipline||"")} ${esc(o.kind||"図面")}</span><span class="r"></span>`;
+      c.appendChild(lab);
+    });
+    h.appendChild(c);
+    const b=el("button","btn primary wide","保存する");
+    b.onclick=async()=>{
+      if(!need())return;
+      const ids=$$("input[type=checkbox]",c).filter(x=>x.checked).map(x=>x.value);
+      await S.db.doc(dwgPath()).update({refIds:ids,
+        refs:ids.map(id=>{const o=S.drawings.find(x=>x.id===id);return o?{id,no:o.no,title:o.title}:{id};})});
+      toast(`関連図面を ${ids.length} 件設定しました`);back();
+    };
+    h.appendChild(b);
+  }
+};
+SCREENS.review={
+  title:()=>"検図結果",
+  body:(h)=>{
+    const d=curDwg();
+    if(d.review){
+      const c=el("div","card");c.style.padding="14px";
+      c.innerHTML=`<div class="row"><div class="stamp ${d.review.result==="要修正"?"":"ok"}">
+          <b>${esc(d.review.result.slice(0,2))}</b><i>${esc(fdate(d.review.at))}</i></div>
+        <div class="grow"><b>${esc(d.review.result)}</b><div class="note">${esc(d.review.by||"")}　Rev.${esc(d.review.rev||"")}</div>
+          <div style="font-size:13.5px;margin-top:4px">${esc(d.review.note||"")}</div></div></div>`;
+      h.appendChild(c);
+    }
+    let res=d.review?d.review.result:"承認";
+    const opts=el("div","card");
+    const R2=[["承認","この版で確定。以降の変更は新しい版として起票します。"],
+      ["条件付承認","軽微な指摘の是正を前提に先行して進めます。"],
+      ["要修正","未対応の指摘を反映した次の版が必要です。"]];
+    opts.innerHTML=R2.map(([k,s])=>`<button class="item" data-r="${k}" aria-current="${res===k}">
+      <span class="t">${k}</span><span class="s">${s}</span><span class="r"></span></button>`).join("");
+    h.appendChild(opts);
+    const sync=()=>$$("[data-r]",opts).forEach(b=>{
+      const on=b.dataset.r===res;
+      b.setAttribute("aria-current",on);
+      b.style.background=on?"var(--accent-soft)":"";
+    });
+    $$("[data-r]",opts).forEach(b=>b.onclick=()=>{res=b.dataset.r;sync();});
+    sync();
+    const f=el("div","field");
+    f.innerHTML=`<span>所見</span><textarea id="rn" placeholder="検図者の所見・条件">${esc(d.review?d.review.note||"":"")}</textarea>`;
+    h.appendChild(f);
+    h.appendChild(el("div","note",`未対応の指摘：${openCount()} 件`));
+    const b=el("button","btn primary wide","検図結果を記録する");
+    b.onclick=async()=>{
+      if(!need())return;
+      await S.db.doc(dwgPath()).update({status:res==="要修正"?"修正中":"検図済",
+        review:{result:res,by:S.me||"名無し",at:nowISO(),note:$("#rn",f).value.trim(),rev:(curRev()||{}).rev||""}});
+      toast(`検図結果「${res}」を記録しました`);back();
+    };
+    h.appendChild(b);
+  }
+};
+async function exportCsv(){
+  if(!S.dl){toast("この環境では書き出せません");return;}
+  const p=curProj(),d=curDwg();
+  if(!d)return;
+  const q=(v)=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+  const rows=[["工事名称","図面番号","図面名称","No","分類","状態","件名","内容","起票者","起票日","担当","回答期限","版","対応者","対応日","返信"]];
+  S.marks.forEach(m=>rows.push([p.name,d.no,d.title,m.no,m.kind,STATUS[m.status]||"未対応",m.title,m.body,
+    m.by,fdate(m.at),m.assignee||"",m.due||"","Rev."+m.rev,m.resolvedBy||"",m.resolvedAt?fdate(m.resolvedAt):"",
+    (m.replies||[]).map(r=>`${r.by}: ${r.text}`).join(" / ")]));
+  try{await S.dl.save({filename:`検図リスト_${d.no}_${fdate(nowISO())}.csv`,data:"﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n")});}
+  catch(e){if(e&&e.code!=="declined")toast("書き出せませんでした");}
+}
+
+/* ============ 登録・設定 ============ */
+SCREENS.newdrawing={
+  live:false,title:()=>"図面を登録",
+  body:(h)=>{
+    const c=el("div","card");c.style.padding="14px";
+    c.innerHTML=`<div class="row">
+        <div class="field" style="width:150px"><span>図面番号</span><input id="n" placeholder="A-101"></div>
+        <div class="field grow"><span>図面名称</span><input id="t" placeholder="1階平面図"></div></div>
+      <div class="row" style="margin-top:10px">
+        <div class="field grow"><span>分野</span><select id="d"><option>意匠</option><option>構造</option><option>設備</option><option>外構</option></select></div>
+        <div class="field grow"><span>種別</span><select id="k"><option>図面</option><option>パース</option><option>3Dモデル</option></select></div>
+        <div class="field" style="width:120px"><span>縮尺</span><input id="s" value="1:100"></div></div>`;
+    h.appendChild(c);
+    const b=el("button","btn primary wide","登録する");
+    b.onclick=async()=>{
+      if(!need())return;
+      const no=$("#n",c).value.trim(),title=$("#t",c).value.trim();
+      if(!no||!title){toast("図面番号と図面名称を入力してください");return;}
+      b.disabled=true;
+      const ref=await S.db.collection(`${base()}/drawings`).add({no,title,discipline:$("#d",c).value,
+        kind:$("#k",c).value,scale:$("#s",c).value.trim(),status:"作図中",lastRev:"—",openCount:0,
+        by:S.me||"名無し",createdAt:nowISO()});
+      pickDrawing(ref.id);toast("図面を登録しました");
+      R.stack=[{s:"home",o:{}},{s:"drawing",o:{}}];paint();
+    };
+    h.appendChild(b);
+  }
+};
+SCREENS.newproject={
+  live:false,title:()=>"プロジェクトを作成",
+  body:(h)=>{
+    let vis="open";
+    const c=el("div","card");c.style.padding="14px";
+    c.innerHTML=`<div class="field"><span>工事名称</span><input id="n" placeholder="例：桜台コミュニティセンター 新築工事"></div>
+      <div class="row" style="margin-top:10px">
+        <div class="field grow"><span>工事番号</span><input id="c" placeholder="2026-014"></div>
+        <div class="field grow"><span>設計段階</span><select id="p"><option>基本設計</option><option selected>実施設計</option><option>施工図</option><option>竣工図</option></select></div></div>`;
+    h.appendChild(c);
+    const v=el("div","card");
+    v.innerHTML=`<h2>公開範囲</h2>
+      <button class="item" data-v="open"><span class="t">オープン</span>
+        <span class="s">このページを開ける人全員が閲覧し、指摘を書き込めます。</span><span class="r"></span></button>
+      <button class="item" data-v="private"><span class="t">プライベート</span>
+        <span class="s">「編集可」で共有された人だけが読み書きできます。閲覧のみの人には図面の存在自体が見えません。</span><span class="r"></span></button>`;
+    h.appendChild(v);
+    const note=el("div","note");h.appendChild(note);
+    const sync=()=>{
+      $$("[data-v]",v).forEach(b=>b.style.background=b.dataset.v===vis?"var(--accent-soft)":"");
+      note.textContent=vis==="private"
+        ?(S.editor?"あなたは編集権限を持っているため、この非公開プロジェクトを作成できます。":"編集権限がないため、プライベートは選べません。")
+        :"公開範囲はあとから切り替えられます。";
+    };
+    $$("[data-v]",v).forEach(b=>b.onclick=()=>{vis=b.dataset.v;sync();});
+    sync();
+    const b=el("button","btn primary wide","作成する");
+    b.onclick=async()=>{
+      if(!need())return;
+      const name=$("#n",c).value.trim();
+      if(!name){toast("工事名称を入力してください");return;}
+      if(vis==="private"&&!S.editor){toast("プライベートの作成には編集権限が必要です");return;}
+      b.disabled=true;
+      const id=uid("p-");
+      await S.db.doc(`${vis==="private"?"vault":"projects"}/${id}`).set({id,name,code:$("#c",c).value.trim(),
+        phase:$("#p",c).value,visibility:vis,by:S.me||"名無し",createdAt:nowISO()});
+      S.pid=id;toast("プロジェクトを作成しました");home();
+    };
+    h.appendChild(b);
+  }
+};
+async function moveProject(p,vis){
+  const from=rootOf(p),to=vis==="private"?"vault":"projects";
+  if(from===to)return;
+  const dws=await S.db.collection(`${from}/${p.id}/drawings`).get();
+  for(const d of dws.docs){
+    for(const sub of ["revs","marks","edits"]){
+      const snap=await S.db.collection(`${from}/${p.id}/drawings/${d.id}/${sub}`).get();
+      for(const x of snap.docs){
+        await S.db.doc(`${to}/${p.id}/drawings/${d.id}/${sub}/${x.id}`).set(x.data());
+        await S.db.doc(`${from}/${p.id}/drawings/${d.id}/${sub}/${x.id}`).delete();
+      }
+    }
+    await S.db.doc(`${to}/${p.id}/drawings/${d.id}`).set(d.data());
+    await S.db.doc(`${from}/${p.id}/drawings/${d.id}`).delete();
+  }
+  const sets=await S.db.collection(`${from}/${p.id}/sets`).get();
+  for(const x of sets.docs){
+    await S.db.doc(`${to}/${p.id}/sets/${x.id}`).set(x.data());
+    await S.db.doc(`${from}/${p.id}/sets/${x.id}`).delete();
+  }
+  await S.db.doc(`${to}/${p.id}`).set({...p,visibility:vis});
+  await S.db.doc(`${from}/${p.id}`).delete();
+}
+SCREENS.visibility={
+  live:false,title:()=>"公開範囲",
+  body:(h)=>{
+    const p=curProj();
+    if(!p){h.innerHTML=`<div class="empty">プロジェクトがありません。</div>`;return;}
+    let vis=p.visibility==="private"?"private":"open";
+    h.appendChild(el("div","note",`<b>${esc(p.name)}</b> の公開範囲を切り替えます。図面・版・指摘・赤入れをまとめて保管領域ごと移します。`));
+    const v=el("div","card");
+    v.innerHTML=`<button class="item" data-v="open"><span class="t">オープン</span>
+        <span class="s">このページを開ける人全員が閲覧・指摘できます（保存先：projects）。</span><span class="r"></span></button>
+      <button class="item" data-v="private"><span class="t">プライベート</span>
+        <span class="s">編集権限を持つ人だけが読み書きできる領域に保管します（保存先：vault）。閲覧のみの相手には図面も指摘も返りません。</span><span class="r"></span></button>`;
+    h.appendChild(v);
+    const sync=()=>$$("[data-v]",v).forEach(b=>b.style.background=b.dataset.v===vis?"var(--accent-soft)":"");
+    $$("[data-v]",v).forEach(b=>b.onclick=()=>{vis=b.dataset.v;sync();});
+    sync();
+    const b=el("button","btn primary wide","この公開範囲にする");
+    b.onclick=async()=>{
+      if(!need())return;
+      if(vis===(p.visibility||"open")){back();return;}
+      if(!S.editor){toast("公開範囲の変更には編集権限が必要です");return;}
+      b.disabled=true;b.textContent="移行中…";
+      try{await moveProject(p,vis);toast(vis==="private"?"プライベートに変更しました":"オープンに変更しました");home();}
+      catch(e){toast("変更できませんでした");b.disabled=false;b.textContent="この公開範囲にする";}
+    };
+    h.appendChild(b);
+  }
+};
+SCREENS.settings={
+  live:false,title:()=>"設定",
+  body:(h)=>{
+    const c=el("div","card");c.style.padding="14px";
+    c.innerHTML=`<div class="field"><span>表示名</span><input id="me" value="${esc(S.me)}" placeholder="担当者名" maxlength="14"></div>
+      <div class="note" style="margin-top:7px">指摘・赤入れ・検図結果にこの名前が記録されます。</div>`;
+    h.appendChild(c);
+    $("#me",c).oninput=(e)=>setMe(e.target.value);
+    const st=el("div","card");st.style.padding="14px";
+    st.innerHTML=`<div class="row"><span class="lbl">接続</span><span>${
+      !S.db?"未接続（閲覧のみ）":S.editor?"接続済み・編集権限あり":"接続済み・閲覧と指摘"}</span></div>
+      <div class="row" style="margin-top:6px"><span class="lbl">AI検図</span><span>${S.sample?"利用できます":"この環境では使えません"}</span></div>
+      <div class="row" style="margin-top:6px"><span class="lbl">書き出し</span><span>${S.dl?"利用できます":"この環境では使えません"}</span></div>`;
+    h.appendChild(st);
+    if(curProj()){
+      const b=el("button","btn wide","公開範囲を変える");
+      b.onclick=()=>go("visibility");h.appendChild(b);
+    }
+    h.appendChild(el("div","note","検図台 — 紙の原図を撮影して取り込み、版を重ねて比較し、位置を指した指摘と共同の赤入れで検図するツールです。"));
+  }
+};
+start();
+
 </script>
