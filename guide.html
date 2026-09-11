@@ -1,0 +1,182 @@
+<title>Drawing Hub の使い方</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F1F2F6; --card:#FFFFFF; --sep:#E8EAEF;
+  --ink:#131C28; --ink-2:#4C5868; --ink-3:#8593A4;
+  --accent:#234B85; --accent-soft:#E1E9F6;
+  --shu:#BC3B2B; --shu-soft:#F8E4E0;
+  --ok:#2C6A4C; --ok-soft:#DFEEE6;
+  --warn:#8E6510; --warn-soft:#F7EDD9;
+  --shadow:0 1px 2px rgba(19,28,40,.05),0 6px 18px rgba(19,28,40,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0E13; --card:#171D26; --sep:#242C37;
+    --ink:#E5EBF3; --ink-2:#9DAABB; --ink-3:#6B7A8D;
+    --accent:#7FA8E8; --accent-soft:#1C2839;
+    --shu:#E9705A; --shu-soft:#38211D;
+    --ok:#63B18B; --ok-soft:#172A22;
+    --warn:#D8A84C; --warn-soft:#2A2313;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.32);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0E13; --card:#171D26; --sep:#242C37;
+  --ink:#E5EBF3; --ink-2:#9DAABB; --ink-3:#6B7A8D;
+  --accent:#7FA8E8; --accent-soft:#1C2839;
+  --shu:#E9705A; --shu-soft:#38211D;
+  --ok:#63B18B; --ok-soft:#172A22;
+  --warn:#D8A84C; --warn-soft:#2A2313;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--ink);margin:0;
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"Roboto Mono","SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums}
+.page{max-width:820px;margin:0 auto;padding:36px 18px 72px}
+a{color:var(--accent)}
+h1{font-size:30px;line-height:1.35;margin:0 0 6px;letter-spacing:.01em;text-wrap:balance}
+h2{font-size:21px;margin:44px 0 4px;letter-spacing:.01em;text-wrap:balance}
+h2 .n{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--accent);display:block;
+  letter-spacing:.18em;font-weight:500;margin-bottom:2px}
+h3{font-size:15.5px;margin:22px 0 4px}
+p{margin:6px 0 0;max-width:64ch}
+.lead{font-size:16px;color:var(--ink-2);max-width:60ch}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-top:14px}
+.card.pad{padding:16px 18px}
+.row{display:flex;align-items:flex-start;gap:13px;padding:13px 18px;position:relative}
+.row+.row::before{content:"";position:absolute;left:64px;right:0;top:0;height:1px;background:var(--sep)}
+.ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;color:#fff;margin-top:2px}
+.ico svg{width:20px;height:20px;display:block}
+.rt{min-width:0}
+.rt b{display:block;font-size:15.5px;font-weight:500;line-height:1.45}
+.rt span{display:block;font-size:13px;color:var(--ink-2);line-height:1.7}
+.steps{counter-reset:s;display:grid;gap:14px;margin-top:14px}
+.step{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:16px 18px 16px 62px;position:relative}
+.step::before{
+  counter-increment:s;content:counter(s);position:absolute;left:16px;top:16px;
+  width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-family:"Roboto Mono",monospace;font-size:14px;font-weight:700;
+}
+.step b{display:block;font-size:16px;font-weight:700}
+.step p{margin-top:3px;font-size:14px;color:var(--ink-2)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:16px}
+.flow i{font-style:normal;color:var(--ink-3);font-size:13px}
+.pill{background:var(--card);border-radius:999px;padding:6px 14px;font-size:13.5px;box-shadow:var(--shadow);white-space:nowrap}
+.pill.shu{background:var(--shu-soft);color:var(--shu)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.tag{display:inline-block;font-size:12.5px;padding:1px 8px;border-radius:5px;background:var(--accent-soft);
+  color:var(--accent);font-family:"Roboto Mono",monospace;white-space:nowrap}
+.tag.shu{background:var(--shu-soft);color:var(--shu)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tbl-wrap{overflow-x:auto;margin-top:14px;background:var(--card);border-radius:16px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:12px 16px;font-size:11.5px;letter-spacing:.12em;color:var(--ink-3);
+  border-bottom:1px solid var(--sep);font-weight:700;white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--sep);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:13px 16px;margin-top:14px;font-size:13.5px;line-height:1.75}
+.note b{display:block;margin-bottom:2px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;
+  text-decoration:none;border-radius:10px;padding:11px 18px;font-size:15px;font-weight:500;margin-top:18px}
+.kicker{font-family:"Roboto Mono",monospace;font-size:11.5px;letter-spacing:.22em;color:var(--ink-3);
+  text-transform:uppercase;margin-bottom:10px}
+.foot{margin-top:52px;padding-top:18px;border-top:1px solid var(--sep);font-size:13px;color:var(--ink-3)}
+@media (max-width:560px){h1{font-size:25px}.step{padding-left:56px}.row{padding:12px 14px}.row+.row::before{left:58px}}
+</style>
+
+<div class="page">
+  <div class="kicker">Drawing Hub</div>
+  <h1>紙の図面を、チームで検図する</h1>
+  <p class="lead">原図を撮って取り込み、版を重ねて比べ、図面の位置を指したまま指摘を交わすためのツールです。ここでは最初の登録から、日々の検図の回し方までをまとめます。</p>
+  <a class="cta" href="https://claude.ai/code/artifact/62548467-785f-48d4-a266-2c36d674377b">Drawing Hub を開く →</a>
+
+  <h2><span class="n">01 / START</span>はじめの3ステップ</h2>
+  <div class="steps">
+    <div class="step"><b>表示名を入れる</b>
+      <p>下タブの<span class="tag">設定</span>を開いて、自分の名前を入力します。指摘・返信・赤入れ・検図結果に、この名前が記録されます。最初に必ず済ませてください。</p></div>
+    <div class="step"><b>工事をつくる</b>
+      <p>ホームの<span class="tag">プロジェクトを作成</span>から、工事名称・工事番号・設計段階を登録します。あわせて<b>公開範囲</b>（オープン／プライベート）を選びます。あとから切り替えできます。</p></div>
+    <div class="step"><b>図面を登録する</b>
+      <p>ホームの<span class="tag">図面を登録</span>で、図面番号（A-101）と図面名称（1階平面図）、分野と縮尺を入れます。この時点では中身が空の「図面カード」ができます。</p></div>
+  </div>
+
+  <h2><span class="n">02 / IMPORT</span>原図を取り込む</h2>
+  <p>図面カードを開いて <span class="tag">版を追加</span>。取り込み方は5つあります。取り込むたびに Rev.A → Rev.B → Rev.C と版が積み上がります。</p>
+  <div class="card">
+    <div class="row"><span class="ico" style="background:#2C6A4C"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.6h3.4L8.7 6h6.6l1.8 2.6h3.4v10.8H3.5V8.6z"/><circle cx="12" cy="13.6" r="3.3"/></svg></span>
+      <span class="rt"><b>カメラで撮影</b><span>大判図面はこれが最短です。真上から撮る → <b>四隅の○を図面枠に合わせる</b> → 仕上げ「白飛ばし」→ プレビュー → 登録。台形の歪みが直り、紙の影と黄ばみが飛びます。</span></span></div>
+    <div class="row"><span class="ico" style="background:#2C5AA0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M9 4.5v15"/></svg></span>
+      <span class="rt"><b>画像ファイル（JPG / PNG）</b><span>スキャナ取り込み。A3以下なら 300dpi・グレースケールが最もきれいに残ります。</span></span></div>
+    <div class="row"><span class="ico" style="background:#B0701A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 13h6M9 16.5h4"/></svg></span>
+      <span class="rt"><b>PDF</b><span>CAD出力やスキャンPDF。ページを選んで取り込みます。<b>元のPDFも一緒に保管</b>され、版の履歴からいつでも取り出せます。</span></span></div>
+    <div class="row"><span class="ico" style="background:#6B4C9A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.5L9 7l4 6.5L15.5 10l4.5 6.5z"/><circle cx="7.5" cy="5.5" r="1.6"/></svg></span>
+      <span class="rt"><b>SVG（ベクター）</b><span>CADやIllustratorからの書き出し。線のまま保持され、拡大しても劣化しません。文字化けの心配もないので、CAD出力があるならこれが最良です。</span></span></div>
+    <div class="row"><span class="ico" style="background:#1F7A74"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l8 4.4v8.8l-8 4.4-8-4.4V7.6l8-4.4z"/><path d="M4 7.6l8 4.4 8-4.4M12 12v8.8"/></svg></span>
+      <span class="rt"><b>3Dモデル（GLB / glTF）</b><span>BIM・SketchUp・Blenderからの書き出し。パースとして回して見られ、モデルの表面に指摘を打てます。</span></span></div>
+  </div>
+  <div class="note"><b>撮影のコツ</b>①真上から ②蛍光灯の映り込みを避ける ③図面枠の四隅を画面内に ④明るい場所で。四隅がうまく合わないときは「補正しない」にして、スキャナ取り込みに切り替えてください。</div>
+
+  <h2><span class="n">03 / REVIEW</span>検図を回す</h2>
+  <p>ここがこのツールの本体です。図面の<b>位置を指したまま</b>指摘を交わし、対応状況を追いかけます。</p>
+  <div class="flow">
+    <span class="pill">版を取り込む</span><i>→</i>
+    <span class="pill shu">指摘を打つ</span><i>→</i>
+    <span class="pill">返信する</span><i>→</i>
+    <span class="pill ok">完了にする</span><i>→</i>
+    <span class="pill">次の版へ</span>
+  </div>
+
+  <h3>指摘を打つ</h3>
+  <p>図面カード →「図面を見る」→ <b><span class="tag">指摘を打つ</span>を押してから図面上をタップ</b>。その座標にピンが刺さります。分類（意匠・構造・設備・法規）、件名、内容、担当、回答期限を入れて起票します。3Dパースの上でも同じように打てて、<b>そのとき見ていたアングルごと保存</b>されます。</p>
+
+  <h3>指摘に答える</h3>
+  <p>下タブの<span class="tag">指摘</span>から一覧を開き、返信を書きます。対応の進み具合は <span class="tag">未対応</span> <span class="tag">対応中</span> <span class="tag ok">完了</span> で切り替え。一覧は「自分宛」「期限超過」で絞り込めます。期限を過ぎたものは赤く出ます。</p>
+
+  <h3>赤入れする</h3>
+  <p>図面カード →「赤入れ」。ペン・直線・引出し・矩形・<b>雲マーク</b>・文字が引けます。色は朱／紺／緑／黒、太さは3段階。<b>他の人が描いた線も選んで動かせる・消せる</b>ので、原図はそのままに、修正案を重ねて共同で詰めていけます。</p>
+
+  <h2><span class="n">04 / TOOLS</span>効いてくる機能</h2>
+  <div class="card">
+    <div class="row"><span class="ico" style="background:#6B4C9A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3.2" y="5.5" width="10" height="13" rx="1.6"/><rect x="10.8" y="5.5" width="10" height="13" rx="1.6"/></svg></span>
+      <span class="rt"><b>版を比較</b><span>旧版を朱・新版を紺で<b>重ねる</b>／境界を動かす<b>ワイプ</b>／<b>並べて</b>の3通り。さらに「変更箇所に雲マーク」を押すと、2つの版の差分から変わった範囲を検出して、<b>改訂雲を自動で打ちます</b>。囲い忘れがなくなります。</span></span></div>
+    <div class="row"><span class="ico" style="background:#234B85"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.8 3.5l1.7 4.8 4.8 1.7-4.8 1.7-1.7 4.8-1.7-4.8L4.3 10l4.8-1.7 1.7-4.8z"/><path d="M18 14.6l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"/></svg></span>
+      <span class="rt"><b>AI検図</b><span>Claude が図面を読み、法規・納まり・整合・設備の取り合いの観点で指摘候補を挙げます。<b>候補は採用するまで記録されません。</b>採用したものだけが指摘として起票され、同時に図面のその範囲へ改訂雲と件名が入ります。</span></span></div>
+    <div class="row"><span class="ico" style="background:#1F7A74"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l8 4.4v8.8l-8 4.4-8-4.4V7.6l8-4.4z"/><path d="M4 7.6l8 4.4 8-4.4M12 12v8.8"/></svg></span>
+      <span class="rt"><b>3D パース</b><span>図面カードの中で図面とワンボタンで切り替わります。パース／アイソメ、南・東・北・西・上からの視点。<b>今見ているアングルをパース画像として版に保存</b>できるので、そのまま赤入れに回せます。</span></span></div>
+    <div class="row"><span class="ico" style="background:#B0701A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.2 13.8a4.2 4.2 0 0 0 5.9 0l2.4-2.4a4.2 4.2 0 0 0-5.9-5.9l-1.4 1.4"/><path d="M13.8 10.2a4.2 4.2 0 0 0-5.9 0l-2.4 2.4a4.2 4.2 0 0 0 5.9 5.9l1.4-1.4"/></svg></span>
+      <span class="rt"><b>関連図面</b><span>平面図と立面図のように連動する図面を登録しておくと、片方に新しい版が上がった瞬間、もう片方に <span class="tag warn">要確認</span> が自動で立ちます。図面間の不整合は事故の定番なので、最初に組んでおく価値があります。</span></span></div>
+    <div class="row"><span class="ico" style="background:#1E3A5F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M8.4 12.2l2.6 2.6 4.6-5.2"/></svg></span>
+      <span class="rt"><b>検図結果</b><span>図面ごとに <b>承認</b>／<b>条件付承認</b>／<b>要修正</b> を所見つきで記録します。図面リストにも結果が出るので、どこまで固まったか一覧で分かります。</span></span></div>
+    <div class="row"><span class="ico" style="background:#5A6675"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8-4 8 4v8l-8 4-8-4V8z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg></span>
+      <span class="rt"><b>発行セット</b><span>ある時点の全図面の版をまとめて凍結し、発行日と宛先つきで記録します。確認申請・見積・施工で「いつ誰にどの版を渡したか」は後から必ず問われます。図面目録はCSVで書き出せます。</span></span></div>
+    <div class="row"><span class="ico" style="background:#5A6675"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 10h17M9.2 10v9"/></svg></span>
+      <span class="rt"><b>検図リスト</b><span>指摘の一覧をCSVで書き出します。Excelでそのまま開ける形式なので、打合せ資料や是正指示書に転用できます。</span></span></div>
+  </div>
+
+  <h2><span class="n">05 / SHARING</span>共有と権限</h2>
+  <p>アプリの右上の共有メニューから相手を追加します。<b>付けた権限によって、アプリ内でできることが変わります。</b></p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>権限</th><th>できること</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag">閲覧可</span></td><td>オープンな工事の図面を見る。指摘を書く・返信する・状態を変える。赤入れする。</td></tr>
+        <tr><td><span class="tag ok">編集可</span></td><td>上のすべてに加えて、<b>図面の取り込み</b>（撮影・画像・PDF・SVG・3Dモデル）と、<b>プライベートな工事の閲覧</b>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>工事の公開範囲を<b>プライベート</b>にすると、その工事は「編集可」の人だけが読み書きできる領域に保管されます。閲覧可の人には、図面も指摘も<b>存在ごと返りません</b>。表示上隠しているのではなく、サーバー側で弾いています。</p>
+
+  <h2><span class="n">06 / LIMITS</span>気をつけること</h2>
+  <div class="note"><b>社外の人には渡せません</b>図面と指摘を保存する共有データベースを使う都合上、共有できるのは同じ組織にサインインしている人だけです。施主や施工者へ渡す用途は、今の構成では想定していません。</div>
+  <div class="note"><b>担当者名は自己申告です</b>閲覧者を識別する仕組みがないため、記録に残る名前は各自が設定画面で入力したものです。検図の記録としては十分回りますが、「誰が承認したか」を法的に主張する用途には耐えません。</div>
+  <div class="note"><b>AI検図の結果は候補です</b>採用操作を経るまで記録には入りません。内容は必ず人の目で確かめてから採用してください。図面から読み取れないことは確認依頼として書くよう指示していますが、誤りは起こります。</div>
+  <div class="note"><b>3Dモデルは約14MBまで</b>Draco圧縮とKTX2テクスチャには対応していません。重いモデルは不要オブジェクトを削るか、テクスチャを縮小して書き出してください。PDFはフォントが埋め込まれていないと文字が欠けることがあります。その場合はSVG書き出しに切り替えてください。</div>
+
+  <div class="foot">Drawing Hub — 紙の原図を撮影して取り込み、版を重ねて比較し、位置を指した指摘と共同の赤入れで検図するツール。</div>
+</div>

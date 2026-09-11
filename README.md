@@ -4,6 +4,7 @@
 **全員で書き換えられる赤入れレイヤー**で検図するツール。単一 HTML ファイルの Claude Artifact として動きます。
 
 公開先: <https://claude.ai/code/artifact/62548467-785f-48d4-a266-2c36d674377b>
+使い方ガイド: <https://claude.ai/code/artifact/26bfd326-e5f4-45a3-af4f-055464f033b2>（`guide.html`）
 
 ## 画面構成
 
