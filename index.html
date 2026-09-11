@@ -315,6 +315,8 @@ textarea{width:100%;background:var(--panel);border:1px solid var(--line);border-
         <button class="f" data-f="status:done" aria-pressed="false">完了</button>
         <span style="width:1px;background:var(--line-2)"></span>
         <button class="f" data-f="rev:cur" aria-pressed="false">この版のみ</button>
+        <button class="f" data-f="mine:1" aria-pressed="false">自分宛</button>
+        <button class="f" data-f="over:1" aria-pressed="false">期限超過</button>
       </div>
       <div class="scroll" id="threads"></div>
       <div class="detail" id="detail" hidden></div>
@@ -333,6 +335,8 @@ const uid=(p)=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const nowISO=()=>new Date().toISOString();
 const fdate=(iso)=>{const d=new Date(iso);return isNaN(d)?"":`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;};
 const REVLET=(i)=>String.fromCharCode(65+Math.min(i,25));
+const today=()=>new Date().toISOString().slice(0,10);
+function overdue(m){return !!(m&&m.due&&m.status!=="done"&&m.due<today());}
 function toast(msg){
   const t=document.createElement("div");t.className="toast";t.textContent=msg;
   $("#toastHost").appendChild(t);setTimeout(()=>t.remove(),2600);
@@ -452,7 +456,7 @@ function genSVG(kind,ink){
 const S={db:null,assets:null,dl:null,editor:false,ready:false,
   projects:[],pid:null,drawings:[],did:null,revs:[],marks:[],
   view:"2d",revId:null,cmpId:null,mode:"none",ratio:50,zoom:1,invert:false,pinMode:false,selMark:null,
-  filt:{open:1,doing:1,done:0,curRev:0},me:""};
+  filt:{open:1,doing:1,done:0,curRev:0},me:"",sample:null};
 const bucket={projects:[],vault:[]};
 const subs={};
 const KINDS=["意匠","構造","設備","法規","その他"];
@@ -469,16 +473,16 @@ const dwgPath=()=>base()&&S.did?`${base()}/drawings/${S.did}`:null;
 const need=()=>{if(!S.db){toast("共有バックエンドに接続していません");return false;}return true;};
 
 /* ---------------- boot ---------------- */
-S.me=localStorage.getItem("kz.me")||"";
+try{S.me=localStorage.getItem("kz.me")||"";}catch(e){S.me="";}
 $("#meName").value=S.me;
-$("#meName").oninput=(e)=>{S.me=e.target.value.trim();localStorage.setItem("kz.me",S.me);};
+$("#meName").oninput=(e)=>{S.me=e.target.value.trim();try{localStorage.setItem("kz.me",S.me);}catch(err){}};
 setConn("接続中…","");
 renderAll();
 
 (async()=>{
   const use=(n)=>(window.claude&&claude.use)?Promise.resolve(claude.use(n)).catch(()=>null):Promise.resolve(null);
-  const [db,assets,dl]=await Promise.all([use("db"),use("assets"),use("downloads")]);
-  S.db=db;S.assets=assets;S.dl=dl;S.editor=!!assets;S.ready=true;
+  const [db,assets,dl,sm]=await Promise.all([use("db"),use("assets"),use("downloads"),use("sample")]);
+  S.db=db;S.assets=assets;S.dl=dl;S.sample=sm;S.editor=!!assets;S.ready=true;
   $("#btnCsv").hidden=!dl;
   if(!db){
     setConn("未接続（閲覧のみ）","off");
@@ -682,7 +686,9 @@ function renderThreads(){
       <span class="chip">${esc(STATUS[m.status]||"未対応")}</span>
       <span class="chip mono">Rev.${esc(m.rev)}</span></span>
     <span class="th-title">${esc(m.title)}</span>
-    <span class="th-sub"><span>${esc(m.by||"—")}</span><span class="mono">${esc(fdate(m.at))}</span>${m.replies&&m.replies.length?`<span>返信 ${m.replies.length}</span>`:""}</span>
+    <span class="th-sub"><span>${esc(m.by||"—")}</span><span class="mono">${esc(fdate(m.at))}</span>${m.replies&&m.replies.length?`<span>返信 ${m.replies.length}</span>`:""}${
+      m.assignee?`<span>→ ${esc(m.assignee)}</span>`:""}${
+      m.due?`<span class="mono"${overdue(m)?' style="color:var(--shu);font-weight:700"':""}>期限 ${esc(m.due)}</span>`:""}</span>
   </button>`).join("");
   $$(".thread",host).forEach(b=>b.onclick=()=>{S.selMark=b.dataset.mid;renderThreads();renderStage();});
   renderDetail();
@@ -847,6 +853,7 @@ function step1(dlg,st){
         rev,view:"3d",src:"model",asset:up.id,format:/\.gltf$/i.test(f.name)?"gltf":"glb",
         note:f.name,by:S.me||"名無し",at:nowISO()});
       await S.db.doc(dwgPath()).update({has3d:true});
+      await propagate(rev);
       S.view="3d";S.revId=null;
       toast(`3Dモデル Rev.${rev} を登録しました`);
       dlg.close();renderStage();
@@ -980,6 +987,7 @@ async function register(dlg,st){
       rev,src:"asset",asset:up.id,pdf:pdfId,w:st.canvas.width,h:st.canvas.height,
       note,by:S.me||"名無し",at:nowISO()});
     await S.db.doc(dwgPath()).update({lastRev:rev,status:"検図中"});
+    await propagate(rev);
     toast(`Rev.${rev} を登録しました`);
   }catch(e){
     toast("登録できませんでした："+(e&&e.code?e.code:"エラー"));
@@ -1099,6 +1107,10 @@ function newMark(x,y){
       <div class="field" style="flex:1"><span>件名</span><input id="mt" placeholder="例：会議室Aの扉が柱に干渉"></div>
     </div>
     <div class="field"><span>内容</span><textarea id="mb" placeholder="根拠・依頼事項・確認したい点"></textarea></div>
+    <div class="row" style="margin:0;gap:10px">
+      <div class="field" style="flex:1"><span>担当</span><input id="ma" placeholder="回答する人"></div>
+      <div class="field" style="width:160px"><span>回答期限</span><input id="mdue" type="date"></div>
+    </div>
     <div class="note mono">位置 X:${(x*100).toFixed(1)}% / Y:${(y*100).toFixed(1)}%　Rev.${esc(r.rev)}</div>`,
     onOk:async(root)=>{
       const title=$("#mt",root).value.trim();
@@ -1106,6 +1118,7 @@ function newMark(x,y){
       const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
       await S.db.collection(`${dwgPath()}/marks`).add({
         no,x,y,rev:r.rev,kind:$("#mk",root).value,title,body:$("#mb",root).value.trim(),
+        assignee:$("#ma",root).value.trim(),due:$("#mdue",root).value||"",
         status:"open",replies:[],by:S.me||"名無し",at:nowISO()});
       await bumpOpen(1);
       S.pinMode=false;$("#btnPin").setAttribute("aria-pressed","false");
@@ -1165,9 +1178,9 @@ async function exportCsv(){
   const p=curProj(),d=curDwg();
   if(!d){toast("図面を選んでください");return;}
   const q=(v)=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
-  const rows=[["工事名称","図面番号","図面名称","No","分類","状態","件名","内容","起票者","起票日","版","対応者","対応日","返信"]];
+  const rows=[["工事名称","図面番号","図面名称","No","分類","状態","件名","内容","起票者","起票日","担当","回答期限","版","対応者","対応日","返信"]];
   S.marks.forEach(m=>rows.push([p.name,d.no,d.title,m.no,m.kind,STATUS[m.status]||"未対応",m.title,m.body,
-    m.by,fdate(m.at),"Rev."+m.rev,m.resolvedBy||"",m.resolvedAt?fdate(m.resolvedAt):"",
+    m.by,fdate(m.at),m.assignee||"",m.due||"","Rev."+m.rev,m.resolvedBy||"",m.resolvedAt?fdate(m.resolvedAt):"",
     (m.replies||[]).map(r=>`${r.by}: ${r.text}`).join(" / ")]));
   const csv="﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n");
   try{await S.dl.save({filename:`検図リスト_${d.no}_${fdate(nowISO())}.csv`,data:csv});}
@@ -1207,8 +1220,10 @@ $("#zOut").onclick=()=>{S.zoom=Math.max(0.5,S.zoom-0.25);renderStage();};
 $("#zFit").onclick=()=>{S.zoom=1;renderStage();};
 $$(".f",$("#filters")).forEach(b=>b.onclick=()=>{
   const [k,v]=b.dataset.f.split(":");
-  if(k==="status")S.filt[v]=S.filt[v]?0:1;else S.filt.curRev=S.filt.curRev?0:1;
-  b.setAttribute("aria-pressed",String(!!(k==="status"?S.filt[v]:S.filt.curRev)));
+  if(k==="status")S.filt[v]=S.filt[v]?0:1;
+  else if(k==="rev")S.filt.curRev=S.filt.curRev?0:1;
+  else S.filt[k]=S.filt[k]?0:1;
+  b.setAttribute("aria-pressed",String(!!(k==="status"?S.filt[v]:k==="rev"?S.filt.curRev:S.filt[k])));
   renderThreads();renderStage();
 });
 document.addEventListener("keydown",(e)=>{
@@ -1512,6 +1527,7 @@ function step1(dlg,st){
         rev,src:"asset",asset:up.id,w:Math.round(w),h:Math.round(h),vector:true,
         note:$("#svgNote")?$("#svgNote").value:"",by:S.me||"名無し",at:nowISO()});
       await S.db.doc(dwgPath()).update({lastRev:rev,status:"検図中"});
+    await propagate(rev);
       toast(`Rev.${rev}（ベクター）を登録しました`);
       dlg.close();
     }catch(err){
@@ -1769,6 +1785,10 @@ function newMark3D(p){
       <div class="field" style="flex:1"><span>件名</span><input id="mt" placeholder="例：庇の出が短く雨掛かりが大きい"></div>
     </div>
     <div class="field"><span>内容</span><textarea id="mb" placeholder="根拠・依頼事項・確認したい点"></textarea></div>
+    <div class="row" style="margin:0;gap:10px">
+      <div class="field" style="flex:1"><span>担当</span><input id="ma" placeholder="回答する人"></div>
+      <div class="field" style="width:160px"><span>回答期限</span><input id="mdue" type="date"></div>
+    </div>
     <div class="note mono">位置 X:${p[0]} Y:${p[1]} Z:${p[2]}　Rev.${esc(r.rev)}（3D）</div>
     <div class="note">いま見ているアングルも一緒に保存されます。指摘を開くと、この視点に戻ります。</div>`,
     onOk:async(root)=>{
@@ -1777,7 +1797,8 @@ function newMark3D(p){
       const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
       await S.db.collection(`${dwgPath()}/marks`).add({
         no,view:"3d",p,cam,x:0,y:0,rev:r.rev,kind:$("#mk",root).value,title,
-        body:$("#mb",root).value.trim(),status:"open",replies:[],by:S.me||"名無し",at:nowISO()});
+        body:$("#mb",root).value.trim(),assignee:$("#ma",root).value.trim(),due:$("#mdue",root).value||"",
+        status:"open",replies:[],by:S.me||"名無し",at:nowISO()});
       await bumpOpen(1);
       S.pinMode=false;$("#btnPin").setAttribute("aria-pressed","false");
       renderStage();
@@ -1797,6 +1818,7 @@ async function savePerspective(){
       rev,view:"2d",src:"asset",asset:up.id,w:V.renderer.domElement.width,h:V.renderer.domElement.height,
       note:"3Dビューから書き出したパース",by:S.me||"名無し",at:nowISO()});
     await S.db.doc(dwgPath()).update({lastRev:rev});
+    await propagate(rev);
     S.view="2d";S.revId=null;renderStage();
     toast(`パースを Rev.${rev} として保存しました。赤入れできます。`);
   }catch(e){toast("保存できませんでした");}
@@ -1918,6 +1940,421 @@ const _rs3=renderStage;
 renderStage=function(){
   if(S.view!=="3d"){const w=$("#sheetWrap");if(w){w.style.padding="";w.style.placeItems="";}}
   _rs3();
+};
+renderAll();
+</script>
+<script>
+/* ================= 担当・期限・フィルタ ================= */
+function visibleMarks(){
+  const r=curRev();
+  return S.marks
+    .filter(m=>S.filt[m.status||"open"])
+    .filter(m=>!S.filt.curRev||!r||m.rev===r.rev)
+    .filter(m=>!S.filt.mine||(m.assignee&&S.me&&m.assignee===S.me))
+    .filter(m=>!S.filt.over||overdue(m));
+}
+const _renderDetailBase=renderDetail;
+renderDetail=function(){
+  _renderDetailBase();
+  const d=$("#detail");
+  if(d.hidden)return;
+  const m=S.marks.find(x=>x.id===S.selMark);
+  if(!m)return;
+  const row=document.createElement("div");
+  row.className="row";
+  const inp='background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:4px 8px';
+  row.innerHTML=`<span class="lbl">担当</span><input id="asg" value="${esc(m.assignee||"")}" placeholder="未定" style="${inp};width:104px">
+    <span class="lbl">期限</span><input id="dueI" type="date" value="${esc(m.due||"")}" style="${inp}">
+    <button class="btn small" id="asgMe">自分が担当</button><button class="btn small" id="asgSave">保存</button>`;
+  const anchor=$('.row[role="group"]',d);
+  d.insertBefore(row,anchor);
+  $("#asgMe",row).onclick=()=>{$("#asg",row).value=S.me||"";};
+  $("#asgSave",row).onclick=async()=>{
+    if(!need())return;
+    await S.db.doc(`${dwgPath()}/marks/${m.id}`).update({assignee:$("#asg",row).value.trim(),due:$("#dueI",row).value||""});
+    toast("担当と期限を保存しました");
+  };
+};
+
+/* ================= 図面間の参照と波及 ================= */
+async function propagate(rev){
+  const d=curDwg();
+  if(!d||!S.db)return;
+  try{
+    const snap=await S.db.collection(`${base()}/drawings`).where("refIds","array-contains",S.did).get();
+    for(const x of snap.docs){
+      if(x.id===S.did)continue;
+      await S.db.doc(`${base()}/drawings/${x.id}`).update({stale:{no:d.no,title:d.title,rev,at:nowISO()}});
+    }
+  }catch(e){}
+}
+function editRefs(){
+  if(!need())return;
+  const d=curDwg();if(!d){toast("図面を選んでください");return;}
+  const others=S.drawings.filter(x=>x.id!==d.id);
+  if(!others.length){toast("関連付けられる図面が他にありません");return;}
+  const cur=d.refIds||[];
+  dialog({title:`関連図面 — ${d.no} ${d.title}`,ok:"保存",body:`
+    <div class="note">ここで選んだ図面に新しい版が上がると、この図面に「要確認」が立ちます。平面と立面、平面と面積表のように、片方を直すともう片方に波及する組み合わせを選んでください。</div>
+    <div style="display:grid;gap:6px;max-height:260px;overflow:auto">
+      ${others.map(o=>`<label class="opt" style="padding:7px 10px"><input type="checkbox" value="${esc(o.id)}" ${cur.includes(o.id)?"checked":""} style="margin-right:8px">
+        <div><strong>${esc(o.no)} ${esc(o.title)}</strong><small>${esc(o.discipline||"")} ${esc(o.kind||"図面")}</small></div></label>`).join("")}
+    </div>`,
+    onOk:async(root)=>{
+      const ids=$$("input[type=checkbox]",root).filter(c=>c.checked).map(c=>c.value);
+      await S.db.doc(dwgPath()).update({refIds:ids,
+        refs:ids.map(id=>{const o=S.drawings.find(x=>x.id===id);return o?{id,no:o.no,title:o.title}:{id};})});
+      toast(`関連図面を ${ids.length} 件設定しました`);
+    }});
+}
+(function buildStaleBar(){
+  const bar=document.createElement("div");
+  bar.className="banner";bar.id="staleBar";bar.hidden=true;
+  $("#revbar").before(bar);
+})();
+function syncStale(){
+  const bar=$("#staleBar"),d=curDwg();
+  if(!d||!d.stale){bar.hidden=true;return;}
+  bar.hidden=false;
+  bar.innerHTML=`<b>整合の確認が必要です</b><span>${esc(d.stale.no)} ${esc(d.stale.title)} が Rev.${esc(d.stale.rev)} に更新されました（${esc(fdate(d.stale.at))}）。</span>
+    <span style="flex:1"></span><button class="btn small" id="staleOk">確認済みにする</button>`;
+  $("#staleOk",bar).onclick=async()=>{
+    if(!need())return;
+    await S.db.doc(dwgPath()).update({stale:null});
+    toast("確認済みにしました");
+  };
+}
+const _rdlBase=renderDwgList;
+renderDwgList=function(){
+  _rdlBase();
+  S.drawings.forEach(d=>{
+    if(!d.stale)return;
+    const b=$(`.dwg[data-did="${d.id}"]`);
+    if(!b)return;
+    const meta=$(".dwg-meta",b);
+    if(meta&&!$(".stale",meta)){
+      const c=document.createElement("span");
+      c.className="chip stale";c.textContent="要確認";
+      c.style.cssText="border-color:var(--warn);color:var(--warn);background:var(--warn-soft)";
+      meta.appendChild(c);
+    }
+  });
+};
+
+/* ================= 発行セット ================= */
+async function snapshotSet(){
+  const items=[];
+  for(const d of S.drawings){
+    let last=null;
+    try{
+      const snap=await S.db.collection(`${base()}/drawings/${d.id}/revs`).get();
+      const revs=snap.docs.map(x=>({...x.data(),id:x.id}))
+        .filter(r=>(r.view||"2d")==="2d")
+        .sort((a,b)=>String(a.at).localeCompare(String(b.at)));
+      last=revs[revs.length-1]||null;
+    }catch(e){}
+    items.push({did:d.id,no:d.no,title:d.title,kind:d.kind||"図面",
+      rev:last?last.rev:"—",revId:last?last.id:"",at:last?last.at:"",
+      review:d.review?d.review.result:""});
+  }
+  return items.sort((a,b)=>String(a.no).localeCompare(String(b.no)));
+}
+async function openSets(){
+  if(!need())return;
+  const p=curProj();if(!p){toast("プロジェクトを選んでください");return;}
+  const dlg=dialog({title:`発行セット — ${p.name}`,wide:true,ok:"閉じる",onOk:()=>true});
+  $("[data-x]",dlg.root).hidden=true;
+  const body=$(".body",dlg.root);
+  const draw=async()=>{
+    body.innerHTML=`<div class="note">読み込んでいます…</div>`;
+    let sets=[];
+    try{
+      const snap=await S.db.collection(`${base()}/sets`).get();
+      sets=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+    }catch(e){}
+    body.innerHTML=`
+      <div class="note">ある時点の各図面の版を凍結して記録します。確認申請・見積・施工でどの版を渡したかが、あとから必ず問われます。</div>
+      <div style="border:1px solid var(--line);border-radius:7px;padding:11px 12px;display:grid;gap:9px">
+        <div class="row" style="margin:0;gap:10px">
+          <div class="field" style="flex:1"><span>セット名</span><input id="sn" placeholder="実施設計 第1回発行"></div>
+          <div class="field" style="width:190px"><span>宛先</span><input id="sto" placeholder="施主 / 確認検査機関"></div>
+        </div>
+        <div class="field"><span>備考</span><input id="sno" placeholder="任意"></div>
+        <div class="row" style="margin:0"><button class="btn primary" id="smk">現在の版でセットを作成</button>
+          <span class="note" style="margin:0">対象 ${S.drawings.length} 図面</span></div>
+      </div>
+      <div style="display:grid;gap:7px">
+        ${sets.length?sets.map(s=>`<button class="thread" data-sid="${esc(s.id)}" style="border:1px solid var(--line);border-radius:7px">
+          <span class="th-top"><span class="num">${esc(fdate(s.at))}</span><span class="chip">${esc(s.items.length)} 図面</span>${s.to?`<span class="chip">${esc(s.to)}</span>`:""}</span>
+          <span class="th-title">${esc(s.name)}</span>
+          <span class="th-sub"><span>${esc(s.by||"—")}</span>${s.note?`<span>${esc(s.note)}</span>`:""}</span>
+        </button>`).join(""):`<div class="note">まだ発行セットはありません。</div>`}
+      </div>
+      <div id="setDetail"></div>`;
+    $("#smk",body).onclick=async()=>{
+      const name=$("#sn",body).value.trim();
+      if(!name){toast("セット名を入力してください");return;}
+      const btn=$("#smk",body);btn.disabled=true;btn.textContent="集計中…";
+      try{
+        const items=await snapshotSet();
+        await S.db.collection(`${base()}/sets`).add({name,to:$("#sto",body).value.trim(),
+          note:$("#sno",body).value.trim(),items,by:S.me||"名無し",at:nowISO()});
+        toast(`「${name}」を発行セットとして記録しました`);
+        draw();
+      }catch(e){toast("作成できませんでした");btn.disabled=false;btn.textContent="現在の版でセットを作成";}
+    };
+    $$("[data-sid]",body).forEach(b=>b.onclick=()=>{
+      const st=sets.find(x=>x.id===b.dataset.sid);
+      const host=$("#setDetail",body);
+      host.innerHTML=`<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+        <div class="row" style="margin:0 0 8px"><b>${esc(st.name)}</b><span class="spacer" style="flex:1"></span>
+          <button class="btn small" id="setCsv">図面目録をCSVで書き出す</button></div>
+        <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+          <thead><tr>${["図面番号","図面名称","種別","版","検図","操作"].map(h=>
+            `<th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3)">${h}</th>`).join("")}</tr></thead>
+          <tbody>${st.items.map(it=>`<tr>
+            <td class="mono" style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.no)}</td>
+            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.title)}</td>
+            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.kind||"図面")}</td>
+            <td class="mono" style="padding:5px 8px;border-bottom:1px solid var(--line-2)">Rev.${esc(it.rev)}</td>
+            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${esc(it.review||"—")}</td>
+            <td style="padding:5px 8px;border-bottom:1px solid var(--line-2)">${it.revId?`<button class="btn small" data-open="${esc(it.did)}" data-rev="${esc(it.revId)}">この版を開く</button>`:"—"}</td>
+          </tr>`).join("")}</tbody></table></div></div>`;
+      $$("[data-open]",host).forEach(x=>x.onclick=()=>{
+        dlg.close();
+        S.view="2d";
+        selectDrawing(x.dataset.open);
+        setTimeout(()=>{S.revId=x.dataset.rev;renderStage();},450);
+      });
+      const csv=$("#setCsv",host);
+      if(!S.dl)csv.hidden=true;
+      else csv.onclick=async()=>{
+        const q=(v)=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+        const rows=[["工事名称","セット名","発行日","宛先","図面番号","図面名称","種別","版","検図"]];
+        st.items.forEach(it=>rows.push([p.name,st.name,fdate(st.at),st.to||"",it.no,it.title,it.kind||"図面","Rev."+it.rev,it.review||""]));
+        try{await S.dl.save({filename:`図面目録_${st.name}.csv`,data:"﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n")});}
+        catch(e){if(e&&e.code!=="declined")toast("書き出せませんでした");}
+      };
+    });
+  };
+  draw();
+}
+
+/* ================= 差分から改訂雲を自動生成 ================= */
+function revToCanvas(rev,W){
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const h=Math.max(1,Math.round(W*(img.height||841)/(img.width||1189)));
+      const c=document.createElement("canvas");c.width=W;c.height=h;
+      const x=c.getContext("2d");x.fillStyle="#FFFFFF";x.fillRect(0,0,W,h);
+      x.drawImage(img,0,0,W,h);res(c);
+    };
+    img.onerror=()=>rej(new Error("img"));
+    if(rev.src==="gen"){
+      const svg=genSVG(rev.gen,"#1A2430").replace("<svg ",'<svg width="1189" height="841" ');
+      img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+    }else img.src="/_blob/"+rev.asset;
+  });
+}
+function diffBoxes(ca,cb,cols){
+  const W=ca.width,H=ca.height;
+  const A=ca.getContext("2d").getImageData(0,0,W,H).data;
+  const B=cb.getContext("2d").getImageData(0,0,W,H).data;
+  const rows=Math.max(1,Math.round(cols*H/W));
+  const cw=W/cols,ch=H/rows;
+  const cnt=new Float32Array(cols*rows);
+  for(let y=0;y<H;y++){
+    const gy=Math.min(rows-1,(y/ch)|0);
+    for(let x=0;x<W;x++){
+      const i=(y*W+x)*4;
+      const va=(A[i]+A[i+1]+A[i+2])/3,vb=(B[i]+B[i+1]+B[i+2])/3;
+      if(Math.abs(va-vb)>46)cnt[gy*cols+Math.min(cols-1,(x/cw)|0)]++;
+    }
+  }
+  const thr=cw*ch*0.014;
+  const on=new Uint8Array(cols*rows);
+  for(let i=0;i<cnt.length;i++)on[i]=cnt[i]>thr?1:0;
+  const seen=new Uint8Array(cols*rows),out=[];
+  for(let i=0;i<on.length;i++){
+    if(!on[i]||seen[i])continue;
+    const q=[i];seen[i]=1;
+    let x0=i%cols,x1=x0,y0=(i/cols)|0,y1=y0,size=0;
+    while(q.length){
+      const c=q.pop(),cx=c%cols,cy=(c/cols)|0;size++;
+      if(cx<x0)x0=cx; if(cx>x1)x1=cx; if(cy<y0)y0=cy; if(cy>y1)y1=cy;
+      [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].forEach(([dx,dy])=>{
+        const nx=cx+dx,ny=cy+dy;
+        if(nx<0||ny<0||nx>=cols||ny>=rows)return;
+        const ni=ny*cols+nx;
+        if(on[ni]&&!seen[ni]){seen[ni]=1;q.push(ni);}
+      });
+    }
+    if(size<3)continue;
+    out.push({x1:Math.max(0,(x0-1)/cols),y1:Math.max(0,(y0-1)/rows),
+              x2:Math.min(1,(x1+2)/cols),y2:Math.min(1,(y1+2)/rows),size});
+  }
+  const big=out.sort((a,b)=>b.size-a.size);
+  const keep=[];
+  big.forEach(b=>{
+    const inside=keep.some(k=>b.x1>=k.x1-1e-6&&b.y1>=k.y1-1e-6&&b.x2<=k.x2+1e-6&&b.y2<=k.y2+1e-6);
+    if(!inside)keep.push(b);
+  });
+  return keep.slice(0,12);
+}
+async function autoCloud(){
+  if(!need())return;
+  const r=curRev(),c=cmpRev();
+  if(!r||!c){toast("比較する版を選んでください（版の右クリックで比較対象を指定）");return;}
+  toast("変更箇所を解析しています…");
+  try{
+    const [ca,cb]=await Promise.all([revToCanvas(c,1100),revToCanvas(r,1100)]);
+    if(ca.height!==cb.height){toast("版の縦横比が違うため比較できません");return;}
+    const boxes=diffBoxes(ca,cb,88);
+    if(!boxes.length){toast("画像上の変更箇所は検出されませんでした");return;}
+    if(!confirm(`変更箇所を ${boxes.length} か所検出しました。Rev.${r.rev} に改訂雲を打ちますか。`))return;
+    for(const b of boxes){
+      await S.db.collection(`${dwgPath()}/edits`).add({
+        type:"cloud",pts:[[b.x1,b.y1],[b.x2,b.y2]],color:"shu",width:2,
+        rev:r.rev,auto:true,by:S.me||"名無し",at:nowISO()});
+    }
+    toast(`改訂雲を ${boxes.length} か所に打ちました`);
+  }catch(e){toast("解析できませんでした");}
+}
+
+/* ================= AI検図（作図サポート） ================= */
+const AI_PROMPT=(p,d,r)=>`あなたは日本の建築実務で検図を担当する一級建築士です。添付画像は「${p.name}」（${p.phase||"設計"}）の図面 ${d.no}「${d.title}」（分野：${d.discipline||"意匠"}／縮尺：${d.scale||"不明"}／Rev.${r.rev}）です。
+
+この図面を読み、設計レビューで指摘すべき点を重要な順に最大6件挙げてください。着目するのは次の観点です。
+- 法規：避難経路・廊下や階段の有効幅・採光排煙・バリアフリー
+- 納まり：建具と柱梁の干渉、開き勝手、天井高、段差
+- 整合：室名と面積、通り芯と寸法の不一致、記号の欠落
+- 設備との取り合い：PS・EPS・給排水・空調の経路
+
+守ること：
+- 画像から読み取れないことを断定しない。確かでないものは「〜を確認してください」という確認依頼として書く。
+- 図面に実際に描かれている室名・記号・寸法を本文中で引用する。
+- 一般論（「安全に配慮すること」など）は書かない。
+
+出力は JSON 配列のみ。説明文やコードフェンスを付けないこと。各要素は次の形式：
+{"x":0.00,"y":0.00,"w":0.00,"h":0.00,"kind":"意匠","title":"30字以内の件名","body":"根拠と依頼事項を120字程度","severity":"高"}
+x,y は指摘箇所を囲む矩形の左上、w,h はその幅と高さ。いずれも画像全体を 1.0 とした割合。
+kind は 意匠 / 構造 / 設備 / 法規 / その他 のいずれか。severity は 高 / 中 / 低。`;
+
+async function aiReview(){
+  if(!need())return;
+  if(!S.sample){toast("この環境ではAI検図を使えません");return;}
+  const r=curRev(),d=curDwg(),p=curProj();
+  if(!r||r.view==="3d"){toast("2Dの図面を表示してから実行してください");return;}
+  const caps=await S.sample.limits().catch(()=>null);
+  if(!caps||!caps.images){toast("この環境では図面画像をAIに渡せません");return;}
+  const dlg=dialog({title:`AI検図 — ${d.no} ${d.title}（Rev.${r.rev}）`,wide:true,ok:"閉じる",onOk:()=>true});
+  $("[data-x]",dlg.root).hidden=true;
+  const body=$(".body",dlg.root);
+  body.innerHTML=`<div class="note">図面を読み込んでいます…</div>`;
+  let cands=[];
+  try{
+    const cv=await revToCanvas(r,1500);
+    const blob=await new Promise(ok=>cv.toBlob(ok,"image/jpeg",0.92));
+    body.innerHTML=`<div class="note">Claude が図面を読んでいます。20〜40秒ほどかかります…</div>`;
+    const out=await S.sample.json(AI_PROMPT(p,d,r),{images:[blob],modelTier:"complex"});
+    cands=(Array.isArray(out)?out:(out&&out.items)||[]).filter(c=>c&&c.title);
+  }catch(e){
+    body.innerHTML=`<div class="note" style="color:var(--shu)">${
+      e&&e.code==="not_granted"?"AIの利用が許可されませんでした。":
+      e&&e.code==="rate_limited"?"混み合っています。少し時間をおいて実行してください。":
+      "読み取れませんでした。図面の解像度を上げて登録し直すと通ることがあります。"}</div>`;
+    return;
+  }
+  if(!cands.length){body.innerHTML=`<div class="note">指摘候補は挙がりませんでした。</div>`;return;}
+  const SEV={"高":"var(--shu)","中":"var(--warn)","低":"var(--ink-3)"};
+  const paint=()=>{
+    body.innerHTML=`
+      <div class="note">AIが挙げた候補です。<b>そのまま記録されることはありません</b>。採用したものだけが指摘として起票され、図面にも改訂雲と件名が入ります。内容は必ず人の目で確かめてください。</div>
+      <div style="display:grid;gap:8px">
+        ${cands.map((c,i)=>c.done?`<div class="note" style="padding:8px 10px;border:1px solid var(--line-2);border-radius:6px">#${i+1} ${esc(c.title)} — ${c.done==="ok"?"起票しました":"却下しました"}</div>`
+        :`<div style="border:1px solid var(--line);border-radius:7px;padding:10px 12px">
+          <div class="th-top"><span class="chip kind-${esc(c.kind||"その他")}">${esc(c.kind||"その他")}</span>
+            <span class="chip" style="border-color:${SEV[c.severity]||"var(--line)"};color:${SEV[c.severity]||"var(--ink-2)"}">重要度 ${esc(c.severity||"中")}</span>
+            <span class="mono" style="font-size:10.5px;color:var(--ink-3)">位置 ${Math.round((+c.x||0)*100)}%, ${Math.round((+c.y||0)*100)}%</span></div>
+          <div style="font-size:13.5px;font-weight:500;margin-top:3px">${esc(c.title)}</div>
+          <div style="font-size:12.5px;color:var(--ink-2);margin-top:3px">${esc(c.body||"")}</div>
+          <div class="row"><button class="btn primary" data-ok="${i}">採用して起票</button>
+            <button class="btn" data-ng="${i}">却下</button></div>
+        </div>`).join("")}
+      </div>
+      <div class="row"><button class="btn" id="aiAll">残りをすべて採用</button></div>`;
+    $$("[data-ok]",body).forEach(b=>b.onclick=()=>adopt(+b.dataset.ok));
+    $$("[data-ng]",body).forEach(b=>b.onclick=()=>{cands[+b.dataset.ng].done="ng";paint();});
+    $("#aiAll",body).onclick=async()=>{
+      for(let i=0;i<cands.length;i++)if(!cands[i].done)await adopt(i,true);
+      paint();
+    };
+  };
+  const adopt=async(i,quiet)=>{
+    const c=cands[i];
+    const x=Math.min(.98,Math.max(0,+c.x||0)),y=Math.min(.98,Math.max(0,+c.y||0));
+    const w=Math.min(1-x,Math.max(.04,+c.w||.12)),h=Math.min(1-y,Math.max(.04,+c.h||.10));
+    const no=(S.marks.reduce((m,v)=>Math.max(m,v.no||0),0))+1;
+    try{
+      await S.db.collection(`${dwgPath()}/marks`).add({
+        no,x:x+w/2,y:y+h/2,rev:r.rev,kind:KINDS.includes(c.kind)?c.kind:"その他",
+        title:String(c.title).slice(0,80),body:String(c.body||""),severity:c.severity||"中",
+        ai:true,assignee:"",due:"",status:"open",replies:[],by:`AI検図（${S.me||"名無し"}）`,at:nowISO()});
+      await S.db.collection(`${dwgPath()}/edits`).add({
+        type:"cloud",pts:[[x,y],[x+w,y+h]],color:"shu",width:2,rev:r.rev,ai:true,by:S.me||"名無し",at:nowISO()});
+      await S.db.collection(`${dwgPath()}/edits`).add({
+        type:"text",pts:[[x,Math.max(.02,y-.012)]],text:`#${no} ${String(c.title).slice(0,26)}`,
+        color:"shu",width:1,rev:r.rev,ai:true,by:S.me||"名無し",at:nowISO()});
+      await bumpOpen(1);
+      c.done="ok";
+      if(!quiet){paint();toast(`指摘 #${no} を起票し、図面に雲マークを打ちました`);}
+    }catch(e){toast("起票できませんでした");}
+  };
+  paint();
+}
+
+/* ================= ツールバーへの追加 ================= */
+(function buildExtras(){
+  const setBtn=document.createElement("button");
+  setBtn.className="btn small";setBtn.id="btnSets";setBtn.textContent="発行セット";
+  $("#btnProjSet").after(setBtn);
+  setBtn.onclick=openSets;
+
+  const wrap=document.createElement("span");
+  wrap.style.cssText="display:contents";
+  wrap.innerHTML=`<button class="btn" id="btnAi">AI検図</button>
+    <button class="btn" id="btnCloud">変更箇所に雲マーク</button>
+    <button class="btn" id="btnRefs">関連図面</button>`;
+  $("#cmpCtl").after(wrap);
+  $("#btnAi").onclick=aiReview;
+  $("#btnCloud").onclick=autoCloud;
+  $("#btnRefs").onclick=editRefs;
+})();
+
+const _syncBars=sync3DBars;
+sync3DBars=function(){
+  _syncBars();
+  const is3=S.view==="3d";
+  $("#btnAi").hidden=is3||!S.sample;
+  $("#btnCloud").hidden=is3;
+  $("#btnRefs").hidden=is3;
+  syncStale();
+};
+const _rt2=renderThreads;
+renderThreads=function(){
+  _rt2();
+  $$(".thread",$("#threads")).forEach(b=>{
+    const m=S.marks.find(x=>x.id===b.dataset.mid);
+    if(!m||!m.ai)return;
+    const top=$(".th-top",b);
+    if(top&&!$(".isai",top)){
+      const c=document.createElement("span");
+      c.className="chip isai";c.textContent="AI";
+      c.style.cssText="border-color:var(--accent);color:var(--accent)";
+      top.insertBefore(c,top.children[1]||null);
+    }
+  });
 };
 renderAll();
 </script>
