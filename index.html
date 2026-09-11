@@ -2,7 +2,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
 <style>
 :root{
-  --bg:#EDEFF3; --surface:#F5F7FA; --panel:#FFFFFF; --panel-2:#F6F8FB;
+  --bg:#F1F2F6; --surface:#F5F7FA; --panel:#FFFFFF; --panel-2:#F6F8FB;
+  --card:#FFFFFF; --sep:#E8EAEF; --tab:#FFFFFF;
   --ink:#131C28; --ink-2:#4C5868; --ink-3:#8593A4;
   --line:#D2D9E3; --line-2:#E6EBF1;
   --accent:#234B85; --accent-2:#3A6CB0; --accent-soft:#E1E9F6;
@@ -15,7 +16,8 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0E1217; --surface:#141A22; --panel:#1A212B; --panel-2:#161D26;
+    --bg:#0B0E13; --surface:#141A22; --panel:#171D26; --panel-2:#1B222C;
+    --card:#171D26; --sep:#242C37; --tab:#1A212B;
     --ink:#E5EBF3; --ink-2:#9DAABB; --ink-3:#6B7A8D;
     --line:#2B3441; --line-2:#222A35;
     --accent:#7FA8E8; --accent-2:#A2C1F2; --accent-soft:#1C2839;
@@ -27,7 +29,8 @@
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0E1217; --surface:#141A22; --panel:#1A212B; --panel-2:#161D26;
+  --bg:#0B0E13; --surface:#141A22; --panel:#171D26; --panel-2:#1B222C;
+  --card:#171D26; --sep:#242C37; --tab:#1A212B;
   --ink:#E5EBF3; --ink-2:#9DAABB; --ink-3:#6B7A8D;
   --line:#2B3441; --line-2:#222A35;
   --accent:#7FA8E8; --accent-2:#A2C1F2; --accent-soft:#1C2839;
@@ -52,20 +55,20 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- shell ---------- */
 #app{min-height:100dvh;display:flex;flex-direction:column}
 .nav{
-  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
-  height:54px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;
+  height:56px;padding:0 14px;background:var(--bg);
 }
 .nav .back{
-  flex:none;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);
-  display:grid;place-items:center;cursor:pointer;font-size:17px;line-height:1;
+  flex:none;width:36px;height:36px;border-radius:50%;border:0;background:var(--card);
+  display:grid;place-items:center;cursor:pointer;font-size:17px;line-height:1;box-shadow:var(--shadow);
 }
 .nav .back:hover{border-color:var(--accent-2);color:var(--accent)}
-.nav h1{margin:0;font-size:16px;font-weight:700;letter-spacing:.02em;flex:1;min-width:0;
+.nav h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.02em;flex:1;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav h1 small{display:block;font-size:11px;font-weight:400;color:var(--ink-3);letter-spacing:.04em}
 .nav .navact{display:flex;gap:6px;align-items:center;flex:none}
 main{flex:1;min-height:0;display:flex;flex-direction:column}
-.wrap{width:100%;max-width:780px;margin:0 auto;padding:16px 16px 44px;display:grid;gap:14px}
+.wrap{width:100%;max-width:780px;margin:0 auto;padding:6px 14px 108px;display:grid;gap:16px}
 .wrap.full{display:flex;flex-direction:column;gap:0;max-width:none;padding:0;flex:1;min-height:0}
 
 /* ---------- common ---------- */
@@ -84,9 +87,13 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 .seg button{background:none;border:0;padding:7px 12px;cursor:pointer;font-size:13px;border-right:1px solid var(--line-2);flex:1}
 .seg button:last-child{border-right:0}
 .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.card>h2{margin:0;padding:11px 14px;font-size:11px;letter-spacing:.16em;color:var(--ink-2);
-  text-transform:uppercase;border-bottom:1px solid var(--line-2);font-weight:700}
+.card{background:var(--card);border:0;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.card>h2{margin:0;padding:13px 16px 3px;font-size:12.5px;letter-spacing:.04em;color:var(--ink-3);
+  text-transform:none;font-weight:500;border:0}
+.sec{display:flex;align-items:baseline;gap:10px;margin:6px 4px -6px}
+.sec h2{margin:0;font-size:21px;font-weight:700;letter-spacing:.01em}
+.sec .more{margin-left:auto;color:var(--ink-3);font-size:13px;line-height:1;padding:0 4px;
+  font-family:"Roboto Mono",monospace}
 .chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid var(--line);
   color:var(--ink-2);white-space:nowrap;line-height:1.7}
 .chip.kind-意匠{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
@@ -109,8 +116,8 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 
 /* ---------- list rows ---------- */
 .item{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:center;width:100%;
-  text-align:left;padding:13px 14px;background:var(--panel);border:0;border-bottom:1px solid var(--line-2);cursor:pointer}
-.item:last-child{border-bottom:0}
+  text-align:left;padding:13px 16px;background:none;border:0;cursor:pointer;position:relative}
+.item+.item::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--sep)}
 .item:hover{background:var(--panel-2)}
 .item .t{font-size:15px;font-weight:500;line-height:1.4}
 .item .s{grid-column:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3)}
@@ -181,6 +188,28 @@ main{flex:1;min-height:0;display:flex;flex-direction:column}
 .stamp b{font-size:14px;font-weight:700;display:block}
 .stamp i{font-style:normal;font-size:8.5px;font-family:"Roboto Mono",monospace}
 .stamp.ok{border-color:var(--ok);color:var(--ok)}
+.irow{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:10px 16px;
+  background:none;border:0;cursor:pointer;position:relative}
+.irow+.irow::before{content:"";position:absolute;left:62px;right:0;top:0;height:1px;background:var(--sep)}
+.irow:hover{background:var(--panel-2)}
+.irow[disabled]{opacity:.42;cursor:not-allowed}
+.ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;color:#fff}
+.ico svg{width:20px;height:20px;display:block}
+.itxt{flex:1;min-width:0}
+.itxt b{display:block;font-size:15.5px;font-weight:500;line-height:1.35;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itxt small{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3);line-height:1.5;min-width:0}
+.stxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itxt small>*:not(.stxt){flex:none;white-space:nowrap}
+.iend{display:flex;align-items:center;gap:9px;flex:none;color:var(--line)}
+.iend .chev{font-size:19px}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:30;display:flex;gap:2px;
+  background:var(--tab);border-radius:26px;padding:6px;box-shadow:0 2px 8px rgba(19,28,40,.10),0 10px 30px rgba(19,28,40,.16)}
+.tabbar button{background:none;border:0;cursor:pointer;display:grid;justify-items:center;gap:1px;
+  padding:6px 15px;border-radius:21px;color:var(--ink-3);font-size:11px;line-height:1.3;white-space:nowrap}
+.tabbar button svg{width:22px;height:22px;display:block}
+.tabbar button[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+@media (max-width:380px){.tabbar button{padding:6px 12px}}
 table.tbl{width:100%;border-collapse:collapse;font-size:13px}
 table.tbl th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);font-size:10.5px;
   letter-spacing:.1em;color:var(--ink-3);font-weight:700}
@@ -194,6 +223,7 @@ table.tbl td{padding:7px 10px;border-bottom:1px solid var(--line-2)}
   </header>
   <main id="main"></main>
 </div>
+<nav class="tabbar" id="tabbar"></nav>
 <div id="toastHost"></div>
 <script>
 "use strict";
@@ -258,6 +288,7 @@ function replace(s,o){R.stack[R.stack.length-1]={s,o:o||{}};paint();}
 function home(){R.stack=[{s:"home",o:{}}];paint();}
 function refresh(){const c=cur();if(SCREENS[c.s]&&SCREENS[c.s].live===false)return;paint();}
 function paint(){
+  if(window.syncTabs)syncTabs();
   const c=cur(),sc=SCREENS[c.s]||SCREENS.home;
   $("#navBack").hidden=R.stack.length<=1;
   const t=sc.title?sc.title(c.o):"検図台";
@@ -972,51 +1003,96 @@ function next3DLetter(){
 }
 </script>
 <script>
+/* ============ アイコンと行 ============ */
+const sv=(d)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICON={
+  building:sv('<rect x="5" y="4" width="14" height="16" rx="1.6"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M9.5 20v-3.4h5V20"/>'),
+  plan:sv('<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M9 4.5v15"/>'),
+  pin:sv('<path d="M12 21s6.6-6.2 6.6-11a6.6 6.6 0 1 0-13.2 0C5.4 14.8 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/>'),
+  pencil:sv('<path d="M4 20.2l4.2-1 9.6-9.6-3.2-3.2L5 16l-1 4.2z"/><path d="M14.6 6.4l3 3"/>'),
+  compare:sv('<rect x="3.2" y="5.5" width="10" height="13" rx="1.6"/><rect x="10.8" y="5.5" width="10" height="13" rx="1.6"/>'),
+  cube:sv('<path d="M12 3.2l8 4.4v8.8l-8 4.4-8-4.4V7.6l8-4.4z"/><path d="M4 7.6l8 4.4 8-4.4M12 12v8.8"/>'),
+  ai:sv('<path d="M10.8 3.5l1.7 4.8 4.8 1.7-4.8 1.7-1.7 4.8-1.7-4.8L4.3 10l4.8-1.7 1.7-4.8z"/><path d="M18 14.6l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"/>'),
+  camera:sv('<path d="M3.5 8.6h3.4L8.7 6h6.6l1.8 2.6h3.4v10.8H3.5V8.6z"/><circle cx="12" cy="13.6" r="3.3"/>'),
+  clock:sv('<circle cx="12" cy="12" r="8.2"/><path d="M12 7.2V12l3.2 2"/>'),
+  link:sv('<path d="M10.2 13.8a4.2 4.2 0 0 0 5.9 0l2.4-2.4a4.2 4.2 0 0 0-5.9-5.9l-1.4 1.4"/><path d="M13.8 10.2a4.2 4.2 0 0 0-5.9 0l-2.4 2.4a4.2 4.2 0 0 0 5.9 5.9l1.4-1.4"/>'),
+  stamp:sv('<circle cx="12" cy="12" r="8.2"/><path d="M8.4 12.2l2.6 2.6 4.6-5.2"/>'),
+  table:sv('<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 10h17M9.2 10v9"/>'),
+  box:sv('<path d="M4 8l8-4 8 4v8l-8 4-8-4V8z"/><path d="M4 8l8 4 8-4M12 12v8"/>'),
+  gear:sv('<circle cx="12" cy="12" r="3.1"/><path d="M12 3.6v2.1M12 18.3v2.1M20.4 12h-2.1M5.7 12H3.6M17.9 6.1l-1.5 1.5M7.6 16.4l-1.5 1.5M17.9 17.9l-1.5-1.5M7.6 7.6L6.1 6.1"/>'),
+  home:sv('<path d="M4 11.2L12 4.6l8 6.6V20h-5.6v-4.8H9.6V20H4v-8.8z"/>'),
+  plus:sv('<path d="M12 5.5v13M5.5 12h13"/>')
+};
+const DCOL={"意匠":"#2C5AA0","構造":"#B0701A","設備":"#2A7A56","外構":"#1F7A74"};
+function sec(h,title,right){
+  const d=el("div","sec");
+  d.innerHTML=`<h2>${title}</h2>`+(right?`<span class="more">${right}</span>`:"");
+  h.appendChild(d);return d;
+}
+function card(h){const c=el("div","card");if(h)h.appendChild(c);return c;}
+function irow(o){
+  const b=el("button","irow");
+  if(o.disabled)b.disabled=true;
+  b.innerHTML=`<span class="ico" style="background:${o.color||"#5A6675"}">${ICON[o.ico]||""}</span>
+    <span class="itxt"><b>${o.title}</b>${(o.sub||o.chips)?`<small><span class="stxt">${o.sub||""}</span>${o.chips||""}</small>`:""}</span>
+    <span class="iend">${o.badge?`<span class="badge">${o.badge}</span>`:""}<span class="chev">›</span></span>`;
+  if(o.on&&!o.disabled)b.onclick=o.on;
+  return b;
+}
+function syncTabs(){
+  const bar=$("#tabbar");
+  if(!bar.childElementCount){
+    bar.innerHTML=[["home","ホーム","home"],["drawing","図面","plan"],["marks","指摘","pin"],["settings","設定","gear"]]
+      .map(([k,l,i])=>`<button data-tab="${k}">${ICON[i]}<span>${l}</span></button>`).join("");
+    $$("[data-tab]",bar).forEach(b=>b.onclick=()=>{
+      const k=b.dataset.tab;
+      if(k==="home"){home();return;}
+      if(k==="settings"){R.stack=[{s:"home",o:{}},{s:"settings",o:{}}];paint();return;}
+      if(!S.did){toast("先に図面を選んでください");return;}
+      R.stack=k==="drawing"?[{s:"home",o:{}},{s:"drawing",o:{}}]
+        :[{s:"home",o:{}},{s:"drawing",o:{}},{s:"marks",o:{}}];
+      paint();
+    });
+  }
+  const g={home:"home",projects:"home",newproject:"home",newdrawing:"home",sets:"home",set:"home",
+    settings:"settings",visibility:"settings",
+    marks:"marks",mark:"marks",newmark:"marks"};
+  const now=g[cur().s]||"drawing";
+  $$("[data-tab]",bar).forEach(b=>b.setAttribute("aria-current",String(b.dataset.tab===now)));
+}
+
 /* ============ ホーム ============ */
 SCREENS.home={
   title:()=>`検図台<small>${curProj()?esc(curProj().name):(S.ready?"プロジェクト未選択":"接続中…")}</small>`,
   act:(a)=>{a.innerHTML=`<button class="btn small" id="aSet">設定</button>`;$("#aSet",a).onclick=()=>go("settings");},
   body:(h)=>{
-    if(!S.ready){h.innerHTML=`<div class="card" style="padding:16px;display:grid;gap:11px">${'<div class="skel"></div>'.repeat(6)}</div>`;return;}
+    if(!S.ready){h.innerHTML=`<div class="card" style="padding:18px;display:grid;gap:12px">${'<div class="skel"></div>'.repeat(6)}</div>`;return;}
     if(!S.db)h.appendChild(el("div","banner","共有バックエンドに接続していません。claude.ai で公開ページを開くと、チームで図面と指摘を共有できます。"));
     const p=curProj();
-    const pc=el("div","card");
-    pc.innerHTML=`<h2>プロジェクト</h2>
-      <button class="item" id="pSel">
-        <span class="t">${p?esc(p.name):"プロジェクトを選ぶ"}</span>
-        <span class="s">${p?`${esc(p.code||"")} ${esc(p.phase||"")}`:"まだ登録がありません"}
-          ${p?`<span class="chip ${p.visibility==="private"?"warn":"ok"}">${p.visibility==="private"?"非公開":"オープン"}</span>`:""}
-          ${p&&p.sample?`<span class="chip">サンプル</span>`:""}</span>
-        <span class="r"><span class="chev">›</span></span></button>`;
-    h.appendChild(pc);
-    $("#pSel",pc).onclick=()=>go("projects");
+    sec(h,"工事");
+    const pc=card(h);
+    pc.appendChild(irow({ico:"building",color:"#3A6CB0",
+      title:p?esc(p.name):"プロジェクトを選ぶ",
+      sub:p?`${esc(p.code||"")}　${esc(p.phase||"")}${p.sample?"　サンプル":""}`:"まだ登録がありません",
+      chips:p?`<span class="chip ${p.visibility==="private"?"warn":"ok"}">${p.visibility==="private"?"非公開":"オープン"}</span>`:"",
+      on:()=>go("projects")}));
     if(!p)return;
-
-    const dc=el("div","card");
-    dc.innerHTML=`<h2>図面 ${S.drawings.length?`（${S.drawings.length}）`:""}</h2>`;
-    if(!S.drawings.length){
-      dc.appendChild(el("div","empty","<b>図面がまだありません</b>図面番号と図面名称を登録し、紙の原図を撮影して版として取り込みます。"));
-    }else{
-      S.drawings.forEach(d=>{
-        const b=el("button","item");
-        const n=d.id===S.did?openCount():(d.openCount||0);
-        b.innerHTML=`<span class="t">${esc(d.no)}　${esc(d.title)}</span>
-          <span class="s"><span class="mono">Rev.${esc(d.lastRev||"—")}</span><span>${esc(d.discipline||"")}</span>
-            ${d.kind&&d.kind!=="図面"?`<span class="chip">${esc(d.kind)}</span>`:""}
-            ${d.stale?`<span class="chip warn">要確認</span>`:""}
-            ${d.review?`<span class="chip ${d.review.result==="要修正"?"shu":"ok"}">${esc(d.review.result)}</span>`:""}</span>
-          <span class="r"><span class="badge ${n?"":"zero"}">${n}</span><span class="chev">›</span></span>`;
-        b.onclick=()=>{pickDrawing(d.id);go("drawing");};
-        dc.appendChild(b);
-      });
-    }
-    h.appendChild(dc);
-    const acts=el("div","row");
-    acts.innerHTML=`<button class="btn primary grow" id="nd">＋ 図面を登録</button>
-      <button class="btn grow" id="ns">発行セット</button>`;
-    h.appendChild(acts);
-    $("#nd",acts).onclick=()=>go("newdrawing");
-    $("#ns",acts).onclick=()=>go("sets");
+    sec(h,"図面",S.drawings.length?String(S.drawings.length):"");
+    const dc=card(h);
+    if(!S.drawings.length)dc.appendChild(el("div","empty","<b>図面がまだありません</b>図面番号と図面名称を登録し、紙の原図を撮影して版として取り込みます。"));
+    S.drawings.forEach(d=>{
+      const num=d.id===S.did?openCount():(d.openCount||0);
+      dc.appendChild(irow({ico:d.kind==="3Dモデル"?"cube":d.kind==="パース"?"camera":"plan",
+        color:DCOL[d.discipline]||"#5A6675",
+        title:`${esc(d.no)}　${esc(d.title)}`,
+        sub:`Rev.${esc(d.lastRev||"—")}　${esc(d.discipline||"")}${d.kind&&d.kind!=="図面"?`　${esc(d.kind)}`:""}`,
+        chips:`${d.stale?'<span class="chip warn">要確認</span>':""}${d.review?`<span class="chip ${d.review.result==="要修正"?"shu":"ok"}">${esc(d.review.result)}</span>`:""}`,
+        badge:num,on:()=>{pickDrawing(d.id);go("drawing");}}));
+    });
+    sec(h,"操作");
+    const ac=card(h);
+    ac.appendChild(irow({ico:"plus",color:"#2C6A4C",title:"図面を登録",sub:"図面番号・図面名称・分野・縮尺",on:()=>go("newdrawing")}));
+    ac.appendChild(irow({ico:"box",color:"#6B4C9A",title:"発行セット",sub:"ある時点の版を凍結して記録する",on:()=>go("sets")}));
   }
 };
 
@@ -1053,11 +1129,11 @@ SCREENS.drawing={
     const d=curDwg(),r=curRev();
     if(!d){h.innerHTML=`<div class="empty">図面が選ばれていません。</div>`;return;}
     if(d.stale){
-      const b=el("div","banner");
-      b.innerHTML=`<div class="grow"><b>整合の確認が必要です</b><br>${esc(d.stale.no)} ${esc(d.stale.title)} が Rev.${esc(d.stale.rev)} に更新されました（${esc(fdate(d.stale.at))}）。</div>
+      const bn=el("div","banner");
+      bn.innerHTML=`<div class="grow"><b>整合の確認が必要です</b><br>${esc(d.stale.no)} ${esc(d.stale.title)} が Rev.${esc(d.stale.rev)} に更新されました（${esc(fdate(d.stale.at))}）。</div>
         <button class="btn small" id="sok">確認済みにする</button>`;
-      h.appendChild(b);
-      $("#sok",b).onclick=async()=>{if(!need())return;await S.db.doc(dwgPath()).update({stale:null});toast("確認済みにしました");};
+      h.appendChild(bn);
+      $("#sok",bn).onclick=async()=>{if(!need())return;await S.db.doc(dwgPath()).update({stale:null});toast("確認済みにしました");};
     }
     if(r){
       const pv=el("button","preview");
@@ -1069,33 +1145,28 @@ SCREENS.drawing={
     }else{
       h.appendChild(el("div","empty","<b>まだ版が登録されていません</b>紙の原図を撮影するか、PDF・SVG・3Dモデルを取り込んでください。"));
     }
-    const meta=el("button","item card");
-    meta.style.borderBottom="0";
-    meta.innerHTML=`<span class="t">版 Rev.${esc(r?r.rev:"—")}${S.view==="3d"?"（3D）":""}</span>
-      <span class="s">${r?`${esc(fdate(r.at))}　${esc(r.by||"")}　${esc(r.note||"")}`:"版なし"}</span>
-      <span class="r"><span class="mono">${revsIn().length} 版</span><span class="chev">›</span></span>`;
-    meta.onclick=()=>go("revs");
-    h.appendChild(meta);
-
-    const t=el("div","tiles");
-    const tile=(id,name,sub,dis)=>`<button class="tile" id="${id}" ${dis?"disabled":""}><b>${name}</b><small>${sub}</small></button>`;
-    t.innerHTML=
-      tile("t1",`指摘事項　${openCount()?`<span class="badge">${openCount()}</span>`:""}`,"位置を指した指摘と回答")+
-      tile("t2","図面を見る","拡大・ピンの確認・指摘を打つ",!r)+
-      tile("t3","赤入れ","雲マーク・引出し・文字を全員で",!r||S.view==="3d")+
-      tile("t4","版を比較","重ね・ワイプ・変更箇所の自動検出",revsIn("2d").length<2)+
-      tile("t5","3D パース",has3D()?"回して見る・モデル上に指摘":"3Dモデル未登録",!has3D())+
-      tile("t6","AI検図",S.sample?"Claudeが指摘候補を挙げる":"この環境では使えません",!r||!S.sample||S.view==="3d")+
-      tile("t7","版を追加","撮影・画像・PDF・SVG・3Dモデル")+
-      tile("t8","関連図面",(d.refIds&&d.refIds.length)?`${d.refIds.length} 件と連動`:"更新の波及先を決める")+
-      tile("t9","検図結果",d.review?`${esc(d.review.result)}（${esc(d.review.by||"")}）`:"承認・条件付承認・要修正")+
-      tile("t10","検図リスト",S.dl?"指摘一覧をCSVで書き出す":"この環境では書き出せません",!S.dl);
-    h.appendChild(t);
-    const on=(id,fn)=>{const b=$("#"+id,t);if(b&&!b.disabled)b.onclick=fn;};
-    on("t1",()=>go("marks"));on("t2",()=>go("viewer"));on("t3",()=>go("draw"));
-    on("t4",()=>go("compare"));on("t5",()=>{S.view="3d";S.revId=null;go("three");});
-    on("t6",()=>go("ai"));on("t7",()=>go("import"));on("t8",()=>go("refs"));
-    on("t9",()=>go("review"));on("t10",exportCsv);
+    sec(h,"この図面");
+    const c0=card(h);
+    c0.appendChild(irow({ico:"clock",color:"#5A6675",
+      title:`版 Rev.${esc(r?r.rev:"—")}${S.view==="3d"?"（3D）":""}`,
+      sub:r?`${esc(fdate(r.at))}　${esc(r.by||"")}${r.note?`　${esc(r.note)}`:""}`:"版なし",
+      chips:`<span class="more mono">${revsIn().length} 版</span>`,on:()=>go("revs")}));
+    sec(h,"見る・書き込む");
+    const c1=card(h);
+    c1.appendChild(irow({ico:"plan",color:"#2C5AA0",title:"図面を見る",sub:"拡大・ピンの確認・指摘を打つ",disabled:!r,on:()=>go("viewer")}));
+    c1.appendChild(irow({ico:"pin",color:"#BC3B2B",title:"指摘事項",sub:"位置を指した指摘と回答",badge:openCount(),on:()=>go("marks")}));
+    c1.appendChild(irow({ico:"pencil",color:"#C2681C",title:"赤入れ",sub:"雲マーク・引出し・文字を全員で",disabled:!r||S.view==="3d",on:()=>go("draw")}));
+    sec(h,"版とチェック");
+    const c2=card(h);
+    c2.appendChild(irow({ico:"camera",color:"#2C6A4C",title:"版を追加",sub:"撮影・画像・PDF・SVG・3Dモデル",on:()=>go("import")}));
+    c2.appendChild(irow({ico:"compare",color:"#6B4C9A",title:"版を比較",sub:"重ね・ワイプ・変更箇所の自動検出",disabled:revsIn("2d").length<2,on:()=>go("compare")}));
+    c2.appendChild(irow({ico:"cube",color:"#1F7A74",title:"3D パース",sub:has3D()?"回して見る・モデル上に指摘":"3Dモデル未登録",disabled:!has3D(),on:()=>{S.view="3d";S.revId=null;go("three");}}));
+    c2.appendChild(irow({ico:"ai",color:"#234B85",title:"AI検図",sub:S.sample?"Claudeが図面を読んで指摘候補を挙げる":"この環境では使えません",disabled:!r||!S.sample||S.view==="3d",on:()=>go("ai")}));
+    sec(h,"記録と共有");
+    const c3=card(h);
+    c3.appendChild(irow({ico:"link",color:"#B0701A",title:"関連図面",sub:(d.refIds&&d.refIds.length)?`${d.refIds.length} 件と連動`:"更新の波及先を決める",on:()=>go("refs")}));
+    c3.appendChild(irow({ico:"stamp",color:"#1E3A5F",title:"検図結果",sub:d.review?`${esc(d.review.result)}（${esc(d.review.by||"")}）`:"承認・条件付承認・要修正",on:()=>go("review")}));
+    c3.appendChild(irow({ico:"table",color:"#5A6675",title:"検図リスト",sub:S.dl?"指摘一覧をCSVで書き出す":"この環境では書き出せません",disabled:!S.dl,on:exportCsv}));
   }
 };
 
