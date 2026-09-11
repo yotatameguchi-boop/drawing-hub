@@ -1,4 +1,4 @@
-<title>検図台</title>
+<title>Drawing Hub</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -218,7 +218,7 @@ table.tbl td{padding:7px 10px;border-bottom:1px solid var(--line-2)}
 <div id="app">
   <header class="nav">
     <button class="back" id="navBack" hidden aria-label="戻る">←</button>
-    <h1 id="navTitle">検図台</h1>
+    <h1 id="navTitle">Drawing Hub</h1>
     <div class="navact" id="navAct"></div>
   </header>
   <main id="main"></main>
@@ -291,7 +291,7 @@ function paint(){
   if(window.syncTabs)syncTabs();
   const c=cur(),sc=SCREENS[c.s]||SCREENS.home;
   $("#navBack").hidden=R.stack.length<=1;
-  const t=sc.title?sc.title(c.o):"検図台";
+  const t=sc.title?sc.title(c.o):"Drawing Hub";
   $("#navTitle").innerHTML=t;
   const act=$("#navAct");act.innerHTML="";
   const main=$("#main");main.innerHTML="";
@@ -1063,7 +1063,7 @@ function syncTabs(){
 
 /* ============ ホーム ============ */
 SCREENS.home={
-  title:()=>`検図台<small>${curProj()?esc(curProj().name):(S.ready?"プロジェクト未選択":"接続中…")}</small>`,
+  title:()=>`Drawing Hub<small>${curProj()?esc(curProj().name):(S.ready?"プロジェクト未選択":"接続中…")}</small>`,
   act:(a)=>{a.innerHTML=`<button class="btn small" id="aSet">設定</button>`;$("#aSet",a).onclick=()=>go("settings");},
   body:(h)=>{
     if(!S.ready){h.innerHTML=`<div class="card" style="padding:18px;display:grid;gap:12px">${'<div class="skel"></div>'.repeat(6)}</div>`;return;}
@@ -2232,7 +2232,7 @@ SCREENS.settings={
       const b=el("button","btn wide","公開範囲を変える");
       b.onclick=()=>go("visibility");h.appendChild(b);
     }
-    h.appendChild(el("div","note","検図台 — 紙の原図を撮影して取り込み、版を重ねて比較し、位置を指した指摘と共同の赤入れで検図するツールです。"));
+    h.appendChild(el("div","note","Drawing Hub — 紙の原図を撮影して取り込み、版を重ねて比較し、位置を指した指摘と共同の赤入れで検図するツールです。"));
   }
 };
 start();
