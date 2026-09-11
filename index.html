@@ -1069,14 +1069,21 @@ SCREENS.home={
     if(!S.ready){h.innerHTML=`<div class="card" style="padding:18px;display:grid;gap:12px">${'<div class="skel"></div>'.repeat(6)}</div>`;return;}
     if(!S.db)h.appendChild(el("div","banner","共有バックエンドに接続していません。claude.ai で公開ページを開くと、チームで図面と指摘を共有できます。"));
     const p=curProj();
+    if(!p){
+      sec(h,"はじめる");
+      const c0=card(h);
+      c0.appendChild(irow({ico:"plus",color:"#2C6A4C",title:"プロジェクトを作成",
+        sub:"工事名称・工事番号・設計段階・公開範囲",on:()=>go("newproject")}));
+      h.appendChild(el("div","note","工事を登録したら、図面を1枚ずつ取り込みます。紙の原図はカメラで撮って台形補正、PDF・SVG・3Dモデルもそのまま登録できます。"));
+      return;
+    }
     sec(h,"工事");
     const pc=card(h);
     pc.appendChild(irow({ico:"building",color:"#3A6CB0",
-      title:p?esc(p.name):"プロジェクトを選ぶ",
-      sub:p?`${esc(p.code||"")}　${esc(p.phase||"")}${p.sample?"　サンプル":""}`:"まだ登録がありません",
-      chips:p?`<span class="chip ${p.visibility==="private"?"warn":"ok"}">${p.visibility==="private"?"非公開":"オープン"}</span>`:"",
+      title:esc(p.name),
+      sub:`${esc(p.code||"")}　${esc(p.phase||"")}`,
+      chips:`<span class="chip ${p.visibility==="private"?"warn":"ok"}">${p.visibility==="private"?"非公開":"オープン"}</span>`,
       on:()=>go("projects")}));
-    if(!p)return;
     sec(h,"図面",S.drawings.length?String(S.drawings.length):"");
     const dc=card(h);
     if(!S.drawings.length)dc.appendChild(el("div","empty","<b>図面がまだありません</b>図面番号と図面名称を登録し、紙の原図を撮影して版として取り込みます。"));
