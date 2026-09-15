@@ -80,6 +80,75 @@ Artifact の `assets` はバイナリの 3D 形式を直接受け付けないた
 このため実質 **約14MB までの GLB** が上限です。Draco 圧縮・KTX2 テクスチャは未対応。
 three.js は jsDelivr から動的に読み込みます（3Dに切り替えたときのみ）。
 
+## 自前で動かす（Docker）
+
+Claude Artifact 版は組織内の人にしか共有できません。社外の設計協力者や施工者にも渡したい場合は、
+Docker で自前のサーバーに立てます。アーティファクト実行環境が提供している `window.claude`
+（データベース・ファイル保管・ダウンロード・AI）を、`server/` の Node サーバーと `server/shim.js`
+が肩代わりするので、**`index.html` は 1 文字も変えずにそのまま動きます**。
+
+```bash
+cp .env.example .env
+# SESSION_SECRET と EDITOR_PASSWORD を必ず設定する
+#   openssl rand -base64 32   でシークレットを生成
+docker compose up -d --build
+```
+
+http://localhost:8080 を開いて合言葉を入れれば使えます。
+
+### 合言葉と権限
+
+アーティファクト版の「編集可／閲覧可」に対応するものを、2つの合言葉で表現しています。
+
+| 環境変数 | 入った人ができること |
+| --- | --- |
+| `EDITOR_PASSWORD` | 図面の取り込み、プライベート工事の閲覧、すべての読み書き |
+| `VIEWER_PASSWORD` | オープンな工事の閲覧、指摘・返信・赤入れ（図面の取り込みは不可） |
+
+`VIEWER_PASSWORD` を空にすると、閲覧専用のログインが無効になります。
+プライベートにした工事は `vault/` 以下に保管され、**閲覧者の要求はサーバー側で弾かれます**
+（存在しないものとして返るので、一覧にも出ません）。
+
+### AI検図
+
+`ANTHROPIC_API_KEY` を入れると AI検図が有効になります。鍵はサーバー側だけに置かれ、ブラウザには渡りません。
+未設定なら、アプリ側で AI検図の項目が自動的に無効表示になります。
+
+### データの置き場所
+
+`drawing-hub-data` という名前付きボリュームの中に入ります。
+
+- `/data/docs.json` … 工事・図面・版・指摘・赤入れ・発行セット
+- `/data/blobs/` … 図面の画像・PDF・SVG・3Dモデルの実体
+- `/data/blobs.json` … 実体のメタ情報
+
+バックアップは次の1行で取れます。
+
+```bash
+docker run --rm -v drawing-hub-data:/data -v "$PWD:/out" alpine tar czf /out/drawing-hub-backup.tgz -C /data .
+```
+
+### 公開するときに必ずやること
+
+- **HTTPS の後ろに置く。** 合言葉が平文で流れます。Caddy や nginx でリバースプロキシを立て、
+  証明書を付けてください。カメラでの撮影も、HTTPS か localhost でないとブラウザが許可しません。
+- **合言葉を強いものにする。** 総当たり対策は入れていません。社外に公開するなら、
+  リバースプロキシ側でレート制限をかけてください。
+- 認証は合言葉の共有制です。誰が書いたかは各自が入力した表示名の自己申告のままで、
+  この点はアーティファクト版と変わりません。
+
+### 構成
+
+```
+Dockerfile / docker-compose.yml   … node:22-alpine、依存パッケージなし
+server/server.mjs                 … 文書ストア・アセット・認証・AI中継
+server/shim.js                    … ブラウザに配る window.claude の実装
+index.html / guide.html           … アーティファクト版と同一ファイル
+```
+
+サーバーは `index.html` をリクエストのたびに読み、アーティファクト実行環境と同じ
+HTML スケルトンで包んで返します。アプリ本体を更新したら、コンテナを再起動するだけで反映されます。
+
 ## 制約
 
 - 動作には Claude Artifact のランタイム（`db` / `assets` / `downloads`）が必要です。

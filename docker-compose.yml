@@ -1,0 +1,22 @@
+services:
+  drawing-hub:
+    build: .
+    image: drawing-hub
+    container_name: drawing-hub
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8080}:8080"
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      EDITOR_PASSWORD: ${EDITOR_PASSWORD:?EDITOR_PASSWORD is required}
+      VIEWER_PASSWORD: ${VIEWER_PASSWORD:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-5}
+    volumes:
+      - drawing-hub-data:/data
+      # 開発中はソースを直接反映させたいので、次の2行を有効にしてください
+      # - ./index.html:/app/index.html:ro
+      # - ./guide.html:/app/guide.html:ro
+
+volumes:
+  drawing-hub-data:
