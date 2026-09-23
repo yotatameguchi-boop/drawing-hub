@@ -558,22 +558,57 @@ function warp(img,quad,maxSide){
   return out;
 }
 
+/* 画素値からグレースケール（ITU-R BT.601）。 */
+function gray(d,W,H){
+  const g=new Float64Array(W*H);
+  for(let i=0,p=0;p<W*H;i+=4,p++)g[p]=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+  return g;
+}
+/* 局所統計。積分画像を2枚（値と二乗）作り、任意の窓の平均と標準偏差を O(1) で返す。
+   scikit-image の threshold_sauvola / OpenCV ximgproc と同じ作り。 */
+function localStats(g,W,H){
+  const S1=new Float64Array((W+1)*(H+1)), S2=new Float64Array((W+1)*(H+1));
+  for(let y=0;y<H;y++){
+    let r1=0,r2=0;
+    for(let x=0;x<W;x++){
+      const v=g[y*W+x]; r1+=v; r2+=v*v;
+      S1[(y+1)*(W+1)+x+1]=S1[y*(W+1)+x+1]+r1;
+      S2[(y+1)*(W+1)+x+1]=S2[y*(W+1)+x+1]+r2;
+    }
+  }
+  return (x,y,r,out)=>{
+    const x0=Math.max(0,x-r),y0=Math.max(0,y-r),x1=Math.min(W,x+r+1),y1=Math.min(H,y+r+1);
+    const n=(x1-x0)*(y1-y0);
+    const s1=S1[y1*(W+1)+x1]-S1[y0*(W+1)+x1]-S1[y1*(W+1)+x0]+S1[y0*(W+1)+x0];
+    const s2=S2[y1*(W+1)+x1]-S2[y0*(W+1)+x1]-S2[y1*(W+1)+x0]+S2[y0*(W+1)+x0];
+    const m=s1/n;
+    out[0]=m; out[1]=Math.sqrt(Math.max(0,s2/n-m*m));
+    return out;
+  };
+}
+const SAUVOLA_K=0.2, SAUVOLA_R=128;
+/* 紙の陰影を飛ばす／線画に落とす。
+   線画は Sauvola の適応二値化：しきい値を T = m(1 + k(s/R - 1)) で画素ごとに決める。
+   単純な平均しきい値と違い、真っ白な余白では s が小さく T が下がるので、
+   紙の細かなムラを線として拾わない。 */
 function finish(cv,mode){
   if(mode==="raw")return cv;
   const ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
   const im=ctx.getImageData(0,0,W,H),d=im.data;
-  const g=new Float64Array(W*H);
-  for(let i=0,p=0;i<d.length;i+=4,p++)g[p]=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-  const ii=new Float64Array((W+1)*(H+1));
-  for(let y=0;y<H;y++){let row=0;for(let x=0;x<W;x++){row+=g[y*W+x];ii[(y+1)*(W+1)+x+1]=ii[y*(W+1)+x+1]+row;}}
-  const r=Math.max(8,Math.round(Math.min(W,H)/26));
+  const g=gray(d,W,H), stat=localStats(g,W,H), st=[0,0];
+  const rBg=Math.max(8,Math.round(Math.min(W,H)/26));  // 紙の地色を見る窓
+  const rTx=Math.max(6,Math.round(Math.min(W,H)/90));  // 線幅くらいの窓
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-    const x0=Math.max(0,x-r),y0=Math.max(0,y-r),x1=Math.min(W,x+r+1),y1=Math.min(H,y+r+1);
-    const s=ii[y1*(W+1)+x1]-ii[y0*(W+1)+x1]-ii[y1*(W+1)+x0]+ii[y0*(W+1)+x0];
-    const mean=s/((x1-x0)*(y1-y0))||1;
-    const ratio=g[y*W+x]/mean;
-    let v=mode==="line"?(ratio<0.87?0:255):Math.max(0,Math.min(255,(ratio-0.12)/0.88*255));
-    const o=(y*W+x)*4;d[o]=d[o+1]=d[o+2]=v;
+    const v=g[y*W+x];
+    let out;
+    if(mode==="line"){
+      stat(x,y,rTx,st);
+      out=v < st[0]*(1+SAUVOLA_K*(st[1]/SAUVOLA_R-1)) ? 0 : 255;
+    }else{
+      stat(x,y,rBg,st);
+      out=Math.max(0,Math.min(255,(v/(st[0]||1)-0.12)/0.88*255));
+    }
+    const o=(y*W+x)*4;d[o]=d[o+1]=d[o+2]=out;
   }
   ctx.putImageData(im,0,0);
   return cv;
@@ -896,34 +931,104 @@ function revToCanvas(rev,W){
   });
 }
 
+/* 線だけを取り出した二値マスク。露出やコントラストの差をここで吸収しておく。 */
+function inkMask(cv){
+  const W=cv.width,H=cv.height;
+  const d=cv.getContext("2d").getImageData(0,0,W,H).data;
+  const g=gray(d,W,H), stat=localStats(g,W,H), st=[0,0];
+  const r=Math.max(6,Math.round(Math.min(W,H)/90));
+  const m=new Uint8Array(W*H);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    stat(x,y,r,st);
+    m[y*W+x]=g[y*W+x] < st[0]*(1+SAUVOLA_K*(st[1]/SAUVOLA_R-1)) ? 1 : 0;
+  }
+  return m;
+}
+/* 分離可能な膨張（横→縦の最大値フィルタ）。区間和が 0 より大きいかで判定するので O(WH)。 */
+function dilate(m,W,H,r){
+  const ps=new Int32Array((W+1)*H), t=new Uint8Array(W*H);
+  for(let y=0;y<H;y++){let a=0;for(let x=0;x<W;x++){a+=m[y*W+x];ps[y*(W+1)+x+1]=a;}}
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const x0=Math.max(0,x-r),x1=Math.min(W,x+r+1);
+    t[y*W+x]=ps[y*(W+1)+x1]-ps[y*(W+1)+x0]>0?1:0;
+  }
+  const qs=new Int32Array(W*(H+1)), o=new Uint8Array(W*H);
+  for(let x=0;x<W;x++){let a=0;for(let y=0;y<H;y++){a+=t[y*W+x];qs[x*(H+1)+y+1]=a;}}
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const y0=Math.max(0,y-r),y1=Math.min(H,y+r+1);
+    o[y*W+x]=qs[x*(H+1)+y1]-qs[x*(H+1)+y0]>0?1:0;
+  }
+  return o;
+}
+/* 2枚がぴったり重なっていない分を平行移動で吸収する。
+   粗い解像度に落として総当たりし、線が一番重なる移動量を選ぶ（ブロックマッチング）。
+   撮影した図面どうしを比べるときは、これが無いと紙のずれが全部「変更」になる。 */
+function bestShift(a,b,W,H,maxPx){
+  const sc=Math.max(1,Math.round(W/240));
+  const w=Math.floor(W/sc),h=Math.floor(H/sc);
+  const down=(m)=>{
+    const o=new Uint8Array(w*h);
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      let c=0;
+      for(let j=0;j<sc;j++)for(let i=0;i<sc;i++)c+=m[(y*sc+j)*W+x*sc+i];
+      o[y*w+x]=c>sc*sc*0.16?1:0;
+    }
+    return o;
+  };
+  const A=down(a),B=down(b);
+  const lim=Math.max(1,Math.round(maxPx/sc));
+  let best=[0,0],score=-1;
+  for(let dy=-lim;dy<=lim;dy++)for(let dx=-lim;dx<=lim;dx++){
+    let hit=0;
+    for(let y=Math.max(0,-dy);y<Math.min(h,h-dy);y++){
+      const ra=y*w, rb=(y+dy)*w+dx;
+      for(let x=Math.max(0,-dx);x<Math.min(w,w-dx);x++) if(A[ra+x]&&B[rb+x])hit++;
+    }
+    if(hit>score){score=hit;best=[dx*sc,dy*sc];}
+  }
+  return best;
+}
+/* 変更箇所の検出。
+   1) 両方を線のマスクにする  2) 平行移動のずれを合わせる
+   3) 相手を膨張させてから差を取る（1〜2画素のにじみを変更と見なさない）
+   4) 追加された線と消えた線を別々に数え、格子に落として連結成分をまとめる */
 function diffBoxes(ca,cb,cols){
   const W=ca.width,H=ca.height;
-  const A=ca.getContext("2d").getImageData(0,0,W,H).data;
-  const B=cb.getContext("2d").getImageData(0,0,W,H).data;
+  const A=inkMask(ca), B0=inkMask(cb);
+  const [dx,dy]=bestShift(A,B0,W,H,Math.max(4,Math.round(W*0.02)));
+  const B=new Uint8Array(W*H);
+  for(let y=0;y<H;y++){
+    const sy=y+dy; if(sy<0||sy>=H)continue;
+    for(let x=0;x<W;x++){const sx=x+dx; if(sx>=0&&sx<W)B[y*W+x]=B0[sy*W+sx];}
+  }
+  const r=Math.max(2,Math.round(W*0.0022));
+  const Ad=dilate(A,W,H,r), Bd=dilate(B,W,H,r);
   const rows=Math.max(1,Math.round(cols*H/W));
   const cw=W/cols,ch=H/rows;
-  const cnt=new Float32Array(cols*rows);
+  const add=new Float32Array(cols*rows), del=new Float32Array(cols*rows);
+  let nAdd=0,nDel=0;
   for(let y=0;y<H;y++){
     const gy=Math.min(rows-1,(y/ch)|0);
     for(let x=0;x<W;x++){
-      const i=(y*W+x)*4;
-      const va=(A[i]+A[i+1]+A[i+2])/3,vb=(B[i]+B[i+1]+B[i+2])/3;
-      if(Math.abs(va-vb)>46)cnt[gy*cols+Math.min(cols-1,(x/cw)|0)]++;
+      const i=y*W+x, gi=gy*cols+Math.min(cols-1,(x/cw)|0);
+      if(B[i]&&!Ad[i]){add[gi]++;nAdd++;}
+      if(A[i]&&!Bd[i]){del[gi]++;nDel++;}
     }
   }
-  const thr=cw*ch*0.014;
+  const thr=cw*ch*0.010;
   const on=new Uint8Array(cols*rows);
-  for(let i=0;i<cnt.length;i++)on[i]=cnt[i]>thr?1:0;
+  for(let i=0;i<on.length;i++)on[i]=(add[i]+del[i])>thr?1:0;
   const seen=new Uint8Array(cols*rows),out=[];
   for(let i=0;i<on.length;i++){
     if(!on[i]||seen[i])continue;
     const q=[i];seen[i]=1;
-    let x0=i%cols,x1=x0,y0=(i/cols)|0,y1=y0,size=0;
+    let x0=i%cols,x1=x0,y0=(i/cols)|0,y1=y0,size=0,ai=0,di=0;
     while(q.length){
-      const c=q.pop(),cx=c%cols,cy=(c/cols)|0;size++;
+      const c=q.pop(),cx=c%cols,cy=(c/cols)|0;
+      size++;ai+=add[c];di+=del[c];
       if(cx<x0)x0=cx; if(cx>x1)x1=cx; if(cy<y0)y0=cy; if(cy>y1)y1=cy;
-      [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].forEach(([dx,dy])=>{
-        const nx=cx+dx,ny=cy+dy;
+      [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].forEach(([mx,my])=>{
+        const nx=cx+mx,ny=cy+my;
         if(nx<0||ny<0||nx>=cols||ny>=rows)return;
         const ni=ny*cols+nx;
         if(on[ni]&&!seen[ni]){seen[ni]=1;q.push(ni);}
@@ -931,15 +1036,15 @@ function diffBoxes(ca,cb,cols){
     }
     if(size<3)continue;
     out.push({x1:Math.max(0,(x0-1)/cols),y1:Math.max(0,(y0-1)/rows),
-              x2:Math.min(1,(x1+2)/cols),y2:Math.min(1,(y1+2)/rows),size});
+              x2:Math.min(1,(x1+2)/cols),y2:Math.min(1,(y1+2)/rows),
+              size,kind:ai>=di?"added":"removed"});
   }
-  const big=out.sort((a,b)=>b.size-a.size);
   const keep=[];
-  big.forEach(b=>{
-    const inside=keep.some(k=>b.x1>=k.x1-1e-6&&b.y1>=k.y1-1e-6&&b.x2<=k.x2+1e-6&&b.y2<=k.y2+1e-6);
-    if(!inside)keep.push(b);
+  out.sort((a,b)=>b.size-a.size).forEach(bx=>{
+    const inside=keep.some(k=>bx.x1>=k.x1-1e-6&&bx.y1>=k.y1-1e-6&&bx.x2<=k.x2+1e-6&&bx.y2<=k.y2+1e-6);
+    if(!inside)keep.push(bx);
   });
-  return keep.slice(0,12);
+  return {boxes:keep.slice(0,12), added:nAdd, removed:nDel, shift:[dx,dy]};
 }
 
 const AI_PROMPT=(p,d,r)=>`あなたは日本の建築実務で検図を担当する一級建築士です。添付画像は「${p.name}」（${p.phase||"設計"}）の図面 ${d.no}「${d.title}」（分野：${d.discipline||"意匠"}／縮尺：${d.scale||"不明"}／Rev.${r.rev}）です。
@@ -1003,6 +1108,196 @@ function next3DLetter(){
 }
 </script>
 <script>
+/* ============ BCF 2.1 書き出し ============
+   BCF (BIM Collaboration Format) は buildingSMART の指摘交換の公開標準で、
+   Revit・Navisworks・Solibri・BIMcollab など主要なBIMツールが読み書きできる。
+   仕様: buildingSMART/BCF-XML release_2_1。
+   .bcfzip は「トピックのGUIDごとのフォルダに markup.bcf / viewpoint.bcfv /
+   snapshot.png を入れた ZIP」という素直な構造なので、外部ライブラリ無しで書ける。
+
+   Drawing Hub の指摘と BCF トピックは、もともと形がほぼ同じ。
+     件名→Title、内容→Description、分類→Labels、担当→AssignedTo、期限→DueDate、
+     返信→Comment、そして 3D指摘のカメラ→Viewpoint の PerspectiveCamera。
+   3D指摘がカメラ位置ごと保存されているので、受け取った側は同じアングルで開ける。 */
+
+const ZIPDATE = (d) => {
+  const t = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xffff;
+  const dt = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xffff;
+  return [t, dt];
+};
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(buf) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+/* 無圧縮(store)のZIPを組み立てる。BCFの中身は小さなXMLとPNGなので圧縮は要らない。 */
+function zipStore(entries) {
+  const enc = new TextEncoder();
+  const now = new Date(), [tm, dt] = ZIPDATE(now);
+  const locals = [], central = [];
+  let offset = 0;
+  for (const e of entries) {
+    const name = enc.encode(e.name);
+    const data = e.data || new Uint8Array(0);
+    const crc = crc32(data);
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true);
+    lh.setUint16(6, 0x0800, true);      // UTF-8 のファイル名
+    lh.setUint16(8, 0, true);           // 無圧縮
+    lh.setUint16(10, tm, true); lh.setUint16(12, dt, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true);
+    lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+    locals.push(new Uint8Array(lh.buffer), name, data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+    ch.setUint16(12, tm, true); ch.setUint16(14, dt, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
+    ch.setUint16(28, name.length, true);
+    ch.setUint32(38, e.dir ? 0x10 : 0, true);   // ディレクトリ属性
+    ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), name);
+    offset += 30 + name.length + data.length;
+  }
+  const cdSize = central.reduce((n, b) => n + b.length, 0);
+  const eo = new DataView(new ArrayBuffer(22));
+  eo.setUint32(0, 0x06054b50, true);
+  eo.setUint16(8, entries.length, true); eo.setUint16(10, entries.length, true);
+  eo.setUint32(12, cdSize, true); eo.setUint32(16, offset, true);
+  return new Blob([...locals, ...central, new Uint8Array(eo.buffer)], { type: "application/octet-stream" });
+}
+/* 指摘のIDから決まったGUIDを作る。同じ指摘を書き出し直しても同じGUIDになるので、
+   受け取った側で二重登録にならない。 */
+function guidFrom(str) {
+  let a = 0x811c9dc5, b = 0x1000193, c = 0xdeadbeef, d = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    a = Math.imul(a ^ ch, 16777619) >>> 0; b = Math.imul(b ^ ch, 2246822519) >>> 0;
+    c = Math.imul(c ^ ch, 3266489917) >>> 0; d = Math.imul(d ^ ch, 668265263) >>> 0;
+  }
+  const h = (n) => (n >>> 0).toString(16).padStart(8, "0");
+  const x = h(a) + h(b) + h(c) + h(d);
+  return `${x.slice(0, 8)}-${x.slice(8, 12)}-4${x.slice(13, 16)}-a${x.slice(17, 20)}-${x.slice(20, 32)}`;
+}
+const xe = (v) => String(v == null ? "" : v)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const bcfDate = (iso) => { const d = new Date(iso); return isNaN(d) ? new Date().toISOString() : d.toISOString(); };
+const BCF_STATUS = { open: "Open", doing: "In Progress", done: "Closed" };
+const BCF_PRIORITY = { "高": "High", "中": "Normal", "低": "Low" };
+
+/* three.js は Y が上、IFC / BCF は Z が上。座標系を合わせる。 */
+const toZUp = (v) => [v[0], -v[2], v[1]];
+function bcfViewpoint(m) {
+  if (!m.cam || !m.cam.p) return `<?xml version="1.0" encoding="UTF-8"?>
+<VisualizationInfo Guid="${guidFrom(m.id + ":vp")}"/>`;
+  const p = toZUp(m.cam.p), t = toZUp(m.cam.t || [0, 0, 0]);
+  const dv = [t[0] - p[0], t[1] - p[1], t[2] - p[2]];
+  const len = Math.hypot(dv[0], dv[1], dv[2]) || 1;
+  const dir = dv.map(n => n / len);
+  const v3 = (tag, a) => `<${tag}><X>${a[0].toFixed(6)}</X><Y>${a[1].toFixed(6)}</Y><Z>${a[2].toFixed(6)}</Z></${tag}>`;
+  const cam = m.cam.iso
+    ? `<OrthogonalCamera>${v3("CameraViewPoint", p)}${v3("CameraDirection", dir)}${v3("CameraUpVector", [0, 0, 1])}<ViewToWorldScale>40</ViewToWorldScale></OrthogonalCamera>`
+    : `<PerspectiveCamera>${v3("CameraViewPoint", p)}${v3("CameraDirection", dir)}${v3("CameraUpVector", [0, 0, 1])}<FieldOfView>46</FieldOfView></PerspectiveCamera>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<VisualizationInfo Guid="${guidFrom(m.id + ":vp")}">${cam}</VisualizationInfo>`;
+}
+function bcfMarkup(m, proj, dwg, hasSnap) {
+  const g = guidFrom(m.id), vg = guidFrom(m.id + ":vp");
+  const label = [m.kind, dwg.no, m.view === "3d" ? "3D" : null, m.ai ? "AI検図" : null]
+    .filter(Boolean).map(t => `    <Labels>${xe(t)}</Labels>`).join("\n");
+  const comments = (m.replies || []).map((r, i) => `  <Comment Guid="${guidFrom(m.id + ":c" + i)}">
+    <Date>${bcfDate(r.at)}</Date>
+    <Author>${xe(r.by || "unknown")}</Author>
+    <Comment>${xe(r.text)}</Comment>
+    <Viewpoint Guid="${vg}"/>
+  </Comment>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Markup>
+  <Header>
+    <File>
+      <Filename>${xe(dwg.no + " " + dwg.title)}</Filename>
+      <Date>${bcfDate(dwg.createdAt)}</Date>
+      <Reference>${xe(dwg.no)}</Reference>
+    </File>
+  </Header>
+  <Topic Guid="${g}" TopicType="Issue" TopicStatus="${BCF_STATUS[m.status] || "Open"}">
+    <Title>${xe(m.title)}</Title>
+    <Priority>${BCF_PRIORITY[m.severity] || "Normal"}</Priority>
+    <Index>${m.no || 0}</Index>
+${label}
+    <CreationDate>${bcfDate(m.at)}</CreationDate>
+    <CreationAuthor>${xe(m.by || "unknown")}</CreationAuthor>
+${m.due ? `    <DueDate>${bcfDate(m.due + "T00:00:00Z")}</DueDate>\n` : ""}${m.assignee ? `    <AssignedTo>${xe(m.assignee)}</AssignedTo>\n` : ""}    <Description>${xe([m.body, `工事: ${proj.name}`, `図面: ${dwg.no} ${dwg.title}  Rev.${m.rev}`].filter(Boolean).join("\n\n"))}</Description>
+    <Stage>${xe(proj.phase || "")}</Stage>
+  </Topic>
+${comments}${comments ? "\n" : ""}  <Viewpoint Guid="${vg}">
+    <Viewpoint>viewpoint.bcfv</Viewpoint>
+${hasSnap ? "    <Snapshot>snapshot.png</Snapshot>\n" : ""}    <Index>0</Index>
+  </Viewpoint>
+</Markup>`;
+}
+/* 2D の指摘は、図面にピンを描いた画像を snapshot.png として同梱する。
+   BCF ビューアは基本これを最初に見せるので、受け取り側が一番早く状況をつかめる。 */
+async function bcfSnapshot(m, cache) {
+  if (m.view === "3d" || !m.rev) return null;
+  const rev = S.revs.find(r => r.rev === m.rev && (r.view || "2d") === "2d") || revsIn("2d").slice(-1)[0];
+  if (!rev) return null;
+  if (!cache[rev.id]) { try { cache[rev.id] = await revToCanvas(rev, 1400); } catch { return null; } }
+  const src = cache[rev.id];
+  const c = document.createElement("canvas");
+  c.width = src.width; c.height = src.height;
+  const g = c.getContext("2d");
+  g.drawImage(src, 0, 0);
+  const x = m.x * c.width, y = m.y * c.height, r = Math.max(14, c.width * 0.016);
+  g.lineWidth = Math.max(2, c.width * 0.0028);
+  g.strokeStyle = "#BC3B2B"; g.fillStyle = "rgba(188,59,43,.14)";
+  g.beginPath(); g.arc(x, y, r * 1.9, 0, 7); g.fill(); g.stroke();
+  g.beginPath(); g.moveTo(x - r * 3, y); g.lineTo(x - r * 2.2, y);
+  g.moveTo(x + r * 2.2, y); g.lineTo(x + r * 3, y);
+  g.moveTo(x, y - r * 3); g.lineTo(x, y - r * 2.2);
+  g.moveTo(x, y + r * 2.2); g.lineTo(x, y + r * 3); g.stroke();
+  g.fillStyle = "#BC3B2B";
+  g.font = `700 ${Math.round(r * 1.5)}px "Roboto Mono", monospace`;
+  g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText("#" + m.no, x, y - r * 4);
+  const blob = await new Promise(ok => c.toBlob(ok, "image/png"));
+  return blob ? new Uint8Array(await blob.arrayBuffer()) : null;
+}
+async function exportBcf() {
+  if (!S.dl) { toast("この環境では書き出せません"); return; }
+  const proj = curProj(), dwg = curDwg();
+  if (!dwg || !S.marks.length) { toast("書き出す指摘がありません"); return; }
+  toast("BCFを組み立てています…");
+  try {
+    const enc = new TextEncoder();
+    const files = [{
+      name: "bcf.version",
+      data: enc.encode(`<?xml version="1.0" encoding="UTF-8"?>
+<Version VersionId="2.1"><DetailedVersion>2.1</DetailedVersion></Version>`)
+    }];
+    const cache = {};
+    for (const m of S.marks) {
+      const g = guidFrom(m.id);
+      const snap = await bcfSnapshot(m, cache);
+      files.push({ name: g + "/", data: new Uint8Array(0), dir: true });
+      files.push({ name: g + "/markup.bcf", data: enc.encode(bcfMarkup(m, proj, dwg, !!snap)) });
+      files.push({ name: g + "/viewpoint.bcfv", data: enc.encode(bcfViewpoint(m)) });
+      if (snap) files.push({ name: g + "/snapshot.png", data: snap });
+    }
+    await S.dl.save({ filename: `${dwg.no}_${proj.name}.bcfzip`, data: zipStore(files) });
+    toast(`${S.marks.length} 件の指摘を BCF 2.1 で書き出しました`);
+  } catch (e) {
+    if (!(e && e.code === "declined")) toast("書き出せませんでした");
+  }
+}
+
+</script>
+<script>
 /* ============ アイコンと行 ============ */
 const sv=(d)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICON={
@@ -1021,7 +1316,8 @@ const ICON={
   box:sv('<path d="M4 8l8-4 8 4v8l-8 4-8-4V8z"/><path d="M4 8l8 4 8-4M12 12v8"/>'),
   gear:sv('<circle cx="12" cy="12" r="3.1"/><path d="M12 3.6v2.1M12 18.3v2.1M20.4 12h-2.1M5.7 12H3.6M17.9 6.1l-1.5 1.5M7.6 16.4l-1.5 1.5M17.9 17.9l-1.5-1.5M7.6 7.6L6.1 6.1"/>'),
   home:sv('<path d="M4 11.2L12 4.6l8 6.6V20h-5.6v-4.8H9.6V20H4v-8.8z"/>'),
-  plus:sv('<path d="M12 5.5v13M5.5 12h13"/>')
+  plus:sv('<path d="M12 5.5v13M5.5 12h13"/>'),
+  swap:sv('<path d="M4 8.5h13l-3.4-3.4M20 15.5H7l3.4 3.4"/>')
 };
 const DCOL={"意匠":"#2C5AA0","構造":"#B0701A","設備":"#2A7A56","外構":"#1F7A74"};
 function sec(h,title,right){
@@ -1174,6 +1470,9 @@ SCREENS.drawing={
     c3.appendChild(irow({ico:"link",color:"#B0701A",title:"関連図面",sub:(d.refIds&&d.refIds.length)?`${d.refIds.length} 件と連動`:"更新の波及先を決める",on:()=>go("refs")}));
     c3.appendChild(irow({ico:"stamp",color:"#1E3A5F",title:"検図結果",sub:d.review?`${esc(d.review.result)}（${esc(d.review.by||"")}）`:"承認・条件付承認・要修正",on:()=>go("review")}));
     c3.appendChild(irow({ico:"table",color:"#5A6675",title:"検図リスト",sub:S.dl?"指摘一覧をCSVで書き出す":"この環境では書き出せません",disabled:!S.dl,on:exportCsv}));
+    c3.appendChild(irow({ico:"swap",color:"#4A5B7A",title:"BCFで書き出す",
+      sub:S.dl?"Revit・Navisworks・Solibri に指摘を渡す":"この環境では書き出せません",
+      disabled:!S.dl||!S.marks.length,on:exportBcf}));
   }
 };
 
@@ -1574,14 +1873,20 @@ async function autoCloud(){
   try{
     const [ca,cb]=await Promise.all([revToCanvas(c,1100),revToCanvas(r,1100)]);
     if(ca.height!==cb.height){toast("版の縦横比が違うため比較できません");return;}
-    const boxes=diffBoxes(ca,cb,88);
-    if(!boxes.length){toast("変更箇所は検出されませんでした");return;}
-    if(!confirm(`変更箇所を ${boxes.length} か所検出しました。Rev.${r.rev} に改訂雲を打ちますか。`))return;
-    for(const b of boxes){
+    const res=diffBoxes(ca,cb,88);
+    if(!res.boxes.length){toast("変更箇所は検出されませんでした");return;}
+    const nAdd=res.boxes.filter(b=>b.kind==="added").length;
+    const nDel=res.boxes.length-nAdd;
+    const shifted=Math.hypot(res.shift[0],res.shift[1])>2
+      ? `\n（2枚のずれ ${Math.round(res.shift[0])}, ${Math.round(res.shift[1])} px を補正して比較しました）` : "";
+    if(!confirm(`変更箇所を ${res.boxes.length} か所検出しました。`+
+      `\n加わった箇所 ${nAdd} / 消えた箇所 ${nDel}${shifted}`+
+      `\n\nRev.${r.rev} に改訂雲を打ちますか。`))return;
+    for(const b of res.boxes){
       await S.db.collection(`${dwgPath()}/edits`).add({type:"cloud",pts:[[b.x1,b.y1],[b.x2,b.y2]],
-        color:"shu",width:2,rev:r.rev,auto:true,by:S.me||"名無し",at:nowISO()});
+        color:"shu",width:2,rev:r.rev,auto:true,diff:b.kind,by:S.me||"名無し",at:nowISO()});
     }
-    toast(`改訂雲を ${boxes.length} か所に打ちました`);
+    toast(`改訂雲を ${res.boxes.length} か所に打ちました`);
   }catch(e){toast("解析できませんでした");}
 }
 
