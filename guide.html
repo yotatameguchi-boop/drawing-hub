@@ -144,7 +144,7 @@ tr:last-child td{border-bottom:0}
   <h2><span class="n">04 / TOOLS</span>効いてくる機能</h2>
   <div class="card">
     <div class="row"><span class="ico" style="background:#6B4C9A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3.2" y="5.5" width="10" height="13" rx="1.6"/><rect x="10.8" y="5.5" width="10" height="13" rx="1.6"/></svg></span>
-      <span class="rt"><b>版を比較</b><span>旧版を朱・新版を紺で<b>重ねる</b>／境界を動かす<b>ワイプ</b>／<b>並べて</b>の3通り。さらに「変更箇所に雲マーク」を押すと、2つの版の差分から変わった範囲を検出して、<b>改訂雲を自動で打ちます</b>。囲い忘れがなくなります。</span></span></div>
+      <span class="rt"><b>版を比較</b><span>旧版を朱・新版を紺で<b>重ねる</b>／境界を動かす<b>ワイプ</b>／<b>並べて</b>の3通り。さらに「変更箇所に雲マーク」を押すと、変わった範囲を検出して<b>改訂雲を自動で打ちます</b>。撮影のずれは自動で位置合わせしてから比べるので、<b>紙がずれて写っただけの箇所は拾いません</b>。加わった線と消えた線は分けて数えます。</span></span></div>
     <div class="row"><span class="ico" style="background:#234B85"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.8 3.5l1.7 4.8 4.8 1.7-4.8 1.7-1.7 4.8-1.7-4.8L4.3 10l4.8-1.7 1.7-4.8z"/><path d="M18 14.6l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"/></svg></span>
       <span class="rt"><b>AI検図</b><span>Claude が図面を読み、法規・納まり・整合・設備の取り合いの観点で指摘候補を挙げます。<b>候補は採用するまで記録されません。</b>採用したものだけが指摘として起票され、同時に図面のその範囲へ改訂雲と件名が入ります。</span></span></div>
     <div class="row"><span class="ico" style="background:#1F7A74"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l8 4.4v8.8l-8 4.4-8-4.4V7.6l8-4.4z"/><path d="M4 7.6l8 4.4 8-4.4M12 12v8.8"/></svg></span>
@@ -157,6 +157,8 @@ tr:last-child td{border-bottom:0}
       <span class="rt"><b>発行セット</b><span>ある時点の全図面の版をまとめて凍結し、発行日と宛先つきで記録します。確認申請・見積・施工で「いつ誰にどの版を渡したか」は後から必ず問われます。図面目録はCSVで書き出せます。</span></span></div>
     <div class="row"><span class="ico" style="background:#5A6675"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 10h17M9.2 10v9"/></svg></span>
       <span class="rt"><b>検図リスト</b><span>指摘の一覧をCSVで書き出します。Excelでそのまま開ける形式なので、打合せ資料や是正指示書に転用できます。</span></span></div>
+    <div class="row"><span class="ico" style="background:#4A5B7A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h13l-3.4-3.4M20 15.5H7l3.4 3.4"/></svg></span>
+      <span class="rt"><b>BCFで書き出す</b><span>指摘一式を <b>BCF 2.1</b>（buildingSMART の指摘交換の標準形式）で書き出します。Revit・Navisworks・Solibri・BIMcollab がそのまま読み込めるので、BIM側で作業している人に指摘を渡せます。件名・内容・分類・状態・担当・期限・返信がそのまま対応し、<b>3Dの指摘はカメラのアングルごと</b>渡るので、受け取った側は同じ視点で開けます。2Dの指摘には、図面にピンを描いた画像が付きます。</span></span></div>
   </div>
 
   <h2><span class="n">05 / SHARING</span>共有と権限</h2>
